@@ -40,17 +40,93 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find()
-        .populate("category", "name slug")
-        .sort({ createdAt: -1 });
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
 
-    return res.status(200).json(
-        new ApiResponse(
-            200,
+    const skip = (page - 1) * limit;
+    const { 
+        search,
+        category,
+        brand,
+        sort,
+        featured,
+        minPrice,
+        maxPrice
+    } = req.query;
+
+    const filter = {};
+
+    if (search) {
+        filter.title = {
+        $regex: search,
+        $options: "i",
+        };
+    }
+    if (category) {
+    filter.category = category;
+    }
+    if (brand) {
+    filter.brand = brand;
+    }
+    if (featured) {
+    filter.featured = featured === "true";
+    }
+    if (minPrice || maxPrice) {
+    filter.price = {};
+
+    if (minPrice) {
+        filter.price.$gte = Number(minPrice);
+    }
+
+    if (maxPrice) {
+        filter.price.$lte = Number(maxPrice);
+        }
+    }
+    let sortOption = { createdAt: -1 };
+
+    if (sort) {
+    switch (sort) {
+        case "price":
+            sortOption = { price: 1 };
+            break;
+
+        case "-price":
+            sortOption = { price: -1 };
+            break;
+
+        case "latest":
+            sortOption = { createdAt: -1 };
+            break;
+
+        case "oldest":
+            sortOption = { createdAt: 1 };
+            break;
+
+        default:
+            sortOption = { createdAt: -1 };
+        }
+    }
+
+    const totalProducts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducts / limit);
+    const products = await Product.find(filter)
+        .populate("category", "name slug")
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit);
+  return res.status(200).json(
+    new ApiResponse(
+        200,
+        {
             products,
-            "Products fetched successfully"
-        )
-    );
+            totalProducts,
+            totalPages,
+            currentPage: page,
+        },
+        "Products fetched successfully"
+    )
+);
+
 });
 
 const getProductById = asyncHandler(async (req, res) => {

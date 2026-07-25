@@ -7,10 +7,7 @@ const createCategoryValidator = () => {
             .notEmpty()
             .withMessage("Category name is required"),
 
-        body("slug")
-            .trim()
-            .notEmpty()
-            .withMessage("Category slug is required"),
+       
     ];
 };
 

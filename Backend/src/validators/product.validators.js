@@ -3,14 +3,14 @@ import { body } from "express-validator";
 const createProductValidator = () => {
   return [
     body("title")
-      .trim()
-      .notEmpty()
-      .withMessage("Product title is required"),
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage("Title must be at least 3 characters long"),
 
     body("description")
-      .trim()
-      .notEmpty()
-      .withMessage("Description is required"),
+    .trim()
+    .isLength({ min: 10 })
+    .withMessage("Description must be at least 10 characters long"),
 
     body("price")
       .isFloat({ min: 0 })
@@ -22,9 +22,12 @@ const createProductValidator = () => {
       .withMessage("Discount price must be a positive number"),
 
     body("category")
-      .notEmpty()
-      .withMessage("Category is required"),
-
+    .notEmpty()
+    .withMessage("Category is required")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid category id"),
+    
     body("brand")
       .trim()
       .notEmpty()

@@ -2,9 +2,14 @@ import { Category } from "../models/category.models.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import slugify from "slugify";
 
 const createCategory = asyncHandler(async (req, res) => {
-    const { name, slug, description } = req.body;
+    const { name,  description } = req.body;
+    const slug = slugify(name, {
+    lower: true,
+    strict: true,
+    });
 
     const categoryExists = await Category.findOne({
         $or: [{ name }, { slug }],
