@@ -25,4 +25,20 @@ const createCategory = asyncHandler(async (req, res) => {
     );
 });
 
-export { createCategory };
+const getAllCategories = asyncHandler(async (req, res) => {
+    const categories = await Category.find().sort({ name: 1 });
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            categories,
+            "Categories fetched successfully"
+        )
+    );
+});
+
+export {
+    createCategory,
+    getAllCategories,
+};
+
