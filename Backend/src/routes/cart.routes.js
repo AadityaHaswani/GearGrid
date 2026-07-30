@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { addToCartValidator,updateCartQuantityValidator,removeFromCartValidator } from "../validators/cart.validators.js";
+import { validate } from "../middlewares/validator.middleware.js";
 
 import {
     addToCart,

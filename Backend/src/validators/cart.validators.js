@@ -1,14 +1,13 @@
 import { body, param } from "express-validator";
 
-export const addToCartValidator = [
+const addToCartValidator = [
     body("productId")
         .notEmpty()
         .withMessage("Product ID is required")
         .isMongoId()
         .withMessage("Invalid Product ID"),
 ];
-
-export const updateCartQuantityValidator = [
+ const updateCartQuantityValidator = [
     param("productId")
         .isMongoId()
         .withMessage("Invalid Product ID"),
@@ -19,9 +18,14 @@ export const updateCartQuantityValidator = [
         .isIn(["increase", "decrease"])
         .withMessage("Action must be either 'increase' or 'decrease'"),
 ];
-
-export const removeFromCartValidator = [
+ const removeFromCartValidator = [
     param("productId")
         .isMongoId()
         .withMessage("Invalid Product ID"),
 ];
+export{
+    addToCartValidator,
+    updateCartQuantityValidator,
+    removeFromCartValidator
+
+}
