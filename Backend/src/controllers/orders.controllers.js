@@ -14,13 +14,23 @@ export const placeOrder = asyncHandler(async (req, res) => {
     if (cart.items.length === 0) {
     throw new ApiError(400, "Cart is empty");
     }
-    const orderItems = cart.items.map((item) => ({
+    for (const item of cart.items) {
+    if (!item.product) {
+        throw new ApiError(
+            400,
+            "One or more products in your cart no longer exist"
+        );
+    }
+}
+
+
+const orderItems = cart.items.map((item) => ({
     product: item.product._id,
-    name: item.product.name,
-    image: item.product.image,
+    name: item.product.title,
+    image: item.product.images[0] || "",
     price: item.product.price,
     quantity: item.quantity,
-    }));
+}));
     const totalAmount = orderItems.reduce((total, item) => {
     return total + item.price * item.quantity;
     }, 0);
@@ -39,4 +49,37 @@ export const placeOrder = asyncHandler(async (req, res) => {
     )
     );
 
+});
+export const getMyOrders = asyncHandler(async (req, res) => {
+    const orders = await Order.find({
+        user: req.user._id,
+    });
+    return res.status(200).json(
+    new ApiResponse(
+        200,
+        orders,
+        "Orders fetched successfully"
+    )
+);
+
+});
+export const getOrderById = asyncHandler(async (req, res) => {
+    const { orderId } = req.params;
+
+    const order = await Order.findOne({
+        _id: orderId,
+        user: req.user._id,
+    });
+
+    if (!order) {
+        throw new ApiError(404, "Order not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            order,
+            "Order fetched successfully"
+        )
+    );
 });
