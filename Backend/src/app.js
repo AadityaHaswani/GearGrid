@@ -31,6 +31,9 @@ import categoryRouter from "./routes/category.routes.js";
 import cartRouter from "./routes/cart.routes.js";
 import productRouter from "./routes/product.routes.js";
 import ordersRouter from "./routes/orders.routes.js";
+import paymentsRouter from "./routes/payments.routes.js";
+
+app.use("/api/v1/payments", paymentsRouter);
 
 
 app.use("/api/v1/products", productRouter);
