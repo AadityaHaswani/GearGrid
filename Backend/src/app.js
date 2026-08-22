@@ -33,6 +33,10 @@ import productRouter from "./routes/product.routes.js";
 import ordersRouter from "./routes/orders.routes.js";
 import paymentsRouter from "./routes/payments.routes.js";
 
+import wishlistRouter from "./routes/wishlists.routes.js";
+
+app.use("/api/v1/wishlist", wishlistRouter);
+
 app.use("/api/v1/payments", paymentsRouter);
 
 
