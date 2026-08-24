@@ -1,0 +1,135 @@
+.bench-section {
+  padding: 60px 0 90px 0;
+  position: relative;
+}
+
+.bench-header-center {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 48px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bench-sub {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.tier-card {
+  background: var(--surface-main);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+.tier-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-medium);
+  transform: translateY(-3px);
+}
+
+.tier-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tier-label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-amber);
+  letter-spacing: 0.06em;
+}
+
+.tier-tag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--surface-elevated);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.tier-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.tier-target {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.tier-specs-box {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tier-spec-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spec-name {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.spec-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tier-best-for {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.tier-card-footer {
+  margin-top: auto;
+}
+
+.tier-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.85rem;
+  gap: 6px;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .tiers-grid {
+    grid-template-columns: 1fr;
+  }
+}

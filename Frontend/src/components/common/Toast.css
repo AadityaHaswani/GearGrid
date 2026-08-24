@@ -1,0 +1,56 @@
+.cyber-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--surface-main);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
+}
+
+.cyber-toast.amber,
+.cyber-toast.cyan {
+  border-color: var(--accent-amber);
+}
+
+.cyber-toast.red,
+.cyber-toast.violet {
+  border-color: var(--accent-red);
+}
+
+.toast-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-amber);
+}
+
+.cyber-toast.red .toast-indicator,
+.cyber-toast.violet .toast-indicator {
+  background: var(--accent-red);
+}
+
+.toast-message {
+  font-weight: 500;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

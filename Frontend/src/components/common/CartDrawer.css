@@ -1,0 +1,248 @@
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.drawer-panel {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  background: var(--bg-main);
+  border-left: 1px solid var(--border-main);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  animation: slideLeft 0.25s ease-out;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-main);
+  background: var(--surface-main);
+}
+
+.drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.drawer-count {
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-main);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+}
+
+.drawer-close-btn {
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.drawer-close-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.drawer-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.4;
+  margin-bottom: 6px;
+}
+
+.drawer-empty h4 {
+  color: var(--text-primary);
+  font-size: 1.15rem;
+}
+
+.empty-action {
+  margin-top: 14px;
+}
+
+.cart-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cart-item-card {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: var(--surface-main);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-md);
+}
+
+.cart-item-thumb {
+  width: 68px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: #000;
+  flex-shrink: 0;
+}
+
+.cart-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-item-cat {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.cart-item-name {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  line-height: 1.3;
+  margin: 2px 0 6px 0;
+  color: var(--text-primary);
+}
+
+.cart-item-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-picker {
+  display: flex;
+  align-items: center;
+  background: var(--bg-main);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-sm);
+}
+
+.qty-btn {
+  padding: 4px 8px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover {
+  color: var(--text-primary);
+}
+
+.qty-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0 8px;
+  color: var(--text-primary);
+}
+
+.cart-remove-btn {
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.cart-remove-btn:hover {
+  color: var(--accent-red);
+}
+
+.drawer-footer {
+  padding: 20px 24px;
+  background: var(--surface-main);
+  border-top: 1px solid var(--border-main);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-main);
+}
+
+.total-label {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.total-val {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 13px;
+  margin-top: 6px;
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

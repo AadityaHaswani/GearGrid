@@ -1,0 +1,55 @@
+:root {
+  /* Amber Edge - Core Hardware Palette */
+  --bg-main: #0B0B0D;
+  --surface-main: #1A1A1F;
+  --surface-elevated: #26262C;
+  --surface-hover: #222228;
+  --surface-glass: rgba(26, 26, 31, 0.85);
+
+  /* Primary Accent: Amber */
+  --accent-amber: #F59E0B;
+  --accent-amber-hover: #D97706;
+  --accent-amber-dim: rgba(245, 158, 11, 0.12);
+  --accent-amber-glow: 0 4px 20px rgba(245, 158, 11, 0.2);
+
+  /* Secondary Accent: Red (used sparingly for warnings/destructives/wishlist) */
+  --accent-red: #EF4444;
+  --accent-red-hover: #DC2626;
+  --accent-red-dim: rgba(239, 68, 68, 0.12);
+
+  /* Typography */
+  --text-primary: #F5F5F5;
+  --text-muted: #A1A1AA;
+  --text-secondary: #A1A1AA;
+  --text-inverse: #0B0B0D;
+
+  /* Industrial Borders */
+  --border-main: #2F3036;
+  --border-subtle: #2F3036;
+  --border-medium: #3E3F47;
+  --border-amber: rgba(245, 158, 11, 0.4);
+  --border-red: rgba(239, 68, 68, 0.4);
+
+  /* Fonts */
+  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+
+  /* Dimensions & Radii */
+  --navbar-height: 74px;
+  --max-width: 1280px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
