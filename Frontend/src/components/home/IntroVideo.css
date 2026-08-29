@@ -1,21 +1,13 @@
+.intro-video-wrapper,
 .intro-video-overlay {
-  position: fixed;
-  inset: 0;
+  position: relative;
   width: 100vw;
   height: 100vh;
   background: #0B0B0D;
-  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  opacity: 1;
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.intro-video-overlay.fading {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .intro-video-element {

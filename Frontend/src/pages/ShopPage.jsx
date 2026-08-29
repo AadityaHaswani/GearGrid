@@ -2,8 +2,34 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { HARDWARE_CATEGORIES, PRODUCTS } from '../data/hardwareData';
 import ProductCard from '../components/shop/ProductCard';
-import { Search, ArrowUpDown } from 'lucide-react';
+import QuickViewDrawer from '../components/shop/QuickViewDrawer';
+import {
+  Search,
+  ArrowUpDown,
+  LayoutGrid,
+  Zap,
+  Cpu,
+  Layers,
+  Monitor,
+  Keyboard,
+  Fan,
+  Server
+} from 'lucide-react';
 import './ShopPage.css';
+
+const getCategoryIcon = (id) => {
+  switch (id) {
+    case 'all': return <LayoutGrid size={15} className="category-item-icon" />;
+    case 'gpus': return <Zap size={15} className="category-item-icon" />;
+    case 'cpus': return <Cpu size={15} className="category-item-icon" />;
+    case 'motherboards': return <Layers size={15} className="category-item-icon" />;
+    case 'monitors': return <Monitor size={15} className="category-item-icon" />;
+    case 'peripherals': return <Keyboard size={15} className="category-item-icon" />;
+    case 'cooling': return <Fan size={15} className="category-item-icon" />;
+    case 'prebuilt': return <Server size={15} className="category-item-icon" />;
+    default: return <LayoutGrid size={15} className="category-item-icon" />;
+  }
+};
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,6 +37,7 @@ export default function ShopPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured'); // 'featured', 'price-low', 'price-high', 'rating'
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   const handleCategorySelect = (categoryId) => {
     if (categoryId === 'all') {
@@ -41,44 +68,82 @@ export default function ShopPage() {
 
   return (
     <div className="shop-page-root">
-      
-      {/* Header Banner */}
-      <section className="shop-header-banner">
-        <div className="container">
-          <div className="shop-header-content">
-            <span className="section-subtitle">HARDWARE CATALOG</span>
-            <h1 className="shop-main-title">HARDWARE ARSENAL</h1>
-            <p className="shop-subtitle">
-              Explore genuine graphics cards, high-performance processors, and gaming peripherals with official brand warranty.
+
+      {/* Hardware Arsenal Hero Header */}
+      <section className="shop-hero-header">
+        <div className="container shop-hero-container">
+
+          {/* Left Column: Editorial Headline & Details */}
+          <div className="shop-hero-content">
+            <div className="shop-hero-eyebrow">
+              <span className="shop-hero-accent-mark"></span>
+              <span>GEARGRID / HARDWARE CATALOG</span>
+            </div>
+
+            <h1 className="shop-hero-title">
+              ENGINEER YOUR NEXT MACHINE.
+            </h1>
+
+            <p className="shop-hero-description">
+              Explore our curated inventory of enthusiast-grade graphics cards, elite processors, precision peripherals, and custom systems engineered for peak performance.
             </p>
+
+            <div className="shop-hero-meta">
+              <div className="shop-catalog-indicator">
+                <span className="indicator-dot"></span>
+                <span>{PRODUCTS.length} PRODUCTS AVAILABLE</span>
+              </div>
+              <div className="shop-hero-connector"></div>
+            </div>
           </div>
+
+          {/* Right Column: Editorial Hardware Visual */}
+          <div className="shop-hero-visual-wrapper">
+            <div className="shop-hero-visual-frame">
+              <img
+                src={PRODUCTS[0].image}
+                alt="Enthusiast Gaming Hardware"
+                className="shop-hero-image"
+              />
+              <div className="shop-hero-image-overlay"></div>
+              <div className="shop-hero-visual-accent"></div>
+            </div>
+          </div>
+
         </div>
       </section>
 
       {/* Catalog Section */}
       <section className="shop-catalog-section">
         <div className="container">
-          
+
+          {/* Segmented Hardware Category Selector */}
+          <nav className="shop-category-nav" aria-label="Hardware Categories">
+            <div className="shop-category-track">
+              {HARDWARE_CATEGORIES.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={`category-item-btn ${isActive ? 'active' : ''}`}
+                    onClick={() => handleCategorySelect(cat.id)}
+                  >
+                    {getCategoryIcon(cat.id)}
+                    <span className="category-item-label">{cat.label}</span>
+                    {isActive && <span className="category-active-line" />}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
           {/* Controls Bar */}
           <div className="shop-controls-bar">
-            
-            {/* Category Pills */}
-            <div className="shop-cat-tabs">
-              {HARDWARE_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  className={`shop-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => handleCategorySelect(cat.id)}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
 
             {/* Filter Tools */}
             <div className="shop-filter-tools">
-              
+
               <div className="shop-search-wrapper">
                 <Search size={16} className="shop-search-icon" />
                 <input
@@ -114,7 +179,7 @@ export default function ShopPage() {
               Showing <strong>{filteredAndSortedProducts.length}</strong> products
             </span>
             {activeCategory !== 'all' && (
-              <button 
+              <button
                 className="clear-cat-btn"
                 onClick={() => handleCategorySelect('all')}
               >
@@ -128,7 +193,7 @@ export default function ShopPage() {
             <div className="shop-no-results">
               <h3>No products found</h3>
               <p>Try adjusting your category selection or search keywords.</p>
-              <button 
+              <button
                 className="btn-outline"
                 onClick={() => {
                   setSearchQuery('');
@@ -140,14 +205,26 @@ export default function ShopPage() {
             </div>
           ) : (
             <div className="shop-products-grid">
-              {filteredAndSortedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {filteredAndSortedProducts.map((product, index) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  index={index} 
+                  onQuickView={setQuickViewProduct} 
+                />
               ))}
             </div>
           )}
 
         </div>
       </section>
+
+      {/* Quick View Side-Over Drawer */}
+      <QuickViewDrawer
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
 
     </div>
   );

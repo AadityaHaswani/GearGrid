@@ -1,62 +1,58 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { FastForward } from 'lucide-react';
 import './IntroVideo.css';
 
-const SESSION_KEY = 'geargrid_intro_played';
-
 export default function IntroVideo({ onComplete }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isFading, setIsFading] = useState(false);
   const videoRef = useRef(null);
 
   useEffect(() => {
-    // Check if intro has already played in this session
-    const hasPlayed = sessionStorage.getItem(SESSION_KEY);
-    if (hasPlayed) {
-      if (onComplete) onComplete();
-      return;
-    }
+    const video = videoRef.current;
+    if (!video) return;
 
-    setIsPlaying(true);
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
 
-    // Attempt video playback
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Fallback if browser autoplay policies block video
-        handleFinish();
-      });
-    }
+    const playVideo = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    playVideo();
+    video.addEventListener('loadeddata', playVideo);
+    video.addEventListener('canplay', playVideo);
+
+    return () => {
+      video.removeEventListener('loadeddata', playVideo);
+      video.removeEventListener('canplay', playVideo);
+    };
   }, []);
 
-  const handleFinish = () => {
-    sessionStorage.setItem(SESSION_KEY, 'true');
-    setIsFading(true);
-
-    setTimeout(() => {
-      setIsPlaying(false);
-      if (onComplete) onComplete();
-    }, 600);
+  const handleSkip = () => {
+    if (onComplete) {
+      onComplete();
+    }
   };
 
-  if (!isPlaying) return null;
-
   return (
-    <div className={`intro-video-overlay ${isFading ? 'fading' : ''}`}>
+    <div className="intro-video-wrapper">
       <video
         ref={videoRef}
-        src="/videos/geargird-intro.mp4"
+        src="/videos/bro_enchance_its_quality_witho.mp4"
+        poster="/videos/intro-poster.jpg"
         className="intro-video-element"
         autoPlay
         muted
         playsInline
-        onEnded={handleFinish}
+        preload="auto"
+        onEnded={onComplete}
       />
 
-      {/* Skip Intro Button */}
       <button 
         type="button" 
         className="intro-skip-btn"
-        onClick={handleFinish}
+        onClick={handleSkip}
         aria-label="Skip Intro"
       >
         <span>Skip Intro</span>

@@ -1,0 +1,230 @@
+/* ==========================================================================
+   WHY GEARGRID - Editorial Trust & Final CTA Section
+   ========================================================================== */
+.why-section {
+  position: relative;
+  padding: 120px 0 110px 0;
+  background: #08080A;
+  border-top: 1px solid var(--border-main);
+  overflow: hidden;
+}
+
+/* Subtle Hardware Texture Background Layer */
+.why-bg-layer {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.035;
+  filter: grayscale(100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header Statement */
+.why-header {
+  max-width: 860px;
+  margin-bottom: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.why-label {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-amber);
+}
+
+.why-statement {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.why-description {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 720px;
+}
+
+/* ==========================================================================
+   Horizontal Editorial Trust Points (Minimal Line Dividers, No Boxed Cards)
+   ========================================================================== */
+.why-trust-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 32px;
+  padding: 48px 0;
+  border-top: 1px solid var(--border-main);
+  border-bottom: 1px solid var(--border-main);
+  position: relative;
+  z-index: 1;
+}
+
+.why-trust-item {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform var(--transition-fast);
+}
+
+.why-trust-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -16px;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: var(--border-main);
+}
+
+.trust-top-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.trust-number {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  letter-spacing: 0.06em;
+}
+
+.trust-icon {
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.why-trust-item:hover .trust-icon {
+  color: var(--accent-amber);
+}
+
+.trust-title {
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+
+.trust-desc {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ==========================================================================
+   Centered Final Call to Action
+   ========================================================================== */
+.why-cta-block {
+  text-align: center;
+  max-width: 650px;
+  margin: 90px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-amber-line {
+  width: 48px;
+  height: 2px;
+  background: var(--accent-amber);
+  margin-bottom: 24px;
+}
+
+.cta-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.cta-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.cta-buttons-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cta-btn {
+  padding: 14px 28px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .why-trust-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .why-trust-item:nth-child(3)::after {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .why-section {
+    padding: 70px 0 80px 0;
+  }
+
+  .why-header {
+    margin-bottom: 40px;
+  }
+
+  .why-trust-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 32px 0;
+  }
+
+  .why-trust-item:not(:last-child)::after {
+    display: none;
+  }
+
+  .why-cta-block {
+    margin-top: 60px;
+  }
+
+  .cta-buttons-row {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

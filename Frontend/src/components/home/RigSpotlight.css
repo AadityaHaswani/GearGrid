@@ -1,159 +1,360 @@
-.spotlight-section {
-  padding: 60px 0;
+/* ==========================================================================
+   THE MACHINE - Flagship 3D PC Showroom
+   ========================================================================== */
+.machine-section {
   position: relative;
+  padding: 110px 0 100px 0;
+  background: #08080A;
+  border-top: 1px solid var(--border-main);
+  overflow: hidden;
 }
 
-.spotlight-card {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 50px;
-  background: var(--surface-main);
-  border: 1px solid var(--border-main);
-  border-radius: var(--radius-xl);
-  padding: 48px;
-  box-shadow: var(--shadow-lg);
+/* Subtle Amber Studio Aura */
+.machine-section::before {
+  content: '';
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 750px;
+  height: 450px;
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.07) 0%, rgba(26, 26, 31, 0.02) 50%, transparent 75%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Editorial Header */
+.machine-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 50px auto;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.spotlight-content-col {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.machine-label {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-amber);
 }
 
-.spotlight-heading {
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-  font-weight: 800;
+.machine-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4.2vw, 3.2rem);
+  font-weight: 900;
   letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
 }
 
-.spotlight-text {
-  font-size: 0.95rem;
-  line-height: 1.6;
+.machine-subtitle {
+  font-size: 1.02rem;
   color: var(--text-muted);
+  line-height: 1.6;
 }
 
-/* Feature List */
-.spotlight-features-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 6px 0;
+/* ==========================================================================
+   3D Stage with Surrounding Component Callouts
+   ========================================================================== */
+.machine-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 32px;
+  align-items: center;
+  min-height: 540px;
+  margin-bottom: 50px;
+  z-index: 1;
 }
 
-.spotlight-item-btn {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 14px 18px;
-  background: var(--surface-elevated);
-  border: 1px solid var(--border-main);
-  border-radius: var(--radius-md);
-  text-align: left;
-  transition: all var(--transition-fast);
-}
-
-.spotlight-item-btn:hover {
-  border-color: var(--border-medium);
-}
-
-.spotlight-item-btn.active {
-  background: var(--surface-hover);
-  border-color: var(--accent-amber);
-}
-
-.item-icon-box {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-main);
-  border: 1px solid var(--border-main);
+/* 3D Canvas Centerpiece */
+.machine-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 560px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-amber);
-  flex-shrink: 0;
+  cursor: grab;
+  user-select: none;
 }
 
-.spotlight-item-btn.active .item-icon-box {
-  background: var(--accent-amber);
-  color: #0B0B0D;
+.machine-canvas-wrapper:active {
+  cursor: grabbing;
 }
 
-.item-details {
-  flex: 1;
+.machine-canvas-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
 }
 
-.item-title-row {
+/* Callouts Columns */
+.machine-callouts-col {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  z-index: 2;
+}
+
+/* Callout Item */
+.machine-callout-card {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 3px;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.item-title {
+/* Progressive appearance when scrolled into view */
+.in-view .col-left .machine-callout-card:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+.in-view .col-left .machine-callout-card:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.25s;
+}
+
+.in-view .col-left .machine-callout-card:nth-child(3) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.4s;
+}
+
+.in-view .col-right .machine-callout-card:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.15s;
+}
+
+.in-view .col-right .machine-callout-card:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.35s;
+}
+
+.callout-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.col-left .callout-text-group {
+  text-align: right;
+  margin-left: auto;
+}
+
+.col-right .callout-text-group {
+  text-align: left;
+}
+
+.callout-label {
   font-family: var(--font-heading);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.item-stat-badge {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--accent-amber);
-  background: var(--accent-amber-dim);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
 }
 
-.item-desc {
+.callout-name {
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.callout-detail {
   font-size: 0.82rem;
   color: var(--text-muted);
   line-height: 1.45;
 }
 
-.spotlight-cta-row {
+/* Indicator Dots */
+.callout-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-amber);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  flex-shrink: 0;
+}
+
+/* Subtle Connector Lines */
+.callout-connector-line {
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.4) 0%, transparent 100%);
+}
+
+.col-left .callout-connector-line {
+  background: linear-gradient(270deg, rgba(245, 158, 11, 0.4) 0%, transparent 100%);
+}
+
+/* ==========================================================================
+   Editorial Price & Action Bar (Not inside a card)
+   ========================================================================== */
+.machine-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding-top: 36px;
+  border-top: 1px solid var(--border-main);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.machine-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.machine-config-tag {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.machine-price-line {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.machine-price-value {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.machine-price-note {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.machine-actions-group {
   display: flex;
   align-items: center;
   gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 6px;
 }
 
-/* Media Column */
-.spotlight-media-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.machine-build-btn {
+  padding: 14px 28px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-.spotlight-photo-frame {
-  width: 100%;
-  height: 100%;
-  min-height: 380px;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-main);
-  background: #000;
+.machine-cart-btn {
+  padding: 14px 22px;
+  font-size: 0.9rem;
 }
 
-.spotlight-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Responsive */
-@media (max-width: 960px) {
-  .spotlight-card {
-    grid-template-columns: 1fr;
-    padding: 30px;
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .machine-stage {
+    grid-template-columns: 220px 1fr 220px;
+    gap: 20px;
   }
 
-  .spotlight-photo-frame {
-    min-height: 260px;
+  .machine-canvas-wrapper {
+    height: 480px;
+  }
+
+  .callout-name {
+    font-size: 1rem;
+  }
+}
+
+/* Tablet: Simplified Stacked Callouts */
+@media (max-width: 900px) {
+  .machine-stage {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .machine-canvas-wrapper {
+    height: 420px;
+    order: -1;
+  }
+
+  .machine-callouts-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .col-left .callout-text-group {
+    text-align: left;
+    margin-left: 0;
+  }
+
+  .callout-connector-line {
+    display: none;
+  }
+}
+
+/* Mobile: Clean Stack */
+@media (max-width: 640px) {
+  .machine-section {
+    padding: 70px 0;
+  }
+
+  .machine-header {
+    text-align: left;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .machine-canvas-wrapper {
+    height: 320px;
+  }
+
+  .machine-callouts-col {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .machine-bottom-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .machine-actions-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .machine-build-btn,
+  .machine-cart-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

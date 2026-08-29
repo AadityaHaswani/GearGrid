@@ -1,175 +1,548 @@
-.about-page-root {
+.about-manifesto-root {
   min-height: 100vh;
-  padding-bottom: 90px;
+  padding-bottom: 96px;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
 }
 
-.about-banner {
-  padding: 60px 0 40px 0;
-  border-bottom: 1px solid var(--border-main);
-  background: linear-gradient(180deg, rgba(26, 26, 31, 0.6) 0%, transparent 100%);
+/* Section 1: Hero */
+.manifesto-hero-section {
+  padding: 64px 0 80px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(20, 21, 26, 0.45) 0%, transparent 100%);
 }
 
-.about-banner-content {
-  max-width: 700px;
-}
-
-.about-title {
-  font-size: clamp(2.2rem, 4vw, 3rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin: 6px 0 10px 0;
-}
-
-.about-sub {
-  font-size: 1.05rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-.about-pillars-section {
-  padding: 70px 0;
-}
-
-.clean-pillars-grid {
+.manifesto-hero-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 60px;
+  align-items: center;
 }
 
-.clean-pillar-card {
-  background: var(--surface-main);
-  border: 1px solid var(--border-main);
-  border-radius: var(--radius-md);
-  padding: 32px;
+.manifesto-hero-text {
   display: flex;
   flex-direction: column;
-  transition: border-color var(--transition-normal);
+  gap: 16px;
 }
 
-.clean-pillar-card:hover {
-  border-color: var(--border-medium);
-}
-
-.pillar-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.pillar-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-elevated);
-  border: 1px solid var(--border-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent-amber);
-}
-
-.pillar-step-number {
+.manifesto-hero-tag {
+  display: inline-block;
   font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+}
+
+.manifesto-hero-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(2.3rem, 4.4vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: var(--text-primary);
+}
+
+.manifesto-hero-lead {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 580px;
+  margin-top: 4px;
+}
+
+.manifesto-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.manifesto-primary-btn {
+  padding: 13px 22px;
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.manifesto-secondary-btn {
+  padding: 13px 20px;
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.manifesto-hero-visual {
+  position: relative;
+}
+
+.manifesto-hero-image-wrapper {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+  background: #121317;
+  aspect-ratio: 4 / 3;
+}
+
+.manifesto-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05) brightness(0.95);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.manifesto-hero-image-wrapper:hover .manifesto-hero-img {
+  transform: scale(1.03);
+}
+
+.manifesto-hero-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(10, 11, 14, 0.8) 100%);
+  pointer-events: none;
+}
+
+.manifesto-img-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(12, 13, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  backdrop-filter: blur(8px);
+  font-family: var(--font-heading);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
 }
 
-.pillar-title {
-  font-size: 1.2rem;
-  font-weight: 700;
+.img-badge-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--accent-amber);
+  box-shadow: 0 0 6px var(--accent-amber);
+}
+
+/* Section 2: Manifesto Statement */
+.manifesto-statement-section {
+  padding: 100px 0 90px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.manifesto-statement-container {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.manifesto-section-num {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.manifesto-statement-quote {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.8vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.18;
+  color: var(--text-primary);
+  margin-bottom: 36px;
+}
+
+.manifesto-editorial-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+  border-left: 2px solid rgba(245, 158, 11, 0.35);
+  padding-left: 28px;
+}
+
+.manifesto-editorial-body .editorial-lead {
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+/* Section 3: The GearGrid Standard (Editorial Principles) */
+.manifesto-principles-section {
+  padding: 100px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.principles-header {
+  margin-bottom: 64px;
+}
+
+.principles-section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.principles-editorial-list {
+  display: flex;
+  flex-direction: column;
+  gap: 88px;
+}
+
+.principle-row {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.principle-row.reversed {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.principle-row.reversed .principle-content-col {
+  order: 2;
+}
+
+.principle-row.reversed .principle-media-col {
+  order: 1;
+}
+
+.principle-content-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.principle-number {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent-amber);
+  opacity: 0.85;
+}
+
+.principle-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 2.5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.principle-tagline {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent-amber);
+  margin-top: -4px;
+}
+
+.principle-desc {
+  font-family: var(--font-body);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-top: 4px;
+  max-width: 520px;
+}
+
+.principle-media-col {
+  position: relative;
+}
+
+.principle-image-frame {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  background: #111216;
+  aspect-ratio: 16 / 10;
+}
+
+.principle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05) brightness(0.9);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.principle-image-frame:hover .principle-img {
+  transform: scale(1.04);
+}
+
+.principle-image-border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/* Section 4: How We Build (Process Flow) */
+.manifesto-process-section {
+  padding: 100px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.process-header {
+  margin-bottom: 60px;
+}
+
+.process-section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: 8px;
 }
 
-.pillar-desc {
-  font-size: 0.92rem;
+.process-section-sub {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 580px;
+}
+
+.process-flow-track {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+
+.process-flow-node {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.process-node-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.process-step-idx {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+
+.process-connector-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.process-connector-dot {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.process-node-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.process-node-detail {
+  font-family: var(--font-body);
+  font-size: 0.84rem;
   line-height: 1.6;
   color: var(--text-muted);
 }
 
-/* Guarantee Section */
-.about-guarantee-section {
-  padding: 20px 0 60px 0;
+/* Section 5: Final Brand Statement */
+.manifesto-closing-section {
+  padding: 100px 0 20px 0;
 }
 
-.guarantee-box {
-  background: var(--surface-main);
-  border: 1px solid var(--border-main);
-  border-radius: var(--radius-xl);
-  padding: 48px;
-}
-
-.guarantee-header {
-  margin-bottom: 36px;
-}
-
-.guarantee-points-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
-}
-
-.guarantee-point {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.guarantee-point h4 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.guarantee-point p {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-/* CTA Section */
-.about-cta-section {
-  padding: 40px 0 20px 0;
-}
-
-.about-cta-card {
-  background: var(--surface-main);
-  border: 1px solid var(--border-main);
-  border-radius: var(--radius-xl);
-  padding: 48px 30px;
+.manifesto-closing-card {
+  background: #111216;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 72px 40px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
 }
 
-.about-cta-card h2 {
-  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+.manifesto-closing-card::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.manifesto-closing-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.8vw, 2.8rem);
   font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  max-width: 700px;
 }
 
-.about-cta-card p {
-  max-width: 520px;
+.manifesto-closing-sub {
+  font-family: var(--font-body);
   font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  line-height: 1.6;
 }
 
-.about-cta-btn {
-  margin-top: 12px;
-  padding: 14px 28px;
+.manifesto-closing-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .clean-pillars-grid,
-  .guarantee-points-grid {
+.manifesto-closing-btn {
+  padding: 13px 24px;
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.manifesto-closing-btn.primary {
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+  .manifesto-hero-grid {
     grid-template-columns: 1fr;
+    gap: 40px;
   }
 
-  .guarantee-box {
-    padding: 30px;
+  .manifesto-hero-image-wrapper {
+    max-width: 600px;
+  }
+
+  .process-flow-track {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .process-connector-line {
+    display: none;
+  }
+
+  .principle-row,
+  .principle-row.reversed {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .principle-row.reversed .principle-content-col {
+    order: 1;
+  }
+
+  .principle-row.reversed .principle-media-col {
+    order: 2;
+  }
+
+  .principle-image-frame {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .manifesto-hero-section {
+    padding: 40px 0 56px 0;
+  }
+
+  .manifesto-statement-section,
+  .manifesto-principles-section,
+  .manifesto-process-section,
+  .manifesto-closing-section {
+    padding: 64px 0;
+  }
+
+  .manifesto-editorial-body {
+    padding-left: 18px;
+  }
+
+  .principles-editorial-list {
+    gap: 56px;
+  }
+
+  .process-flow-track {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .manifesto-closing-card {
+    padding: 48px 24px;
+  }
+
+  .manifesto-hero-actions,
+  .manifesto-closing-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .manifesto-primary-btn,
+  .manifesto-secondary-btn,
+  .manifesto-closing-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -1,0 +1,31 @@
+.intro-gate-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0B0B0D;
+  z-index: 999999;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-gate-container.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-gate-content {
+  width: 100%;
+  min-height: 100vh;
+  animation: fadeInApp 0.4s ease-out;
+}
+
+@keyframes fadeInApp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

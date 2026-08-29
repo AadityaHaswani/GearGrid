@@ -4,7 +4,6 @@ import Footer from '../common/Footer';
 import CartDrawer from '../common/CartDrawer';
 import WishlistDrawer from '../common/WishlistDrawer';
 import SearchModal from '../common/SearchModal';
-import AuthModal from '../common/AuthModal';
 import Toast from '../common/Toast';
 import './MainLayout.css';
 
@@ -26,7 +25,6 @@ export default function MainLayout() {
       <CartDrawer />
       <WishlistDrawer />
       <SearchModal />
-      <AuthModal />
       <Toast />
     </div>
   );

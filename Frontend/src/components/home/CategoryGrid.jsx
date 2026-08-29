@@ -1,53 +1,125 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Cpu, Monitor, Keyboard, Fan, Server, ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import './CategoryGrid.css';
 
-const CATEGORIES = [
-  { id: 'gpus', title: 'Graphics Cards', count: '14 Products', icon: Zap, desc: 'RTX 50 & 40 Series, Radeon 7000' },
-  { id: 'cpus', title: 'Processors', count: '18 Products', icon: Cpu, desc: 'AMD Ryzen 7000 & Intel Core 14th Gen' },
-  { id: 'prebuilt', title: 'Custom Gaming PCs', count: '8 Systems', icon: Server, desc: 'Hand-crafted liquid-cooled battlestations' },
-  { id: 'monitors', title: 'Gaming Displays', count: '12 Displays', icon: Monitor, desc: 'QD-OLED & high refresh rate monitors' },
-  { id: 'peripherals', title: 'Keyboards & Peripherals', count: '24 Devices', icon: Keyboard, desc: 'Hall-Effect magnetic switch keyboards' },
-  { id: 'cooling', title: 'Cooling & Cases', count: '16 Kits', icon: Fan, desc: 'Quiet AIO liquid coolers and airflow cases' }
+const VAULT_CATEGORIES = [
+  {
+    id: 'gpus',
+    title: 'Graphics Cards',
+    count: '14 Products',
+    desc: 'Flagship RTX 50 & 40 Series, Radeon 7000 with custom triple-fan cooling and high VRAM throughput.',
+    image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80',
+    gridClass: 'vault-panel-dominant'
+  },
+  {
+    id: 'cpus',
+    title: 'Processors',
+    count: '18 Products',
+    desc: 'Next-generation AMD Ryzen 9000 & Intel Core 14th Gen unlocked CPUs with 3D V-Cache.',
+    image: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80',
+    gridClass: 'vault-panel-regular'
+  },
+  {
+    id: 'prebuilt',
+    title: 'Custom Gaming PCs',
+    count: '8 Systems',
+    desc: 'Hand-crafted liquid-cooled battlestations featuring clean cable routing and stress-tested overclocks.',
+    image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=800&q=80',
+    gridClass: 'vault-panel-regular'
+  },
+  {
+    id: 'monitors',
+    title: 'Gaming Displays',
+    count: '12 Displays',
+    desc: 'QD-OLED & 360Hz ultra-low latency tournament displays with true black HDR contrast.',
+    image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?auto=format&fit=crop&w=800&q=80',
+    gridClass: 'vault-panel-regular'
+  },
+  {
+    id: 'peripherals',
+    title: 'Keyboards & Peripherals',
+    count: '24 Devices',
+    desc: 'Magnetic Hall-Effect switches, rapid trigger actuation, and lightweight wireless mice.',
+    image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=800&q=80',
+    gridClass: 'vault-panel-regular'
+  },
+  {
+    id: 'cooling',
+    title: 'Cooling & Cases',
+    count: '16 Kits',
+    desc: 'Quiet 360mm AIO liquid loops, high-airflow mesh chassis, and custom thermal management.',
+    image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1200&q=80',
+    gridClass: 'vault-panel-wide'
+  }
 ];
 
 export default function CategoryGrid() {
+  const [hoveredId, setHoveredId] = useState(null);
+
   return (
-    <section className="cat-section">
+    <section className="vault-section">
       <div className="container">
-        
-        {/* Header */}
-        <div className="cat-header-row">
-          <div>
-            <span className="section-subtitle">EXPLORE BY CATEGORY</span>
-            <h2 className="section-title">HARDWARE ARSENAL</h2>
+
+        {/* Section Header */}
+        <div className="vault-header">
+          <div className="vault-header-text">
+            <h2 className="vault-title">EXPLORE BY CATEGORY</h2>
+            <p className="vault-subtitle">Everything you need to engineer your next machine.</p>
           </div>
-          <Link to="/shop" className="btn-outline cat-all-link">
+
+          <Link to="/shop" className="vault-view-all-link">
             <span>View All Categories</span>
             <ArrowRight size={16} />
           </Link>
         </div>
 
-        {/* Categories Grid */}
-        <div className="clean-cat-grid">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
+        {/* Asymmetric Hardware Display Wall */}
+        <div className="vault-display-wall">
+          {VAULT_CATEGORIES.map((cat, index) => {
+            const isHovered = hoveredId === cat.id;
+            const isAnyHovered = hoveredId !== null;
+            const isDimmed = isAnyHovered && !isHovered;
+
             return (
-              <Link 
-                to={`/shop?category=${cat.id}`} 
-                key={cat.id} 
-                className="clean-cat-card"
+              <Link
+                key={cat.id}
+                to={`/shop?category=${cat.id}`}
+                className={`vault-panel ${cat.gridClass} ${isHovered ? 'active' : ''} ${isDimmed ? 'dimmed' : ''}`}
+                onMouseEnter={() => setHoveredId(cat.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                aria-label={`Explore ${cat.title}`}
               >
-                <div className="cat-top-row">
-                  <div className="cat-icon-container">
-                    <Icon size={22} />
-                  </div>
-                  <span className="cat-product-count">{cat.count}</span>
+                {/* Hardware Background Image & Lighting */}
+                <div className="vault-image-container">
+                  <img
+                    src={cat.image}
+                    alt={cat.title}
+                    className="vault-bg-image"
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                  <div className="vault-gradient-overlay" />
+                  <div className="vault-amber-glow" />
                 </div>
 
-                <div className="cat-bottom-content">
-                  <h3 className="cat-card-name">{cat.title}</h3>
-                  <p className="cat-card-subtitle">{cat.desc}</p>
+                {/* Panel Content */}
+                <div className="vault-content">
+                  <div className="vault-meta-top">
+                    <span className="vault-count-tag">{cat.count}</span>
+                    <div className="vault-arrow-circle">
+                      <ArrowUpRight size={18} />
+                    </div>
+                  </div>
+
+                  <div className="vault-info-bottom">
+                    <h3 className="vault-cat-name">{cat.title}</h3>
+                    <p className="vault-cat-desc">{cat.desc}</p>
+
+                    <div className="vault-action-row">
+                      <span className="vault-explore-text">EXPLORE CATEGORY</span>
+                      <ArrowRight size={14} className="vault-explore-arrow" />
+                    </div>
+                  </div>
                 </div>
               </Link>
             );

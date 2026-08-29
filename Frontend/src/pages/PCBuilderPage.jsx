@@ -1,21 +1,33 @@
 import { useState } from 'react';
 import { BUILDER_SLOTS } from '../data/hardwareData';
 import { useShop } from '../context/ShopContext';
-import { 
-  Wrench, 
-  Zap, 
-  ShieldCheck, 
-  ShoppingCart, 
-  RotateCcw, 
-  Check, 
-  Gauge
+import BuildLabScene from '../components/builder/BuildLabScene';
+import {
+  Zap,
+  ShieldCheck,
+  ShoppingCart,
+  RotateCcw,
+  Check,
+  Sliders,
+  ChevronRight
 } from 'lucide-react';
 import './PCBuilderPage.css';
+
+const CATEGORY_SHORT_NAMES = {
+  cpu: 'CPU',
+  gpu: 'GPU',
+  motherboard: 'MOTHERBOARD',
+  ram: 'RAM',
+  storage: 'STORAGE',
+  cooling: 'COOLING',
+  psu: 'PSU'
+};
 
 export default function PCBuilderPage() {
   const { addToCart, showToast } = useShop();
 
-  // Selected component per slot
+  const [activeCategory, setActiveCategory] = useState('cpu');
+
   const [selectedBuild, setSelectedBuild] = useState({
     cpu: BUILDER_SLOTS[0].options[0],
     gpu: BUILDER_SLOTS[1].options[0],
@@ -31,7 +43,7 @@ export default function PCBuilderPage() {
       ...prev,
       [slotKey]: option
     }));
-    showToast(`Selected: ${option.name.split('(')[0]}`, 'amber');
+    showToast(`Configured: ${option.name.split('(')[0]}`, 'amber');
   };
 
   const handleReset = () => {
@@ -44,10 +56,10 @@ export default function PCBuilderPage() {
       cooling: BUILDER_SLOTS[5].options[0],
       psu: BUILDER_SLOTS[6].options[0]
     });
-    showToast('Reset to default configuration', 'red');
+    setActiveCategory('cpu');
+    showToast('Reset to baseline configuration', 'amber');
   };
 
-  // Calculations
   const totalPrice = Object.values(selectedBuild).reduce((acc, curr) => acc + curr.price, 0);
   const totalWattage = Object.values(selectedBuild).reduce((acc, curr) => acc + curr.wattage, 0);
   const recommendedPsu = Math.round((totalWattage * 1.35) / 50) * 50;
@@ -63,161 +75,232 @@ export default function PCBuilderPage() {
       reviews: 1,
       badge: 'Custom Build',
       specs: [
-        selectedBuild.cpu.name.split('(')[0],
-        selectedBuild.gpu.name.split('(')[0],
-        selectedBuild.ram.name.split('(')[0],
-        selectedBuild.cooling.name.split('(')[0]
+        selectedBuild.cpu.name.split('(')[0].trim(),
+        selectedBuild.gpu.name.split('(')[0].trim(),
+        selectedBuild.ram.name.split('(')[0].trim(),
+        selectedBuild.cooling.name.split('(')[0].trim()
       ],
       wattage: totalWattage,
       inStock: true,
       image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=800&q=80',
-      description: 'Customer-configured custom gaming PC.'
+      description: 'Custom-configured gaming PC assembled and verified in the Build Lab.'
     };
 
     addToCart(customRigProduct);
   };
 
+  const currentSlotGroup = BUILDER_SLOTS.find(s => s.slot === activeCategory) || BUILDER_SLOTS[0];
+  const currentEquipped = selectedBuild[activeCategory];
+
   return (
-    <div className="builder-page-root">
-      
-      {/* Header Banner */}
-      <section className="builder-banner">
+    <div className="buildlab-page-root">
+
+      {/* Top Header */}
+      <section className="buildlab-header-section">
         <div className="container">
-          <div className="builder-banner-content">
-            <span className="section-subtitle">CUSTOM SYSTEM CONFIGURATOR</span>
-            <h1 className="builder-title">PC CONFIGURATOR</h1>
-            <p className="builder-sub">
-              Select verified components, calculate system power requirements, and build your custom gaming desktop.
+          <div className="buildlab-header-content">
+            <span className="buildlab-micro-label">GEARGRID / BUILD LAB</span>
+            <h1 className="buildlab-main-heading">BUILD YOUR MACHINE.</h1>
+            <p className="buildlab-subheading">
+              Choose every component. We handle the compatibility.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Main Builder Grid */}
-      <section className="builder-main-section">
-        <div className="container builder-layout-grid">
-          
-          {/* Left Column: Component Slots */}
-          <div className="builder-slots-column">
-            
-            <div className="slots-header">
-              <h3>Select Components</h3>
-              <button 
-                type="button" 
-                onClick={handleReset} 
-                className="btn-outline reset-btn"
-              >
-                <RotateCcw size={14} />
-                <span>Reset Defaults</span>
-              </button>
-            </div>
+      {/* Main Studio Workspace */}
+      <section className="buildlab-workspace-section">
+        <div className="container buildlab-grid-layout">
 
-            <div className="slots-list">
-              {BUILDER_SLOTS.map((slotGroup) => {
-                const currentSelected = selectedBuild[slotGroup.slot];
-                return (
-                  <div key={slotGroup.slot} className="slot-card">
-                    <div className="slot-card-header">
-                      <span className="slot-label">{slotGroup.name}</span>
-                      <span className="slot-status-active">
-                        <Check size={12} /> Selected
+          {/* Left Column (~60%): 3D Visualizer + Horizontal Component Navigation */}
+          <div className="buildlab-visualizer-column">
+
+            {/* 3D Interactive Rig Visualizer */}
+            <BuildLabScene
+              activeSlot={activeCategory}
+              onSelectSlot={(slotId) => setActiveCategory(slotId)}
+            />
+
+            {/* Component Selection Hub */}
+            <div className="buildlab-selection-hub">
+
+              {/* Category Navigation Bar */}
+              <div className="buildlab-category-nav-bar" role="tablist">
+                {BUILDER_SLOTS.map((slotGroup) => {
+                  const isActive = activeCategory === slotGroup.slot;
+                  const equippedOption = selectedBuild[slotGroup.slot];
+                  return (
+                    <button
+                      key={slotGroup.slot}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`buildlab-cat-tab ${isActive ? 'active' : ''}`}
+                      onClick={() => setActiveCategory(slotGroup.slot)}
+                    >
+                      <span className="cat-tab-name">
+                        {CATEGORY_SHORT_NAMES[slotGroup.slot] || slotGroup.slot.toUpperCase()}
                       </span>
-                    </div>
+                      <span className="cat-tab-preview">
+                        {equippedOption ? equippedOption.name.split(' ')[0] : 'Select'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
 
-                    <div className="slot-options-grid">
-                      {slotGroup.options.map((opt) => {
-                        const isEquipped = currentSelected?.id === opt.id;
-                        return (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            className={`slot-opt-btn ${isEquipped ? 'equipped' : ''}`}
-                            onClick={() => handleSelectOption(slotGroup.slot, opt)}
-                          >
-                            <div className="opt-meta">
-                              <span className="opt-name">{opt.name}</span>
-                              {opt.wattage > 0 && (
-                                <span className="opt-watt">
-                                  <Zap size={11} /> {opt.wattage}W TDP
-                                </span>
-                              )}
-                            </div>
-                            <span className="opt-price">${opt.price.toLocaleString()}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
+              {/* Active Category Header & Options */}
+              <div className="buildlab-options-panel">
+                <div className="options-panel-header">
+                  <div className="options-panel-title-group">
+                    <span className="options-cat-index">SLOT // {activeCategory.toUpperCase()}</span>
+                    <h3 className="options-cat-title">{currentSlotGroup.name}</h3>
                   </div>
-                );
-              })}
+                  <span className="options-count-badge">
+                    {currentSlotGroup.options.length} Verified Options
+                  </span>
+                </div>
+
+                <div className="buildlab-options-list">
+                  {currentSlotGroup.options.map((opt) => {
+                    const isSelected = currentEquipped?.id === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className={`buildlab-option-row ${isSelected ? 'selected' : ''}`}
+                        onClick={() => handleSelectOption(activeCategory, opt)}
+                      >
+                        <div className="option-select-marker">
+                          {isSelected ? <Check size={14} /> : <div className="marker-radio-dot" />}
+                        </div>
+
+                        <div className="option-details">
+                          <span className="option-name-text">{opt.name}</span>
+                          {opt.wattage > 0 && (
+                            <span className="option-spec-badge">
+                              <Zap size={11} /> {opt.wattage}W TDP
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="option-pricing">
+                          <span className="option-price-amount">${opt.price.toLocaleString()}</span>
+                          <span className="option-status-label">
+                            {isSelected ? 'EQUIPPED' : 'SELECT'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
             </div>
 
           </div>
 
-          {/* Right Column: Sticky Summary */}
-          <div className="builder-summary-column">
-            <div className="sticky-summary-box">
-              
-              <div className="summary-box-header">
-                <h4>System Summary</h4>
-                <div className="compat-pill">
+          {/* Right Column (~40%): Fixed Engineering Console Summary Panel */}
+          <div className="buildlab-console-column">
+            <div className="buildlab-console-panel">
+
+              {/* Console Header */}
+              <div className="console-panel-header">
+                <div className="console-header-left">
+                  <span className="console-terminal-badge">BUILD CONSOLE // SYSTEM MANIFEST</span>
+                </div>
+                <div className="console-compat-tag">
                   <ShieldCheck size={14} />
-                  <span>Compatible</span>
+                  <span>100% COMPATIBLE</span>
                 </div>
               </div>
 
-              {/* Power Meter */}
-              <div className="power-meter-hud">
-                <div className="pm-header">
-                  <div className="pm-title">
-                    <Gauge size={15} />
-                    <span>Estimated System Power</span>
+              {/* Power & Thermal Calibration Meter */}
+              <div className="console-power-module">
+                <div className="power-module-header">
+                  <div className="power-label-group">
+                    <Zap size={14} />
+                    <span className="power-label-title">ESTIMATED SYSTEM DRAW</span>
                   </div>
-                  <span className="pm-watt-val">{totalWattage} W</span>
+                  <span className="power-total-val">{totalWattage} W</span>
                 </div>
 
-                <div className="pm-bar-track">
-                  <div 
-                    className="pm-bar-fill"
+                <div className="power-track-bar">
+                  <div
+                    className="power-fill-bar"
                     style={{ width: `${Math.min((totalWattage / 850) * 100, 100)}%` }}
-                  ></div>
+                  />
                 </div>
 
-                <div className="pm-footer">
-                  <span>Recommended PSU: <strong>{recommendedPsu}W+</strong></span>
+                <div className="power-module-footer">
+                  <span className="power-rec-text">
+                    Recommended PSU: <strong>{recommendedPsu}W+ ATX 3.0</strong>
+                  </span>
+                  <span className="power-headroom-text">
+                    {Math.max(0, 1000 - totalWattage)}W Headroom
+                  </span>
                 </div>
               </div>
 
-              {/* Breakdown */}
-              <div className="builder-parts-summary">
-                {Object.entries(selectedBuild).map(([slotKey, part]) => (
-                  <div key={slotKey} className="part-line">
-                    <span className="part-slot-name">{slotKey.toUpperCase()}</span>
-                    <span className="part-item-name">{part.name.split('(')[0]}</span>
-                    <span className="part-item-price">${part.price}</span>
-                  </div>
-                ))}
+              {/* Selected Hardware Component Manifest */}
+              <div className="console-manifest-container">
+                <div className="manifest-section-title">CONFIGURED HARDWARE</div>
+                <div className="manifest-items-list">
+                  {BUILDER_SLOTS.map((slotGroup) => {
+                    const part = selectedBuild[slotGroup.slot];
+                    const isRowActive = activeCategory === slotGroup.slot;
+                    return (
+                      <button
+                        key={slotGroup.slot}
+                        type="button"
+                        className={`manifest-row-btn ${isRowActive ? 'active-row' : ''}`}
+                        onClick={() => setActiveCategory(slotGroup.slot)}
+                        title={`Configure ${slotGroup.name}`}
+                      >
+                        <span className="manifest-slot-code">
+                          {CATEGORY_SHORT_NAMES[slotGroup.slot] || slotGroup.slot.toUpperCase()}
+                        </span>
+                        <span className="manifest-part-name">
+                          {part?.name.split('(')[0].trim() || 'Not Configured'}
+                        </span>
+                        <span className="manifest-part-price">${part?.price}</span>
+                        <ChevronRight size={13} className="manifest-jump-arrow" />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Total & Action */}
-              <div className="summary-total-section">
-                <div className="subtotal-row">
-                  <span>Total Investment:</span>
-                  <span className="total-digits">${totalPrice.toLocaleString()}</span>
+              {/* Total Investment & Action Controls */}
+              <div className="console-actions-block">
+                <div className="console-total-row">
+                  <span className="console-total-label">TOTAL INVESTMENT</span>
+                  <span className="console-total-price">${totalPrice.toLocaleString()}</span>
                 </div>
 
-                <p className="summary-note">
-                  Includes professional assembly, cable management, and 3-year warranty.
+                <p className="console-warranty-note">
+                  Includes precision bench assembly, BIOS flashing, thermal tuning & 3-year warranty.
                 </p>
 
-                <button
-                  type="button"
-                  className="btn-primary deploy-build-btn"
-                  onClick={handleDeployCustomRig}
-                >
-                  <ShoppingCart size={17} />
-                  <span>Add Custom PC to Cart</span>
-                </button>
+                <div className="console-buttons-group">
+                  <button
+                    type="button"
+                    className="btn-primary buildlab-order-btn"
+                    onClick={handleDeployCustomRig}
+                  >
+                    <ShoppingCart size={17} />
+                    <span>ADD BUILD TO CART</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="btn-outline buildlab-reset-btn"
+                  >
+                    <RotateCcw size={14} />
+                    <span>RESET BUILD</span>
+                  </button>
+                </div>
               </div>
 
             </div>
