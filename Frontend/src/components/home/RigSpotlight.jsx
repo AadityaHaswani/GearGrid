@@ -6,6 +6,7 @@ import { ArrowRight, ShoppingCart } from 'lucide-react';
 import * as THREE from 'three';
 import { useShop } from '../../context/ShopContext';
 import { PRODUCTS } from '../../data/hardwareData';
+import { formatPrice } from '../../utils/formatCurrency';
 import './RigSpotlight.css';
 
 function MachineModel() {
@@ -219,7 +220,7 @@ export default function RigSpotlight() {
           <div className="machine-price-block">
             <span className="machine-config-tag">FLAGSHIP SPECIFICATION</span>
             <div className="machine-price-line">
-              <span className="machine-price-value">${rigProduct.price.toLocaleString()}</span>
+              <span className="machine-price-value">{formatPrice(rigProduct.price)}</span>
               <span className="machine-price-note">Turnkey custom-assembled & stress-tested</span>
             </div>
           </div>

@@ -261,6 +261,11 @@
   text-decoration: underline;
 }
 
+.modal-back-btn {
+  text-align: center;
+  margin-top: 4px;
+}
+
 .modal-input-wrap {
   position: relative;
   display: flex;
@@ -295,6 +300,53 @@
 
 .modal-input-field::placeholder {
   color: rgba(160, 160, 170, 0.4);
+}
+
+.modal-otp-input {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-align: center;
+  padding: 10px 16px;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.modal-resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.modal-resend-text {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.modal-resend-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent-amber);
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+
+.modal-resend-btn:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.modal-resend-btn:not(:disabled):hover {
+  color: #FBBF24;
+  text-decoration: underline;
 }
 
 .modal-visibility-btn {

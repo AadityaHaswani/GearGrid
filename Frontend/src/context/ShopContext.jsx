@@ -1,7 +1,52 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { authAPI } from '../services/api';
+import cartAPI from '../services/cart.api';
+import wishlistAPI from '../services/wishlist.api';
 
 const ShopContext = createContext();
+
+export const normalizeProduct = (p) => {
+  if (!p) return null;
+  const id = p._id || p.id;
+  const name = p.title || p.name || 'Hardware Component';
+  const categoryLabel = p.category?.name || p.categoryLabel || p.brand || 'Hardware';
+  const price = p.discountPrice && p.discountPrice < p.price ? p.discountPrice : (p.price || 0);
+  const originalPrice = p.originalPrice || (p.discountPrice && p.discountPrice < p.price ? p.price : null);
+  const rating = p.rating || 4.8;
+  const reviews = p.numReviews ?? p.reviews ?? 0;
+  const image = (p.images && p.images.length > 0 && p.images[0]?.url)
+    ? p.images[0].url
+    : (p.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80');
+  const specs = p.specs && p.specs.length > 0
+    ? p.specs
+    : [p.brand, p.category?.name, p.stock ? `${p.stock} in stock` : 'In Stock'].filter(Boolean);
+
+  return {
+    ...p,
+    id,
+    _id: id,
+    name,
+    title: name,
+    categoryLabel,
+    price,
+    originalPrice,
+    rating,
+    reviews,
+    numReviews: reviews,
+    image,
+    specs
+  };
+};
+
+const normalizeCartItem = (item) => {
+  if (!item || !item.product) return null;
+  return {
+    ...item,
+    product: normalizeProduct(item.product),
+    quantity: item.quantity || 1
+  };
+};
 
 export function ShopProvider({ children }) {
   const navigate = useNavigate();
@@ -46,19 +91,6 @@ export function ShopProvider({ children }) {
     }
   });
 
-  // Sync cart & wishlist to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('geargrid_cart', JSON.stringify(cart));
-    } catch {}
-  }, [cart]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('geargrid_wishlist', JSON.stringify(wishlist));
-    } catch {}
-  }, [wishlist]);
-
   // Modal / Drawer visibility states
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -75,6 +107,72 @@ export function ShopProvider({ children }) {
     }, 3200);
   };
 
+  // Sync state to localStorage cache
+  useEffect(() => {
+    try {
+      localStorage.setItem('geargrid_cart', JSON.stringify(cart));
+    } catch {}
+  }, [cart]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('geargrid_wishlist', JSON.stringify(wishlist));
+    } catch {}
+  }, [wishlist]);
+
+  // Fetch real cart from backend
+  const fetchCart = useCallback(async () => {
+    if (!localStorage.getItem('geargrid_token') && !user) return;
+    try {
+      const res = await cartAPI.getCart();
+      const items = res.data?.data?.items || [];
+      const normalized = items.map(normalizeCartItem).filter(Boolean);
+      setCart(normalized);
+    } catch {
+      // Offline fallback
+    }
+  }, [user]);
+
+  // Fetch real wishlist from backend
+  const fetchWishlist = useCallback(async () => {
+    if (!localStorage.getItem('geargrid_token') && !user) return;
+    try {
+      const res = await wishlistAPI.getWishlist();
+      const products = res.data?.data?.products || [];
+      const normalized = products.map(normalizeProduct).filter(Boolean);
+      setWishlist(normalized);
+    } catch {
+      // Offline fallback
+    }
+  }, [user]);
+
+  // Initial user verification & cart/wishlist hydration
+  useEffect(() => {
+    const token = localStorage.getItem('geargrid_token');
+    if (token) {
+      authAPI.getCurrentUser()
+        .then((res) => {
+          const u = res.data?.data;
+          if (u) {
+            const formatted = {
+              id: u._id,
+              name: u.username || u.name,
+              email: u.email,
+              avatar: u.avatar?.url || null,
+              role: u.role || 'user'
+            };
+            setUser(formatted);
+            localStorage.setItem('geargrid_user', JSON.stringify(formatted));
+          }
+        })
+        .catch(() => {
+          // Token expired or invalid
+        });
+      fetchCart();
+      fetchWishlist();
+    }
+  }, [fetchCart, fetchWishlist]);
+
   // Global Keyboard shortcut: Ctrl+K or Cmd+K opens Search
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -87,24 +185,8 @@ export function ShopProvider({ children }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Internal direct cart manipulation
-  const executeAddToCart = (product, qty = 1) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + qty }
-            : item
-        );
-      }
-      return [...prev, { product, quantity: qty }];
-    });
-    showToast(`Added ${product.name.split('(')[0].trim()} to Cart`, 'amber');
-  };
-
   // Protected Cart operation
-  const addToCart = (product, qty = 1) => {
+  const addToCart = async (product, qty = 1) => {
     if (!user) {
       const pending = {
         type: 'cart',
@@ -119,53 +201,85 @@ export function ShopProvider({ children }) {
       navigate('/login', { state: { from: location.pathname + location.search } });
       return false;
     }
-    executeAddToCart(product, qty);
+
+    const productId = product._id || product.id;
+    try {
+      const res = await cartAPI.addToCart(productId);
+      const items = res.data?.data?.items || [];
+      const normalized = items.map(normalizeCartItem).filter(Boolean);
+      setCart(normalized);
+    } catch {
+      // Local optimistic update
+      setCart((prev) => {
+        const norm = normalizeProduct(product);
+        const existing = prev.find((item) => (item.product._id || item.product.id) === productId);
+        if (existing) {
+          return prev.map((item) =>
+            (item.product._id || item.product.id) === productId
+              ? { ...item, quantity: item.quantity + qty }
+              : item
+          );
+        }
+        return [...prev, { product: norm, quantity: qty }];
+      });
+    }
+
+    showToast(`Added ${(product.title || product.name || 'Component').split('(')[0].trim()} to Cart`, 'amber');
     return true;
   };
 
-  const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeFromCart = async (productId) => {
+    try {
+      const res = await cartAPI.removeFromCart(productId);
+      const items = res.data?.data?.items || [];
+      const normalized = items.map(normalizeCartItem).filter(Boolean);
+      setCart(normalized);
+    } catch {
+      setCart((prev) => prev.filter((item) => (item.product._id || item.product.id) !== productId));
+    }
     showToast('Item removed from cart', 'red');
   };
 
-  const updateQuantity = (productId, newQty) => {
+  const updateQuantity = async (productId, newQty) => {
     if (newQty <= 0) {
       removeFromCart(productId);
       return;
     }
-    setCart((prev) =>
-      prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity: newQty } : item
-      )
-    );
+
+    const currentItem = cart.find(item => (item.product._id || item.product.id) === productId);
+    const action = currentItem && newQty < currentItem.quantity ? 'decrease' : 'increase';
+
+    try {
+      const res = await cartAPI.updateCartQuantity(productId, action);
+      const items = res.data?.data?.items || [];
+      const normalized = items.map(normalizeCartItem).filter(Boolean);
+      setCart(normalized);
+    } catch {
+      setCart((prev) =>
+        prev.map((item) =>
+          (item.product._id || item.product.id) === productId ? { ...item, quantity: newQty } : item
+        )
+      );
+    }
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
+    try {
+      await cartAPI.clearCart();
+    } catch {
+      // Ignore
+    }
     setCart([]);
   };
 
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
   const cartTotal = cart.reduce(
-    (total, item) => total + item.product.price * item.quantity,
+    (total, item) => total + (item.product?.price || 0) * (item.quantity || 1),
     0
   );
 
-  // Internal direct wishlist manipulation
-  const executeToggleWishlist = (product) => {
-    setWishlist((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
-      if (exists) {
-        showToast('Removed from Wishlist', 'red');
-        return prev.filter((item) => item.id !== product.id);
-      } else {
-        showToast(`Saved ${product.name.split('(')[0].trim()} to Wishlist`, 'amber');
-        return [...prev, product];
-      }
-    });
-  };
-
   // Protected Wishlist operation
-  const toggleWishlist = (product) => {
+  const toggleWishlist = async (product) => {
     if (!user) {
       const pending = {
         type: 'wishlist',
@@ -179,12 +293,32 @@ export function ShopProvider({ children }) {
       navigate('/login', { state: { from: location.pathname + location.search } });
       return false;
     }
-    executeToggleWishlist(product);
+
+    const productId = product._id || product.id;
+    const exists = wishlist.some((item) => (item._id || item.id) === productId);
+
+    if (exists) {
+      try {
+        await wishlistAPI.removeFromWishlist(productId);
+        await fetchWishlist();
+      } catch {
+        setWishlist((prev) => prev.filter((item) => (item._id || item.id) !== productId));
+      }
+      showToast('Removed from Wishlist', 'red');
+    } else {
+      try {
+        await wishlistAPI.addToWishlist(productId);
+        await fetchWishlist();
+      } catch {
+        setWishlist((prev) => [...prev, normalizeProduct(product)]);
+      }
+      showToast(`Saved ${(product.title || product.name || 'Component').split('(')[0].trim()} to Wishlist`, 'amber');
+    }
     return true;
   };
 
   const isInWishlist = (productId) => {
-    return wishlist.some((item) => item.id === productId);
+    return wishlist.some((item) => (item._id || item.id) === productId);
   };
 
   const wishlistCount = wishlist.length;
@@ -195,6 +329,9 @@ export function ShopProvider({ children }) {
     try {
       localStorage.setItem('geargrid_user', JSON.stringify(userData));
     } catch {}
+
+    fetchCart();
+    fetchWishlist();
 
     // Retrieve pending action from state or sessionStorage
     let action = pendingAuthAction;
@@ -209,9 +346,9 @@ export function ShopProvider({ children }) {
 
     if (action) {
       if (action.type === 'cart' && action.product) {
-        executeAddToCart(action.product, action.qty || 1);
+        addToCart(action.product, action.qty || 1);
       } else if (action.type === 'wishlist' && action.product) {
-        executeToggleWishlist(action.product);
+        toggleWishlist(action.product);
       }
       try {
         sessionStorage.removeItem('geargrid_pending_action');
@@ -228,12 +365,21 @@ export function ShopProvider({ children }) {
   };
 
   // Logout handler
-  const logoutUser = () => {
+  const logoutUser = async () => {
+    try {
+      await authAPI.logout();
+    } catch {}
     setUser(null);
+    setCart([]);
+    setWishlist([]);
     try {
       localStorage.removeItem('geargrid_user');
+      localStorage.removeItem('geargrid_token');
+      localStorage.removeItem('geargrid_cart');
+      localStorage.removeItem('geargrid_wishlist');
     } catch {}
     showToast('Signed out of GearGrid', 'amber');
+    navigate('/');
   };
 
   return (
@@ -245,6 +391,7 @@ export function ShopProvider({ children }) {
         pendingAuthAction,
         setPendingAuthAction,
         cart,
+        fetchCart,
         addToCart,
         removeFromCart,
         updateQuantity,
@@ -252,6 +399,7 @@ export function ShopProvider({ children }) {
         cartCount,
         cartTotal,
         wishlist,
+        fetchWishlist,
         toggleWishlist,
         isInWishlist,
         wishlistCount,

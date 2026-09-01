@@ -1,56 +1,57 @@
 import { Router } from "express";
 import {
-  changeCurrentPassword,
-  forgotPasswordRequest,
-  getCurrentUser,
+  registerUser,
+  verifyEmail,
+  resendEmailVerification,
   login,
   logoutUser,
+  getCurrentUser,
   refreshAccessToken,
-  registerUser,
-  resendEmailVerification,
+  forgotPasswordRequest,
+  verifyResetOtp,
   resetForgotPassword,
-  verifyEmail,
+  changeCurrentPassword,
 } from "../controllers/auth.controllers..js";
 import {
-  userChangeCurrentPasswordValidator,
-  userForgotPasswordValidator,
-  userLoginValidator,
   userRegisterValidator,
+  userLoginValidator,
+  userVerifyEmailOtpValidator,
+  userResendOtpValidator,
+  userForgotPasswordValidator,
+  userVerifyResetOtpValidator,
   userResetForgotPasswordValidator,
+  userChangeCurrentPasswordValidator,
 } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
+const authRouter = Router();
 
-const authRouter = Router()
-authRouter.post("/register",userRegisterValidator(),validate,registerUser)
+// Registration & Email Verification (OTP)
+authRouter.post("/register", userRegisterValidator(), validate, registerUser);
+authRouter.post("/verify-email-otp", userVerifyEmailOtpValidator(), validate, verifyEmail);
+authRouter.post("/verify-otp", userVerifyEmailOtpValidator(), validate, verifyEmail);
+authRouter.post("/resend-email-verification", userResendOtpValidator(), validate, resendEmailVerification);
+authRouter.post("/resend-otp", userResendOtpValidator(), validate, resendEmailVerification);
 
+// Authentication
+authRouter.post("/login", userLoginValidator(), validate, login);
+authRouter.post("/logout", verifyJWT, logoutUser);
+authRouter.post("/current-user", verifyJWT, getCurrentUser);
+authRouter.post("/refresh-token", refreshAccessToken);
 
-authRouter.post("/login",userLoginValidator(),validate,login )
-authRouter.route("/verify-email/:verificationToken").get(verifyEmail);
-authRouter.route("/refresh-token").post(refreshAccessToken);
-authRouter
-  .route("/forgot-password")
-  .post(userForgotPasswordValidator(), validate, forgotPasswordRequest);
-authRouter
-  .route("/reset-password/:resetToken")
-  .post(userResetForgotPasswordValidator(), validate, resetForgotPassword);
+// Forgot Password & Reset (OTP)
+authRouter.post("/forgot-password", userForgotPasswordValidator(), validate, forgotPasswordRequest);
+authRouter.post("/verify-reset-otp", userVerifyResetOtpValidator(), validate, verifyResetOtp);
+authRouter.post("/reset-password", userResetForgotPasswordValidator(), validate, resetForgotPassword);
 
-authRouter.post("/logout",verifyJWT,logoutUser )
+// Change Password
+authRouter.post(
+  "/change-password",
+  verifyJWT,
+  userChangeCurrentPasswordValidator(),
+  validate,
+  changeCurrentPassword
+);
 
-authRouter.route("/current-user").post(verifyJWT, getCurrentUser);
-authRouter
-  .route("/change-password")
-  .post(
-    verifyJWT,
-    userChangeCurrentPasswordValidator(),
-    validate,
-    changeCurrentPassword,
-  );
-authRouter
-  .route("/resend-email-verification")
-  .post(verifyJWT, resendEmailVerification);
-
-
-
-export default authRouter
+export default authRouter;

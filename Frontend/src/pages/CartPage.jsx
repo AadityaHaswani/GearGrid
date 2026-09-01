@@ -14,6 +14,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { formatPrice } from '../utils/formatCurrency';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -59,11 +60,13 @@ export default function CartPage() {
   };
 
   const handleMoveToWishlist = (product) => {
-    if (!isInWishlist(product.id)) {
+    const pId = product._id || product.id;
+    if (!isInWishlist(pId)) {
       toggleWishlist(product);
     }
-    removeFromCart(product.id);
-    showToast(`Moved ${product.name.split('(')[0].trim()} to Wishlist`, 'amber');
+    removeFromCart(pId);
+    const pName = (product.title || product.name || 'Component').split('(')[0].trim();
+    showToast(`Moved ${pName} to Wishlist`, 'amber');
   };
 
   const handleRemoveItem = (productId) => {
@@ -156,13 +159,18 @@ export default function CartPage() {
               <div className="manifest-sequence-line" />
 
               {cart.map(({ product, quantity }, index) => {
-                const itemTotal = product.price * quantity;
-                const isRemoving = removingId === product.id;
+                const productId = product._id || product.id;
+                const title = product.title || product.name || 'Hardware Component';
+                const categoryLabel = product.category?.name || product.categoryLabel || product.brand || 'HARDWARE COMPONENT';
+                const price = product.price || 0;
+                const image = (product.images && product.images[0]?.url) || product.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
+                const itemTotal = price * quantity;
+                const isRemoving = removingId === productId;
                 const indexStr = (index + 1).toString().padStart(2, '0');
 
                 return (
                   <article 
-                    key={product.id} 
+                    key={productId} 
                     className={`manifest-item-row ${isRemoving ? 'removing' : ''}`}
                   >
                     
@@ -173,10 +181,10 @@ export default function CartPage() {
                     </div>
 
                     {/* Dominant Hardware Visual */}
-                    <Link to={`/product/${product.id}`} className="manifest-visual-container">
+                    <Link to={`/product/${productId}`} className="manifest-visual-container">
                       <img 
-                        src={product.image} 
-                        alt={product.name} 
+                        src={image} 
+                        alt={title} 
                         className="manifest-product-image"
                         loading="lazy"
                       />
@@ -188,11 +196,11 @@ export default function CartPage() {
                       
                       <div className="manifest-item-meta">
                         <span className="manifest-cat-label">
-                          {product.categoryLabel || 'HARDWARE COMPONENT'}
+                          {categoryLabel}
                         </span>
                         
-                        <Link to={`/product/${product.id}`} className="manifest-name-link">
-                          <h2 className="manifest-item-title">{product.name}</h2>
+                        <Link to={`/product/${productId}`} className="manifest-name-link">
+                          <h2 className="manifest-item-title">{title}</h2>
                         </Link>
 
                         {product.specs && product.specs.length > 0 && (
@@ -211,7 +219,7 @@ export default function CartPage() {
                           <button 
                             type="button" 
                             className="manifest-qty-btn"
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
+                            onClick={() => updateQuantity(productId, quantity - 1)}
                             disabled={quantity <= 1}
                             aria-label="Decrease quantity"
                           >
@@ -225,7 +233,7 @@ export default function CartPage() {
                           <button 
                             type="button" 
                             className="manifest-qty-btn"
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
+                            onClick={() => updateQuantity(productId, quantity + 1)}
                             aria-label="Increase quantity"
                           >
                             <Plus size={12} />
@@ -235,11 +243,11 @@ export default function CartPage() {
                         {/* Price Presentation */}
                         <div className="manifest-price-stack">
                           <span className="manifest-current-price">
-                            ${itemTotal.toLocaleString()}
+                            {formatPrice(itemTotal)}
                           </span>
-                          {product.originalPrice && product.originalPrice > product.price && (
+                          {product.originalPrice && product.originalPrice > price && (
                             <span className="manifest-original-price">
-                              ${(product.originalPrice * quantity).toLocaleString()}
+                              {formatPrice(product.originalPrice * quantity)}
                             </span>
                           )}
                         </div>
@@ -253,7 +261,7 @@ export default function CartPage() {
                           className="manifest-action-link"
                           onClick={() => handleMoveToWishlist(product)}
                         >
-                          <Heart size={13} className={isInWishlist(product.id) ? 'action-active-heart' : ''} />
+                          <Heart size={13} className={isInWishlist(productId) ? 'action-active-heart' : ''} />
                           <span>Move to Wishlist</span>
                         </button>
 
@@ -262,7 +270,7 @@ export default function CartPage() {
                         <button 
                           type="button"
                           className="manifest-action-link remove-link"
-                          onClick={() => handleRemoveItem(product.id)}
+                          onClick={() => handleRemoveItem(productId)}
                         >
                           <Trash2 size={13} />
                           <span>Remove</span>
@@ -299,7 +307,7 @@ export default function CartPage() {
               <div className="summary-items-list">
                 <div className="summary-data-row">
                   <span className="data-row-label">Hardware Subtotal</span>
-                  <span className="data-row-value">${cartTotal.toLocaleString()}</span>
+                  <span className="data-row-value">{formatPrice(cartTotal)}</span>
                 </div>
 
                 <div className="summary-data-row">
@@ -315,7 +323,7 @@ export default function CartPage() {
                 {promoApplied && (
                   <div className="summary-data-row discount-row">
                     <span className="data-row-label">Builder Voucher ({discountPercent}%)</span>
-                    <span className="data-row-value discount-text">-${discountAmount.toLocaleString()}</span>
+                    <span className="data-row-value discount-text">-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
               </div>
@@ -355,7 +363,7 @@ export default function CartPage() {
                   <span className="total-duty-note">All freight & calibration included</span>
                 </div>
                 <div className="total-number-display">
-                  ${finalTotal.toLocaleString()}
+                  {formatPrice(finalTotal)}
                 </div>
               </div>
 

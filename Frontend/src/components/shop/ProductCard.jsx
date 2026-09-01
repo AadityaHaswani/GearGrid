@@ -1,15 +1,58 @@
 import { useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart, Star, ArrowRight } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
+import { formatPrice } from '../../utils/formatCurrency';
 import './ProductCard.css';
+
+const getImageForProduct = (prod) => {
+  if (prod.images && prod.images.length > 0 && prod.images[0]?.url) {
+    return prod.images[0].url;
+  }
+  if (prod.image) return prod.image;
+  const cat = (prod.category?.slug || prod.category?.name || prod.category || prod.title || '').toLowerCase();
+  if (cat.includes('headphone') || cat.includes('audio') || cat.includes('sony')) {
+    return 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80';
+  }
+  if (cat.includes('keyboard') || cat.includes('keychron') || cat.includes('g413')) {
+    return 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80';
+  }
+  if (cat.includes('mouse') || cat.includes('deathadder') || cat.includes('superlight')) {
+    return 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80';
+  }
+  if (cat.includes('monitor') || cat.includes('display') || cat.includes('oled')) {
+    return 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80';
+  }
+  if (cat.includes('gpu') || cat.includes('rtx') || cat.includes('geforce')) {
+    return 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
+  }
+  if (cat.includes('cpu') || cat.includes('ryzen') || cat.includes('intel')) {
+    return 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80';
+  }
+  return 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
+};
 
 export default function ProductCard({ product, index, variant = 'standard', onQuickView }) {
   const navigate = useNavigate();
   const { addToCart, toggleWishlist, isInWishlist } = useShop();
   
+  if (!product) return null;
+
   const productId = product._id || product.id;
   const isWishlisted = isInWishlist(productId);
   const indexNumber = typeof index === 'number' ? String(index + 1).padStart(2, '0') : '01';
+
+  const title = product.title || product.name || 'Hardware Component';
+  const categoryLabel = product.category?.name || product.categoryLabel || product.brand || 'Hardware';
+  const price = typeof product.price === 'number' ? product.price : 0;
+  const originalPrice = product.originalPrice || (product.discountPrice && product.discountPrice < product.price ? product.price : null);
+  const displayPrice = product.discountPrice && product.discountPrice < product.price ? product.discountPrice : price;
+  const rating = product.rating || 4.8;
+  const reviews = product.numReviews ?? product.reviews;
+  const description = product.description || '';
+  const specs = product.specs && product.specs.length > 0
+    ? product.specs
+    : [product.brand, product.category?.name, product.stock ? `${product.stock} in stock` : 'In Stock'].filter(Boolean);
+  const image = getImageForProduct(product);
 
   const handleNavigateToDetails = (e) => {
     if (e) e.stopPropagation();
@@ -37,7 +80,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
     return (
       <div className="product-card product-card-flagship" onClick={handleNavigateToDetails}>
         <div className="product-card-media flagship-media">
-          <img src={product.image} alt={product.name} className="product-card-image" loading="lazy" />
+          <img src={image} alt={title} className="product-card-image" loading="lazy" />
           <button
             type="button"
             className={`product-card-wishlist-btn ${isWishlisted ? 'active' : ''}`}
@@ -50,20 +93,20 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
 
         <div className="product-card-body flagship-body">
           <div className="product-card-meta">
-            <span className="product-card-category">{product.categoryLabel}</span>
+            <span className="product-card-category">{categoryLabel}</span>
             <div className="product-card-rating">
               <Star size={13} fill="#F59E0B" className="star-amber" />
-              <span>{product.rating}</span>
-              {product.reviews && <span className="product-card-reviews">({product.reviews} reviews)</span>}
+              <span>{rating}</span>
+              {reviews ? <span className="product-card-reviews">({reviews} reviews)</span> : null}
             </div>
           </div>
 
-          <h3 className="product-card-title flagship-title">{product.name}</h3>
-          {product.description && <p className="product-card-desc">{product.description}</p>}
+          <h3 className="product-card-title flagship-title">{title}</h3>
+          {description && <p className="product-card-desc">{description}</p>}
 
-          {product.specs && product.specs.length > 0 && (
+          {specs && specs.length > 0 && (
             <div className="product-card-specs">
-              {product.specs.slice(0, 3).map((spec, i) => (
+              {specs.slice(0, 3).map((spec, i) => (
                 <div key={i} className="product-card-spec-item">
                   <span className="spec-dot">•</span>
                   <span className="spec-text">{spec}</span>
@@ -74,9 +117,9 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
 
           <div className="product-card-footer">
             <div className="product-card-price-wrap">
-              <span className="product-card-price">${product.price.toLocaleString()}</span>
-              {product.originalPrice && (
-                <span className="product-card-old-price">${product.originalPrice.toLocaleString()}</span>
+              <span className="product-card-price">{formatPrice(displayPrice)}</span>
+              {originalPrice && (
+                <span className="product-card-old-price">{formatPrice(originalPrice)}</span>
               )}
             </div>
 
@@ -84,7 +127,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
               type="button"
               className="product-card-cart-btn"
               onClick={handleAddToCartClick}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={`Add ${title} to cart`}
             >
               <ShoppingCart size={15} />
               <span>Add to Cart</span>
@@ -99,7 +142,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
     return (
       <div className="product-card product-card-compact" onClick={handleNavigateToDetails}>
         <div className="product-card-media compact-media">
-          <img src={product.image} alt={product.name} className="product-card-image" loading="lazy" />
+          <img src={image} alt={title} className="product-card-image" loading="lazy" />
           <button
             type="button"
             className={`product-card-wishlist-btn compact-wishlist ${isWishlisted ? 'active' : ''}`}
@@ -112,18 +155,18 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
 
         <div className="product-card-body compact-body">
           <div className="product-card-meta">
-            <span className="product-card-category">{product.categoryLabel}</span>
+            <span className="product-card-category">{categoryLabel}</span>
             <div className="product-card-rating">
               <Star size={12} fill="#F59E0B" className="star-amber" />
-              <span>{product.rating}</span>
+              <span>{rating}</span>
             </div>
           </div>
 
-          <h4 className="product-card-title compact-title">{product.name}</h4>
+          <h4 className="product-card-title compact-title">{title}</h4>
 
-          {product.specs && product.specs.length > 0 && (
+          {specs && specs.length > 0 && (
             <div className="product-card-specs compact-specs">
-              {product.specs.slice(0, 2).map((spec, i) => (
+              {specs.slice(0, 2).map((spec, i) => (
                 <div key={i} className="product-card-spec-item">
                   <span className="spec-dot">•</span>
                   <span className="spec-text">{spec}</span>
@@ -133,12 +176,12 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
           )}
 
           <div className="product-card-footer compact-footer">
-            <span className="product-card-price compact-price">${product.price.toLocaleString()}</span>
+            <span className="product-card-price compact-price">{formatPrice(displayPrice)}</span>
             <button
               type="button"
               className="product-card-cart-btn compact-btn"
               onClick={handleAddToCartClick}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={`Add ${title} to cart`}
             >
               <ShoppingCart size={13} />
               <span>Add</span>
@@ -158,8 +201,8 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
       {/* Edge-to-edge Product Image Stage */}
       <div className="product-card-media standard-media" onClick={handleNavigateToDetails}>
         <img 
-          src={product.image} 
-          alt={product.name} 
+          src={image} 
+          alt={title} 
           className="product-card-image" 
           loading="lazy" 
         />
@@ -173,7 +216,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
             type="button"
             className="product-card-action-btn action-quickview"
             onClick={handleQuickViewClick}
-            aria-label={`Quick view ${product.name}`}
+            aria-label={`Quick view ${title}`}
           >
             <span>QUICK VIEW</span>
           </button>
@@ -182,7 +225,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
             type="button"
             className="product-card-action-btn action-details"
             onClick={handleNavigateToDetails}
-            aria-label={`View details for ${product.name}`}
+            aria-label={`View details for ${title}`}
           >
             <span>VIEW DETAILS</span>
             <ArrowRight size={13} />
@@ -205,23 +248,23 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
         
         {/* Minimal Category Label & Rating */}
         <div className="product-card-meta">
-          <span className="product-card-category">{product.categoryLabel}</span>
+          <span className="product-card-category">{categoryLabel}</span>
           <div className="product-card-rating">
             <Star size={12} fill="#F59E0B" className="star-amber" />
-            <span>{product.rating}</span>
-            {product.reviews && <span className="product-card-reviews">({product.reviews})</span>}
+            <span>{rating}</span>
+            {reviews ? <span className="product-card-reviews">({reviews})</span> : null}
           </div>
         </div>
 
         {/* Product Title (Navigates to /product/:id) */}
         <h3 className="product-card-title" onClick={handleNavigateToDetails}>
-          {product.name}
+          {title}
         </h3>
 
         {/* 2 Concise Key Specifications */}
-        {product.specs && product.specs.length > 0 && (
+        {specs && specs.length > 0 && (
           <div className="product-card-specs">
-            {product.specs.slice(0, 2).map((spec, i) => (
+            {specs.slice(0, 2).map((spec, i) => (
               <div key={i} className="product-card-spec-item">
                 <span className="spec-dot">•</span>
                 <span className="spec-text">{spec}</span>
@@ -233,9 +276,9 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
         {/* Price Hierarchy & Compact Amber CTA */}
         <div className="product-card-footer">
           <div className="product-card-price-wrap">
-            <span className="product-card-price">${product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className="product-card-old-price">${product.originalPrice.toLocaleString()}</span>
+            <span className="product-card-price">{formatPrice(displayPrice)}</span>
+            {originalPrice && (
+              <span className="product-card-old-price">{formatPrice(originalPrice)}</span>
             )}
           </div>
 
@@ -243,7 +286,7 @@ export default function ProductCard({ product, index, variant = 'standard', onQu
             type="button"
             className="product-card-cart-btn"
             onClick={handleAddToCartClick}
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={`Add ${title} to cart`}
           >
             <ShoppingCart size={14} />
             <span>Add</span>

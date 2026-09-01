@@ -43,9 +43,21 @@ app.use("/api/v1/payments", paymentsRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/categories", categoryRouter);
 
-app.use("/api/v1/healthcheck",healthCheckRouter)
-app.use("/api/v1/auth",authRouter)
+app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/orders", ordersRouter);
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  return res.status(statusCode).json({
+    statusCode,
+    success: false,
+    message,
+    errors: err.errors || [],
+  });
+});
 
 

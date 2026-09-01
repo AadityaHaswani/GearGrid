@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PRODUCTS } from '../../data/hardwareData';
-import { useShop } from '../../context/ShopContext';
+import { getProducts } from '../../services/product.api';
+import { useShop, normalizeProduct } from '../../context/ShopContext';
+import { formatPrice } from '../../utils/formatCurrency';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -22,6 +24,7 @@ const ARSENAL_CATEGORIES = [
 ];
 
 export default function ArsenalShowroom() {
+  const [allProducts, setAllProducts] = useState(PRODUCTS);
   const [activeCategory, setActiveCategory] = useState('all');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
@@ -32,11 +35,27 @@ export default function ArsenalShowroom() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  const filteredProducts = activeCategory === 'all'
-    ? PRODUCTS
-    : PRODUCTS.filter((p) => p.category === activeCategory);
+  useEffect(() => {
+    let isMounted = true;
+    getProducts({ limit: 50 })
+      .then((res) => {
+        if (isMounted && res.data?.data?.products?.length > 0) {
+          const mapped = res.data.data.products.map(normalizeProduct).filter(Boolean);
+          setAllProducts(mapped);
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
 
-  const total = filteredProducts.length;
+  const filteredProducts = activeCategory === 'all'
+    ? allProducts
+    : allProducts.filter((p) => {
+        const cat = p.category?.slug || p.category?.name || p.category;
+        return typeof cat === 'string' && cat.toLowerCase().includes(activeCategory.toLowerCase());
+      });
+
+  const total = Math.max(1, filteredProducts.length);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -206,9 +225,9 @@ export default function ArsenalShowroom() {
               {/* Price & Dual Action Bar */}
               <div className="arsenal-action-bar">
                 <div className="arsenal-price-group">
-                  <span className="arsenal-price">${currentProduct.price.toLocaleString()}</span>
+                  <span className="arsenal-price">{formatPrice(currentProduct.price)}</span>
                   {currentProduct.originalPrice && (
-                    <span className="arsenal-old-price">${currentProduct.originalPrice.toLocaleString()}</span>
+                    <span className="arsenal-old-price">{formatPrice(currentProduct.originalPrice)}</span>
                   )}
                 </div>
 

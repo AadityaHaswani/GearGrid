@@ -83,4 +83,13 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// Strategic indexes for Shop list queries and filters
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ featured: 1, createdAt: -1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ title: 1 });
+
 export const Product = mongoose.model("Product", productSchema);

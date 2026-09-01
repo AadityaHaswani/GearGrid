@@ -379,6 +379,11 @@
   transition: all var(--transition-fast);
 }
 
+.account-menu-item.admin-highlight {
+  color: var(--accent-amber);
+  font-weight: 700;
+}
+
 .account-menu-item:hover {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);

@@ -1,5 +1,5 @@
 import { ApiError } from "../utils/ApiErrors.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 import { UserRolesEnum } from "../utils/constants.js";
 
 export const isAdmin = asyncHandler(async (req, res, next) => {

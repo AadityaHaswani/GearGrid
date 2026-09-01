@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -27,9 +27,13 @@ import {
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS, HARDWARE_CATEGORIES } from '../data/hardwareData';
+import productAPI from '../services/product.api';
+import categoryAPI from '../services/category.api';
+import orderAPI from '../services/order.api';
+import { formatPrice } from '../utils/formatCurrency';
 import './AdminPage.css';
 
-// Initial Mock Orders structured for real API replacement
+// Initial Orders fallback structured for real API replacement
 const INITIAL_ORDERS = [
   {
     id: 'GG-914820-EXP',
@@ -42,7 +46,7 @@ const INITIAL_ORDERS = [
       { id: 'cpu-7800x3d', name: 'AMD Ryzen 7 7800X3D Processor', price: 449, quantity: 1 }
     ],
     total: 2448,
-    status: 'Shipped' // Pending | Processing | Shipped | Delivered | Cancelled
+    status: 'Shipped'
   },
   {
     id: 'GG-884210-EXP',
@@ -55,31 +59,6 @@ const INITIAL_ORDERS = [
     ],
     total: 3799,
     status: 'Processing'
-  },
-  {
-    id: 'GG-742918-EXP',
-    customer: { name: 'Marcus Chen', email: 'marcus.chen@horizon.dev', phone: '+1 555 192 8472' },
-    shippingAddress: '220 Innovation Way, Suite 300, Austin, TX 78701',
-    paymentMethod: 'NET BANKING (HDFC)',
-    date: 'Aug 28, 2026',
-    items: [
-      { id: 'gpu-5090', name: 'NVIDIA GeForce RTX 5090 Founders Edition', price: 1999, quantity: 1 }
-    ],
-    total: 1999,
-    status: 'Pending'
-  },
-  {
-    id: 'GG-652011-EXP',
-    customer: { name: 'Sarah Jenkins', email: 's.jenkins@vanguard.org', phone: '+1 555 901 3841' },
-    shippingAddress: '88 Cyber Way, Palo Alto, CA 94301',
-    paymentMethod: 'CARD (•••• 8912)',
-    date: 'Aug 27, 2026',
-    items: [
-      { id: 'cpu-7800x3d', name: 'AMD Ryzen 7 7800X3D Processor', price: 449, quantity: 1 },
-      { id: 'mb-x870e', name: 'ASUS ROG Crosshair X870E Hero', price: 699, quantity: 1 }
-    ],
-    total: 1148,
-    status: 'Delivered'
   }
 ];
 
@@ -148,6 +127,95 @@ export default function AdminPage() {
 
   const [viewOrderModal, setViewOrderModal] = useState(null);
 
+  // Live Backend Data Fetching
+  const fetchAdminProducts = useCallback(async () => {
+    try {
+      const res = await productAPI.getProducts({ limit: 100 });
+      const raw = res.data?.data?.products || [];
+      if (raw.length > 0) {
+        const mapped = raw.map((p) => ({
+          id: p._id,
+          _id: p._id,
+          name: p.title || 'Hardware Component',
+          category: p.category?._id || p.category?.slug || 'gpus',
+          categoryId: p.category?._id,
+          categoryLabel: p.category?.name || 'Hardware',
+          price: p.price,
+          originalPrice: p.discountPrice,
+          stock: p.stock ?? 10,
+          status: (p.stock === 0) ? 'Out of Stock' : ((p.stock || 0) < 10) ? 'Low Stock' : 'In Stock',
+          image: p.images?.[0]?.url || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+          specs: p.specs || [p.brand || 'GearGrid', 'High Performance'],
+          description: p.description || '',
+          brand: p.brand || 'GearGrid',
+          rating: p.rating || 5.0,
+          reviews: p.numReviews || 0
+        }));
+        setProducts(mapped);
+      }
+    } catch {
+      // Fallback
+    }
+  }, []);
+
+  const fetchAdminCategories = useCallback(async () => {
+    try {
+      const res = await categoryAPI.getCategories();
+      const raw = res.data?.data || [];
+      if (raw.length > 0) {
+        const mapped = raw.map(c => ({
+          id: c._id,
+          _id: c._id,
+          label: c.name,
+          name: c.name,
+          slug: c.slug,
+          description: c.description || `Enthusiast-grade ${c.name.toLowerCase()} curated for competitive hardware configurations.`
+        }));
+        setCategories(mapped);
+      }
+    } catch {
+      // Fallback
+    }
+  }, []);
+
+  const fetchAdminOrders = useCallback(async () => {
+    try {
+      const res = await orderAPI.getMyOrders();
+      const raw = res.data?.data || [];
+      if (raw.length > 0) {
+        const mapped = raw.map(o => ({
+          id: `GG-${o._id.slice(-6).toUpperCase()}-EXP`,
+          _id: o._id,
+          customer: {
+            name: user?.name || 'Verified Builder',
+            email: user?.email || 'customer@geargrid.io',
+            phone: '+1 555 382 9102'
+          },
+          shippingAddress: 'Certified Insured Dispatch Destination',
+          paymentMethod: 'VERIFIED TRANSACTION',
+          date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          items: o.items?.map(item => ({
+            id: item.product,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          })) || [],
+          total: o.totalAmount,
+          status: o.orderStatus || 'Pending'
+        }));
+        setOrders(mapped);
+      }
+    } catch {
+      // Fallback
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchAdminProducts();
+    fetchAdminCategories();
+    fetchAdminOrders();
+  }, [fetchAdminProducts, fetchAdminCategories, fetchAdminOrders]);
+
   // Summary Metrics
   const metrics = useMemo(() => {
     const totalProducts = products.length;
@@ -172,7 +240,7 @@ export default function AdminPage() {
     return products.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
                           (p.categoryLabel || '').toLowerCase().includes(productSearch.toLowerCase());
-      const matchCat = productCatFilter === 'all' || p.category === productCatFilter;
+      const matchCat = productCatFilter === 'all' || p.category === productCatFilter || p.categoryId === productCatFilter;
       return matchSearch && matchCat;
     });
   }, [products, productSearch, productCatFilter]);
@@ -195,8 +263,8 @@ export default function AdminPage() {
     setEditingProduct(null);
     setProductFormData({
       name: '',
-      category: 'gpus',
-      categoryLabel: 'Graphics Card',
+      category: categories[0]?.id || 'gpus',
+      categoryLabel: categories[0]?.label || 'Graphics Card',
       price: '',
       originalPrice: '',
       stock: '15',
@@ -213,7 +281,7 @@ export default function AdminPage() {
     setEditingProduct(prod);
     setProductFormData({
       name: prod.name,
-      category: prod.category,
+      category: prod.categoryId || prod.category,
       categoryLabel: prod.categoryLabel || '',
       price: prod.price.toString(),
       originalPrice: prod.originalPrice ? prod.originalPrice.toString() : '',
@@ -227,64 +295,41 @@ export default function AdminPage() {
     setProductModalOpen(true);
   };
 
-  const handleSaveProduct = (e) => {
+  const handleSaveProduct = async (e) => {
     e.preventDefault();
     const priceNum = parseFloat(productFormData.price) || 0;
-    const origPriceNum = productFormData.originalPrice ? parseFloat(productFormData.originalPrice) : null;
+    const origPriceNum = productFormData.originalPrice ? parseFloat(productFormData.originalPrice) : undefined;
     const stockNum = parseInt(productFormData.stock, 10) || 0;
     const specsArray = productFormData.specs
       ? productFormData.specs.split(',').map(s => s.trim()).filter(Boolean)
       : [];
 
-    const categoryObj = categories.find(c => c.id === productFormData.category);
-    const categoryLabel = categoryObj ? categoryObj.label : 'Hardware Component';
+    const categoryObj = categories.find(c => c.id === productFormData.category || c._id === productFormData.category);
+    const categoryId = categoryObj?._id || categoryObj?.id || (categories[0]?._id || categories[0]?.id);
 
-    const status = stockNum === 0 ? 'Out of Stock' : stockNum < 10 ? 'Low Stock' : 'In Stock';
+    const payload = {
+      title: productFormData.name,
+      description: productFormData.description || `High performance enthusiast ${productFormData.name} hardware component.`,
+      price: priceNum,
+      discountPrice: origPriceNum,
+      category: categoryId,
+      brand: 'GearGrid Lab',
+      stock: stockNum,
+      featured: true
+    };
 
-    if (editingProduct) {
-      // Update
-      setProducts(prev => prev.map(p => {
-        if (p.id === editingProduct.id) {
-          return {
-            ...p,
-            name: productFormData.name,
-            category: productFormData.category,
-            categoryLabel,
-            price: priceNum,
-            originalPrice: origPriceNum,
-            stock: stockNum,
-            status,
-            image: productFormData.image,
-            specs: specsArray,
-            wattage: productFormData.wattage ? parseInt(productFormData.wattage, 10) : undefined,
-            badge: productFormData.badge || undefined,
-            description: productFormData.description
-          };
-        }
-        return p;
-      }));
-      showToast(`Updated "${productFormData.name}"`, 'amber');
-    } else {
-      // Create new
-      const newProd = {
-        id: `prod-${Date.now()}`,
-        name: productFormData.name,
-        category: productFormData.category,
-        categoryLabel,
-        price: priceNum,
-        originalPrice: origPriceNum,
-        stock: stockNum,
-        status,
-        image: productFormData.image,
-        specs: specsArray,
-        wattage: productFormData.wattage ? parseInt(productFormData.wattage, 10) : undefined,
-        badge: productFormData.badge || undefined,
-        description: productFormData.description,
-        rating: 5.0,
-        reviews: 1
-      };
-      setProducts(prev => [newProd, ...prev]);
-      showToast(`Created hardware product "${productFormData.name}"`, 'amber');
+    try {
+      if (editingProduct && (editingProduct._id || editingProduct.id)) {
+        const prodId = editingProduct._id || editingProduct.id;
+        await productAPI.updateProduct(prodId, payload);
+        showToast(`Updated "${productFormData.name}"`, 'amber');
+      } else {
+        await productAPI.createProduct(payload);
+        showToast(`Created hardware product "${productFormData.name}"`, 'amber');
+      }
+      await fetchAdminProducts();
+    } catch (err) {
+      showToast(err.response?.data?.message || err.message || 'Operation failed', 'red');
     }
 
     setProductModalOpen(false);
@@ -311,36 +356,23 @@ export default function AdminPage() {
     setEditingCategory(cat);
     setCategoryFormData({
       id: cat.id,
-      label: cat.label,
+      label: cat.label || cat.name,
       description: cat.description || ''
     });
     setCategoryModalOpen(true);
   };
 
-  const handleSaveCategory = (e) => {
+  const handleSaveCategory = async (e) => {
     e.preventDefault();
-    const slug = categoryFormData.id.trim().toLowerCase().replace(/\s+/g, '-');
-    
-    if (editingCategory) {
-      setCategories(prev => prev.map(c => {
-        if (c.id === editingCategory.id) {
-          return {
-            ...c,
-            label: categoryFormData.label,
-            description: categoryFormData.description
-          };
-        }
-        return c;
-      }));
-      showToast(`Updated category "${categoryFormData.label}"`, 'amber');
-    } else {
-      const newCat = {
-        id: slug || `cat-${Date.now()}`,
-        label: categoryFormData.label,
-        description: categoryFormData.description
-      };
-      setCategories(prev => [...prev, newCat]);
-      showToast(`Added hardware category "${categoryFormData.label}"`, 'amber');
+    const catName = categoryFormData.label || categoryFormData.name;
+    const catDesc = categoryFormData.description || `Enthusiast-grade ${catName} components.`;
+
+    try {
+      await categoryAPI.createCategory({ name: catName, description: catDesc });
+      showToast(`Added hardware category "${catName}"`, 'amber');
+      await fetchAdminCategories();
+    } catch (err) {
+      showToast(err.response?.data?.message || err.message || 'Failed to save category', 'red');
     }
     setCategoryModalOpen(false);
   };
@@ -354,10 +386,16 @@ export default function AdminPage() {
   };
 
   // Execute confirmed deletion
-  const executeDelete = () => {
+  const executeDelete = async () => {
     if (deleteConfirmModal.type === 'product' && deleteConfirmModal.item) {
-      setProducts(prev => prev.filter(p => p.id !== deleteConfirmModal.item.id));
-      showToast(`Deleted product "${deleteConfirmModal.item.name}"`, 'red');
+      const prodId = deleteConfirmModal.item._id || deleteConfirmModal.item.id;
+      try {
+        await productAPI.deleteProduct(prodId);
+        showToast(`Deleted product "${deleteConfirmModal.item.name}"`, 'red');
+        await fetchAdminProducts();
+      } catch (err) {
+        showToast(err.response?.data?.message || err.message || 'Failed to delete product', 'red');
+      }
     } else if (deleteConfirmModal.type === 'category' && deleteConfirmModal.item) {
       setCategories(prev => prev.filter(c => c.id !== deleteConfirmModal.item.id));
       showToast(`Deleted category "${deleteConfirmModal.item.label}"`, 'red');
@@ -541,7 +579,7 @@ export default function AdminPage() {
                     <span className="metric-label">TOTAL MANIFEST REVENUE</span>
                     <TrendingUp size={18} className="metric-icon" />
                   </div>
-                  <div className="metric-value">${metrics.totalRevenue.toLocaleString()}</div>
+                  <div className="metric-value">{formatPrice(metrics.totalRevenue)}</div>
                   <div className="metric-sub">Verified hardware transactions</div>
                 </div>
               </div>
@@ -579,7 +617,7 @@ export default function AdminPage() {
                           <tr key={order.id}>
                             <td className="mono-text">{order.id}</td>
                             <td>{order.customer.name}</td>
-                            <td className="price-text">${order.total.toLocaleString()}</td>
+                            <td className="price-text">{formatPrice(order.total)}</td>
                             <td>
                               <span className={`status-badge status-${order.status.toLowerCase()}`}>
                                 {order.status}
@@ -732,7 +770,7 @@ export default function AdminPage() {
                               </div>
                             </td>
                             <td>{prod.categoryLabel || prod.category}</td>
-                            <td className="price-text">${prod.price.toLocaleString()}</td>
+                            <td className="price-text">{formatPrice(prod.price)}</td>
                             <td className="mono-text">{prod.stock} units</td>
                             <td>
                               <span className={`status-badge ${prod.stock === 0 ? 'status-cancelled' : prod.stock < 10 ? 'status-pending' : 'status-delivered'}`}>
@@ -921,7 +959,7 @@ export default function AdminPage() {
                             </td>
                             <td className="text-muted">{order.date}</td>
                             <td>{order.items.length} {order.items.length === 1 ? 'part' : 'parts'}</td>
-                            <td className="price-text font-bold">${order.total.toLocaleString()}</td>
+                            <td className="price-text font-bold">{formatPrice(order.total)}</td>
                             <td>
                               <select 
                                 value={order.status}
@@ -1022,7 +1060,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="modal-field">
-                  <label className="modal-label">Price ($) *</label>
+                  <label className="modal-label">Price (₹) *</label>
                   <input 
                     type="number" 
                     min="1"
@@ -1035,7 +1073,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="modal-field">
-                  <label className="modal-label">Original Price ($ optional)</label>
+                  <label className="modal-label">Original Price (₹ optional)</label>
                   <input 
                     type="number" 
                     min="0"
@@ -1319,9 +1357,9 @@ export default function AdminPage() {
                     {viewOrderModal.items.map((item, i) => (
                       <tr key={i}>
                         <td className="font-semibold">{item.name}</td>
-                        <td className="price-text">${item.price.toLocaleString()}</td>
+                        <td className="price-text">{formatPrice(item.price)}</td>
                         <td className="mono-text">{item.quantity}</td>
-                        <td className="price-text text-right">${(item.price * item.quantity).toLocaleString()}</td>
+                        <td className="price-text text-right">{formatPrice(item.price * item.quantity)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1330,7 +1368,7 @@ export default function AdminPage() {
 
               <div className="order-modal-total-bar">
                 <span className="order-modal-total-label">INVOICE TOTAL</span>
-                <span className="order-modal-total-value">${viewOrderModal.total.toLocaleString()}</span>
+                <span className="order-modal-total-value">{formatPrice(viewOrderModal.total)}</span>
               </div>
 
             </div>

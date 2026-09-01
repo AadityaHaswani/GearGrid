@@ -14,6 +14,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { formatPrice } from '../utils/formatCurrency';
 import './WishlistPage.css';
 
 export default function WishlistPage() {
@@ -186,13 +187,18 @@ export default function WishlistPage() {
 
           <div className="arsenal-items-list">
             {sortedWishlist.map((product, index) => {
+              const productId = product._id || product.id;
+              const title = product.title || product.name || 'Hardware Component';
+              const categoryLabel = product.category?.name || product.categoryLabel || product.brand || 'HARDWARE COMPONENT';
+              const price = product.price || 0;
+              const image = (product.images && product.images[0]?.url) || product.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
               const isEven = index % 2 === 1; // Alternating layout
               const indexStr = (index + 1).toString().padStart(2, '0');
-              const isRemoving = removingId === product.id;
+              const isRemoving = removingId === productId;
 
               return (
                 <article 
-                  key={product.id} 
+                  key={productId} 
                   className={`arsenal-editorial-row ${isEven ? 'row-reversed' : ''} ${isRemoving ? 'removing' : ''}`}
                 >
                   
@@ -204,10 +210,10 @@ export default function WishlistPage() {
 
                   {/* Dominant Product Visual */}
                   <div className="arsenal-visual-column">
-                    <Link to={`/product/${product.id}`} className="arsenal-image-box">
+                    <Link to={`/product/${productId}`} className="arsenal-image-box">
                       <img 
-                        src={product.image} 
-                        alt={product.name} 
+                        src={image} 
+                        alt={title} 
                         className="arsenal-image"
                         loading="lazy"
                       />
@@ -220,20 +226,20 @@ export default function WishlistPage() {
                     
                     <div className="arsenal-meta-top">
                       <span className="arsenal-category-tag">
-                        {product.categoryLabel || 'HARDWARE COMPONENT'}
+                        {categoryLabel}
                       </span>
 
                       {product.rating && (
                         <div className="arsenal-rating-pill">
                           <Star size={12} className="star-amber" fill="var(--accent-amber)" />
                           <span>{product.rating}</span>
-                          {product.reviews && <span className="reviews-count">({product.reviews})</span>}
+                          {(product.reviews || product.numReviews) && <span className="reviews-count">({product.reviews || product.numReviews})</span>}
                         </div>
                       )}
                     </div>
 
-                    <Link to={`/product/${product.id}`} className="arsenal-title-link">
-                      <h2 className="arsenal-product-title">{product.name}</h2>
+                    <Link to={`/product/${productId}`} className="arsenal-title-link">
+                      <h2 className="arsenal-product-title">{title}</h2>
                     </Link>
 
                     {/* Specifications */}
@@ -251,11 +257,11 @@ export default function WishlistPage() {
                     {/* Pricing */}
                     <div className="arsenal-price-row">
                       <span className="arsenal-price-val">
-                        ${product.price.toLocaleString()}
+                        {formatPrice(price)}
                       </span>
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.originalPrice && product.originalPrice > price && (
                         <span className="arsenal-orig-price">
-                          ${product.originalPrice.toLocaleString()}
+                          {formatPrice(product.originalPrice)}
                         </span>
                       )}
                     </div>
@@ -274,20 +280,20 @@ export default function WishlistPage() {
                       </button>
 
                       {/* View Details Link */}
-                      <Link to={`/product/${product.id}`} className="arsenal-details-link">
+                      <Link to={`/product/${productId}`} className="arsenal-details-link">
                         <span>VIEW DETAILS</span>
                         <ArrowUpRight size={14} />
                       </Link>
 
-                      {/* Secondary Remove Action */}
+                      {/* Remove Button */}
                       <button 
                         type="button" 
                         className="arsenal-remove-btn"
                         onClick={() => handleRemove(product)}
                         title="Remove from Arsenal"
+                        aria-label="Remove item"
                       >
-                        <Trash2 size={13} />
-                        <span>REMOVE</span>
+                        <Trash2 size={15} />
                       </button>
 
                     </div>

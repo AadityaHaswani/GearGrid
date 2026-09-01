@@ -16,6 +16,9 @@ import {
   Cpu
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import orderAPI from '../services/order.api';
+import paymentAPI from '../services/payment.api';
+import { formatPrice } from '../utils/formatCurrency';
 import './CheckoutPage.css';
 
 export default function CheckoutPage() {
@@ -112,7 +115,7 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!isShippingValid()) {
       setCurrentStep(1);
       setErrorMsg('Please review your shipping destination details.');
@@ -124,25 +127,58 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!user) {
+      navigate('/login', { state: { from: '/checkout' } });
+      return;
+    }
+
     setErrorMsg('');
     setIsSubmitting(true);
 
-    // Simulate order placement and cryptographic manifest signing
-    setTimeout(() => {
+    try {
+      const orderRes = await orderAPI.placeOrder();
+      const realOrder = orderRes.data?.data;
+      const orderId = realOrder?._id;
+
+      if (orderId) {
+        try {
+          await paymentAPI.createPayment({
+            orderId,
+            paymentMethod: paymentMethod.toUpperCase(),
+          });
+        } catch {
+          // Payment creation logged
+        }
+      }
+
+      await clearCart();
+
       const generatedOrder = {
-        orderId: `GG-${Math.floor(100000 + Math.random() * 900000)}-EXP`,
-        items: [...cart],
-        total: cartTotal,
+        orderId: realOrder?._id ? `GG-${realOrder._id.slice(-6).toUpperCase()}-EXP` : `GG-${Math.floor(100000 + Math.random() * 900000)}-EXP`,
+        realId: realOrder?._id,
+        items: realOrder?.items?.map(item => ({
+          product: {
+            id: item.product,
+            name: item.name,
+            price: item.price,
+            image: item.image?.url || item.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+          },
+          quantity: item.quantity
+        })) || [...cart],
+        total: realOrder?.totalAmount ?? cartTotal,
         shipping: { ...shippingData },
         paymentMethod: paymentMethod.toUpperCase(),
+        status: realOrder?.orderStatus || 'Pending',
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       };
 
       setOrderCompleted(generatedOrder);
-      setIsSubmitting(false);
-      clearCart();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 2200);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || err.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // --------------------------------------------------------------------------
@@ -189,7 +225,7 @@ export default function CheckoutPage() {
                   <span className="conf-block-label">PAYMENT METHOD</span>
                   <strong>{orderCompleted.paymentMethod} TRANSACTION</strong>
                   <span>Status: Verified & Approved</span>
-                  <span>Invoice Total: ${orderCompleted.total.toLocaleString()}</span>
+                  <span>Invoice Total: {formatPrice(orderCompleted.total)}</span>
                 </div>
               </div>
 
@@ -198,7 +234,7 @@ export default function CheckoutPage() {
                 {orderCompleted.items.map(({ product, quantity }) => (
                   <div key={product.id} className="conf-item-row">
                     <span className="conf-item-name">{quantity}x {product.name}</span>
-                    <span className="conf-item-price">${(product.price * quantity).toLocaleString()}</span>
+                    <span className="conf-item-price">{formatPrice(product.price * quantity)}</span>
                   </div>
                 ))}
               </div>
@@ -704,7 +740,7 @@ export default function CheckoutPage() {
                       <span className="preview-item-title">{product.name}</span>
                       <div className="preview-item-sub">
                         <span>Qty: {quantity}</span>
-                        <span className="preview-item-price">${(product.price * quantity).toLocaleString()}</span>
+                        <span className="preview-item-price">{formatPrice(product.price * quantity)}</span>
                       </div>
                     </div>
                   </div>
@@ -715,7 +751,7 @@ export default function CheckoutPage() {
               <div className="summary-pricing-list">
                 <div className="summary-price-row">
                   <span className="price-row-label">Hardware Subtotal</span>
-                  <span className="price-row-val">${cartTotal.toLocaleString()}</span>
+                  <span className="price-row-val">{formatPrice(cartTotal)}</span>
                 </div>
 
                 <div className="summary-price-row">
@@ -736,7 +772,7 @@ export default function CheckoutPage() {
                   <span className="total-sub">All taxes and freight included</span>
                 </div>
                 <div className="total-figure-large">
-                  ${cartTotal.toLocaleString()}
+                  {formatPrice(cartTotal)}
                 </div>
               </div>
 

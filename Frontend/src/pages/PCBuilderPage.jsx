@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BUILDER_SLOTS } from '../data/hardwareData';
 import { useShop } from '../context/ShopContext';
 import BuildLabScene from '../components/builder/BuildLabScene';
+import { formatPrice } from '../utils/formatCurrency';
 import {
   Zap,
   ShieldCheck,
@@ -185,7 +186,7 @@ export default function PCBuilderPage() {
                         </div>
 
                         <div className="option-pricing">
-                          <span className="option-price-amount">${opt.price.toLocaleString()}</span>
+                          <span className="option-price-amount">{formatPrice(opt.price)}</span>
                           <span className="option-status-label">
                             {isSelected ? 'EQUIPPED' : 'SELECT'}
                           </span>
@@ -263,7 +264,7 @@ export default function PCBuilderPage() {
                         <span className="manifest-part-name">
                           {part?.name.split('(')[0].trim() || 'Not Configured'}
                         </span>
-                        <span className="manifest-part-price">${part?.price}</span>
+                        <span className="manifest-part-price">{formatPrice(part?.price)}</span>
                         <ChevronRight size={13} className="manifest-jump-arrow" />
                       </button>
                     );
@@ -275,7 +276,7 @@ export default function PCBuilderPage() {
               <div className="console-actions-block">
                 <div className="console-total-row">
                   <span className="console-total-label">TOTAL INVESTMENT</span>
-                  <span className="console-total-price">${totalPrice.toLocaleString()}</span>
+                  <span className="console-total-price">{formatPrice(totalPrice)}</span>
                 </div>
 
                 <p className="console-warranty-note">

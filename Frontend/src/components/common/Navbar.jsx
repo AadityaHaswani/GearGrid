@@ -253,11 +253,11 @@ export default function Navbar() {
                     {user.role === 'admin' && (
                       <Link
                         to="/admin"
-                        className="account-menu-item"
+                        className="account-menu-item admin-highlight"
                         onClick={() => setAccountMenuOpen(false)}
                       >
                         <ShieldAlert size={15} className="menu-item-icon text-amber" />
-                        <span style={{ color: 'var(--accent-amber)', fontWeight: 700 }}>Admin Console</span>
+                        <span>Admin Console</span>
                       </Link>
                     )}
 
@@ -409,7 +409,6 @@ export default function Navbar() {
                 to="/wishlist" 
                 onClick={() => setMobileMenuOpen(false)} 
                 className="mobile-sub-action"
-                style={{ textDecoration: 'none' }}
               >
                 <Heart size={16} /> Arsenal ({wishlistCount})
               </Link>
@@ -417,7 +416,6 @@ export default function Navbar() {
                 to="/cart" 
                 onClick={() => setMobileMenuOpen(false)} 
                 className="mobile-sub-action"
-                style={{ textDecoration: 'none' }}
               >
                 <ShoppingCart size={16} /> Cart ({cartCount})
               </Link>

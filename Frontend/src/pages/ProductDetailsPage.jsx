@@ -20,9 +20,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { PRODUCTS } from '../data/hardwareData';
+import { getProductById } from '../services/product.api';
 import { useShop } from '../context/ShopContext';
 import ProductCard from '../components/shop/ProductCard';
 import QuickViewDrawer from '../components/shop/QuickViewDrawer';
+import { formatPrice } from '../utils/formatCurrency';
 import './ProductDetailsPage.css';
 
 const getProductGallery = (product) => {
@@ -55,12 +57,18 @@ const getProductGallery = (product) => {
     ]
   };
 
-  if (galleryPresets[product.id]) {
-    return galleryPresets[product.id];
+  const pid = product._id || product.id;
+  if (galleryPresets[pid]) {
+    return galleryPresets[pid];
+  }
+
+  if (product.images && product.images.length > 0) {
+    const urls = product.images.map(img => img.url || img).filter(Boolean);
+    if (urls.length > 0) return urls;
   }
 
   return [
-    product.image,
+    product.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'
@@ -72,7 +80,48 @@ export default function ProductDetailsPage() {
   const navigate = useNavigate();
   const { addToCart, toggleWishlist, isInWishlist } = useShop();
 
-  const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
+  const [rawProduct, setRawProduct] = useState(() => {
+    return PRODUCTS.find((p) => p.id === id || p._id === id) || PRODUCTS[0];
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadProduct = async () => {
+      try {
+        const res = await getProductById(id);
+        if (isMounted && res.data?.data) {
+          setRawProduct(res.data.data);
+        }
+      } catch {
+        const found = PRODUCTS.find((p) => p.id === id || p._id === id);
+        if (isMounted && found) {
+          setRawProduct(found);
+        }
+      }
+    };
+    if (id) {
+      loadProduct();
+    }
+    return () => { isMounted = false; };
+  }, [id]);
+
+  const product = {
+    ...rawProduct,
+    id: rawProduct._id || rawProduct.id,
+    name: rawProduct.title || rawProduct.name || 'Hardware Component',
+    categoryLabel: rawProduct.category?.name || rawProduct.categoryLabel || rawProduct.brand || 'Hardware',
+    price: rawProduct.discountPrice && rawProduct.discountPrice < rawProduct.price ? rawProduct.discountPrice : (rawProduct.price || 0),
+    originalPrice: rawProduct.originalPrice || (rawProduct.discountPrice && rawProduct.discountPrice < rawProduct.price ? rawProduct.price : null),
+    rating: rawProduct.rating || 4.8,
+    reviews: rawProduct.numReviews ?? rawProduct.reviews ?? 0,
+    specs: rawProduct.specs && rawProduct.specs.length > 0
+      ? rawProduct.specs
+      : [rawProduct.brand, rawProduct.category?.name, rawProduct.stock ? `${rawProduct.stock} units in stock` : 'In Stock'].filter(Boolean),
+    image: (rawProduct.images && rawProduct.images.length > 0 && rawProduct.images[0]?.url)
+      ? rawProduct.images[0].url
+      : (rawProduct.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80'),
+    description: rawProduct.description || 'Precision engineered hardware component built for maximum performance and reliability.'
+  };
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -220,15 +269,15 @@ export default function ProductDetailsPage() {
             {/* Price Section */}
             <div className="product-lab-price-row">
               <span className="product-lab-current-price">
-                ${product.price.toLocaleString()}
+                {formatPrice(product.price)}
               </span>
               {product.originalPrice && (
                 <>
                   <span className="product-lab-old-price">
-                    ${product.originalPrice.toLocaleString()}
+                    {formatPrice(product.originalPrice)}
                   </span>
                   <span className="product-lab-save-badge">
-                    Save ${product.originalPrice - product.price}
+                    Save {formatPrice(product.originalPrice - product.price)}
                   </span>
                 </>
               )}
@@ -304,7 +353,7 @@ export default function ProductDetailsPage() {
                 ) : (
                   <>
                     <ShoppingCart size={18} />
-                    <span>ADD TO CART • ${(product.price * quantity).toLocaleString()}</span>
+                    <span>ADD TO CART • {formatPrice(product.price * quantity)}</span>
                   </>
                 )}
               </button>

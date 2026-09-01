@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { HARDWARE_CATEGORIES, PRODUCTS } from '../data/hardwareData';
+import { HARDWARE_CATEGORIES } from '../data/hardwareData';
+import { getProducts } from '../services/product.api';
 import ProductCard from '../components/shop/ProductCard';
 import QuickViewDrawer from '../components/shop/QuickViewDrawer';
 import {
@@ -13,9 +14,14 @@ import {
   Monitor,
   Keyboard,
   Fan,
-  Server
+  Server,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import './ShopPage.css';
+
+const ITEMS_PER_PAGE = 8;
 
 const getCategoryIcon = (id) => {
   switch (id) {
@@ -31,13 +37,71 @@ const getCategoryIcon = (id) => {
   }
 };
 
+const matchesCategory = (item, catId) => {
+  if (!catId || catId === 'all') return true;
+  const itemCatSlug = (item.category?.slug || '').toLowerCase();
+  const itemCatName = (item.category?.name || '').toLowerCase();
+  const itemCatRaw = typeof item.category === 'string' ? item.category.toLowerCase() : '';
+  const cat = catId.toLowerCase();
+
+  if (itemCatSlug === cat || itemCatName === cat || itemCatRaw === cat) return true;
+  if (itemCatSlug.includes(cat) || cat.includes(itemCatSlug)) return true;
+
+  if (cat === 'peripherals') {
+    const peripheralTypes = ['keyboard', 'mouse', 'headphone', 'audio', 'headset', 'mic', 'peripheral'];
+    return peripheralTypes.some(t => itemCatSlug.includes(t) || itemCatName.includes(t));
+  }
+  if (cat === 'gpus') {
+    return itemCatSlug.includes('gpu') || itemCatSlug.includes('graphic') || itemCatName.includes('gpu') || itemCatName.includes('graphic');
+  }
+  if (cat === 'cpus') {
+    return itemCatSlug.includes('cpu') || itemCatSlug.includes('processor') || itemCatName.includes('cpu') || itemCatName.includes('processor');
+  }
+  if (cat === 'cooling') {
+    return itemCatSlug.includes('cool') || itemCatSlug.includes('case') || itemCatSlug.includes('fan');
+  }
+  if (cat === 'prebuilt') {
+    return itemCatSlug.includes('system') || itemCatSlug.includes('prebuilt') || itemCatSlug.includes('pc') || itemCatSlug.includes('desktop');
+  }
+
+  return false;
+};
+
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || 'all';
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('featured'); // 'featured', 'price-low', 'price-high', 'rating'
+  const [sortBy, setSortBy] = useState('featured');
+  const [currentPage, setCurrentPage] = useState(1);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+
+  const fetchProductsList = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getProducts({ page: 1, limit: 8 });
+      const productList = res.data?.data?.products || res.data?.data || [];
+      setProducts(productList);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to load products from server.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProductsList();
+  }, [fetchProductsList]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery, sortBy]);
 
   const handleCategorySelect = (categoryId) => {
     if (categoryId === 'all') {
@@ -49,22 +113,49 @@ export default function ShopPage() {
   };
 
   const filteredAndSortedProducts = useMemo(() => {
-    return PRODUCTS.filter((item) => {
-      const matchesCat = activeCategory === 'all' || item.category === activeCategory;
+    return products.filter((item) => {
+      const matchesCat = matchesCategory(item, activeCategory);
       const q = searchQuery.toLowerCase().trim();
+      const title = (item.title || item.name || '').toLowerCase();
+      const catLabel = (item.category?.name || item.categoryLabel || '').toLowerCase();
+      const brand = (item.brand || '').toLowerCase();
+      const desc = (item.description || '').toLowerCase();
+      const specs = item.specs || [];
       const matchesSearch = q === '' || (
-        item.name.toLowerCase().includes(q) ||
-        item.categoryLabel.toLowerCase().includes(q) ||
-        item.specs.some(s => s.toLowerCase().includes(q))
+        title.includes(q) ||
+        catLabel.includes(q) ||
+        brand.includes(q) ||
+        desc.includes(q) ||
+        specs.some(s => s.toLowerCase().includes(q))
       );
       return matchesCat && matchesSearch;
     }).sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
+      const priceA = (a.discountPrice && a.discountPrice < a.price ? a.discountPrice : a.price) || 0;
+      const priceB = (b.discountPrice && b.discountPrice < b.price ? b.discountPrice : b.price) || 0;
+      const ratingA = a.rating || 0;
+      const ratingB = b.rating || 0;
+      if (sortBy === 'price-low') return priceA - priceB;
+      if (sortBy === 'price-high') return priceB - priceA;
+      if (sortBy === 'rating') return ratingB - ratingA;
       return 0;
     });
-  }, [activeCategory, searchQuery, sortBy]);
+  }, [products, activeCategory, searchQuery, sortBy]);
+
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE) || 1;
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAndSortedProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAndSortedProducts, currentPage]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 380, behavior: 'smooth' });
+    }
+  };
+
+  const heroImage = products[0]?.images?.[0]?.url || products[0]?.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
 
   return (
     <div className="shop-page-root">
@@ -91,7 +182,7 @@ export default function ShopPage() {
             <div className="shop-hero-meta">
               <div className="shop-catalog-indicator">
                 <span className="indicator-dot"></span>
-                <span>{PRODUCTS.length} PRODUCTS AVAILABLE</span>
+                <span>{products.length} PRODUCTS AVAILABLE</span>
               </div>
               <div className="shop-hero-connector"></div>
             </div>
@@ -101,7 +192,7 @@ export default function ShopPage() {
           <div className="shop-hero-visual-wrapper">
             <div className="shop-hero-visual-frame">
               <img
-                src={PRODUCTS[0].image}
+                src={heroImage}
                 alt="Enthusiast Gaming Hardware"
                 className="shop-hero-image"
               />
@@ -176,7 +267,7 @@ export default function ShopPage() {
           {/* Results Status */}
           <div className="shop-results-status">
             <span className="results-count">
-              Showing <strong>{filteredAndSortedProducts.length}</strong> products
+              Showing <strong>{filteredAndSortedProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}</strong> - <strong>{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedProducts.length)}</strong> of <strong>{filteredAndSortedProducts.length}</strong> products
             </span>
             {activeCategory !== 'all' && (
               <button
@@ -188,12 +279,31 @@ export default function ShopPage() {
             )}
           </div>
 
-          {/* Product Grid */}
-          {filteredAndSortedProducts.length === 0 ? (
+          {/* Catalog Content States */}
+          {loading ? (
+            <div className="shop-loading-state">
+              <div className="shop-loading-spinner" />
+              <span className="shop-loading-text">Loading catalog...</span>
+            </div>
+          ) : error && products.length === 0 ? (
+            <div className="shop-error-state">
+              <AlertCircle size={32} className="shop-error-icon" />
+              <h3 className="shop-error-title">Unable to load catalog</h3>
+              <p className="shop-error-desc">{error}</p>
+              <button
+                type="button"
+                className="btn-primary shop-retry-btn"
+                onClick={fetchProductsList}
+              >
+                Retry Connection
+              </button>
+            </div>
+          ) : filteredAndSortedProducts.length === 0 ? (
             <div className="shop-no-results">
               <h3>No products found</h3>
               <p>Try adjusting your category selection or search keywords.</p>
               <button
+                type="button"
                 className="btn-outline"
                 onClick={() => {
                   setSearchQuery('');
@@ -204,16 +314,66 @@ export default function ShopPage() {
               </button>
             </div>
           ) : (
-            <div className="shop-products-grid">
-              {filteredAndSortedProducts.map((product, index) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  index={index} 
-                  onQuickView={setQuickViewProduct} 
-                />
-              ))}
-            </div>
+            <>
+              <div className="shop-products-grid">
+                {paginatedProducts.map((product, index) => (
+                  <ProductCard 
+                    key={product._id || product.id} 
+                    product={product} 
+                    index={(currentPage - 1) * ITEMS_PER_PAGE + index} 
+                    onQuickView={setQuickViewProduct} 
+                  />
+                ))}
+              </div>
+
+              {/* Clean Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="shop-pagination-wrapper">
+                  <div className="shop-pagination-controls">
+                    <button
+                      type="button"
+                      className="shop-pagination-nav-btn"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage <= 1}
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft size={16} />
+                      <span>Previous</span>
+                    </button>
+
+                    <div className="shop-pagination-pages">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          className={`shop-pagination-page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                          onClick={() => handlePageChange(pageNum)}
+                          aria-label={`Page ${pageNum}`}
+                          aria-current={currentPage === pageNum ? 'page' : undefined}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="shop-pagination-nav-btn"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage >= totalPages}
+                      aria-label="Next page"
+                    >
+                      <span>Next</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+
+                  <span className="shop-pagination-info">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
+              )}
+            </>
           )}
 
         </div>

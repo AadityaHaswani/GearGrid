@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Product } from "../models/product.models.js";
 import { Category } from "../models/category.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -41,9 +42,9 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
     const page = Math.max(Number(req.query.page) || 1, 1);
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
-
+    const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 100);
     const skip = (page - 1) * limit;
+
     const { 
         search,
         category,
@@ -58,75 +59,112 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
     if (search) {
         filter.title = {
-        $regex: search,
-        $options: "i",
+            $regex: search.trim(),
+            $options: "i",
         };
     }
+
     if (category) {
-    filter.category = category;
-    }
-    if (brand) {
-    filter.brand = brand;
-    }
-    if (featured) {
-    filter.featured = featured === "true";
-    }
-    if (minPrice || maxPrice) {
-    filter.price = {};
+        if (mongoose.Types.ObjectId.isValid(category)) {
+            filter.category = category;
+        } else {
+            const foundCategory = await Category.findOne({
+                $or: [
+                    { slug: category.toLowerCase() },
+                    { name: { $regex: new RegExp(`^${category}$`, "i") } }
+                ]
+            }).select("_id").lean();
 
-    if (minPrice) {
-        filter.price.$gte = Number(minPrice);
-    }
-
-    if (maxPrice) {
-        filter.price.$lte = Number(maxPrice);
+            if (foundCategory) {
+                filter.category = foundCategory._id;
+            } else {
+                filter.category = null;
+            }
         }
     }
+
+    if (brand) {
+        filter.brand = { $regex: new RegExp(`^${brand.trim()}$`, "i") };
+    }
+
+    if (featured !== undefined) {
+        filter.featured = featured === "true";
+    }
+
+    if (minPrice || maxPrice) {
+        filter.price = {};
+        if (minPrice) {
+            filter.price.$gte = Number(minPrice);
+        }
+        if (maxPrice) {
+            filter.price.$lte = Number(maxPrice);
+        }
+    }
+
     let sortOption = { createdAt: -1 };
 
     if (sort) {
-    switch (sort) {
-        case "price":
-            sortOption = { price: 1 };
-            break;
+        switch (sort) {
+            case "price":
+            case "price-low":
+                sortOption = { price: 1 };
+                break;
 
-        case "-price":
-            sortOption = { price: -1 };
-            break;
+            case "-price":
+            case "price-high":
+                sortOption = { price: -1 };
+                break;
 
-        case "latest":
-            sortOption = { createdAt: -1 };
-            break;
+            case "rating":
+                sortOption = { rating: -1 };
+                break;
 
-        case "oldest":
-            sortOption = { createdAt: 1 };
-            break;
+            case "latest":
+                sortOption = { createdAt: -1 };
+                break;
 
-        default:
-            sortOption = { createdAt: -1 };
+            case "oldest":
+                sortOption = { createdAt: 1 };
+                break;
+
+            default:
+                sortOption = { createdAt: -1 };
         }
     }
 
-    const totalProducts = await Product.countDocuments(filter);
-    const totalPages = Math.ceil(totalProducts / limit);
-    const products = await Product.find(filter)
-        .populate("category", "name slug")
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit);
-  return res.status(200).json(
-    new ApiResponse(
-        200,
-        {
-            products,
-            totalProducts,
-            totalPages,
-            currentPage: page,
-        },
-        "Products fetched successfully"
-    )
-);
+    // Execute count and selective projection find query concurrently
+    const [totalProducts, products] = await Promise.all([
+        Product.countDocuments(filter),
+        Product.find(filter)
+            .select("_id title price discountPrice brand stock rating numReviews images category featured createdAt")
+            .populate("category", "name slug")
+            .sort(sortOption)
+            .skip(skip)
+            .limit(limit)
+            .lean()
+    ]);
 
+    const totalPages = Math.ceil(totalProducts / limit) || 1;
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                products,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalProducts,
+                    limit,
+                },
+                totalProducts,
+                totalPages,
+                currentPage: page,
+                limit,
+            },
+            "Products fetched successfully"
+        )
+    );
 });
 
 const getProductById = asyncHandler(async (req, res) => {

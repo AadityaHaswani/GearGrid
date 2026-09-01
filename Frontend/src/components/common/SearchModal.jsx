@@ -1,19 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, ShoppingCart } from 'lucide-react';
 import { PRODUCTS } from '../../data/hardwareData';
-import { useShop } from '../../context/ShopContext';
+import { getProducts } from '../../services/product.api';
+import { useShop, normalizeProduct } from '../../context/ShopContext';
+import { formatPrice } from '../../utils/formatCurrency';
 import './SearchModal.css';
 
-const SUGGESTED_SEARCHES = ['RTX 5090', 'Ryzen 7 7800X3D', '360Hz OLED', 'DDR5-6000', 'Liquid Cooler', 'Wooting 80HE'];
+const SUGGESTED_SEARCHES = ['RTX 5090', 'Ryzen 7 7800X3D', '360Hz OLED', 'DDR5-6000', 'Liquid Cooler', 'Sony WH-1000XM5'];
 
 export default function SearchModal() {
   const { isSearchOpen, setIsSearchOpen, addToCart } = useShop();
   const [query, setQuery] = useState('');
+  const [catalog, setCatalog] = useState(PRODUCTS);
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (isSearchOpen) {
       setTimeout(() => inputRef.current?.focus(), 80);
+      getProducts({ limit: 100 })
+        .then((res) => {
+          if (res.data?.data?.products?.length > 0) {
+            setCatalog(res.data.data.products.map(normalizeProduct).filter(Boolean));
+          }
+        })
+        .catch(() => {});
     } else {
       setQuery('');
     }
@@ -23,13 +33,12 @@ export default function SearchModal() {
 
   const filteredProducts = query.trim() === ''
     ? []
-    : PRODUCTS.filter((item) => {
+    : catalog.filter((item) => {
         const q = query.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(q) ||
-          item.categoryLabel.toLowerCase().includes(q) ||
-          item.specs.some(s => s.toLowerCase().includes(q))
-        );
+        const title = (item.title || item.name || '').toLowerCase();
+        const cat = (item.category?.name || item.categoryLabel || '').toLowerCase();
+        const specsMatch = Array.isArray(item.specs) && item.specs.some(s => typeof s === 'string' && s.toLowerCase().includes(q));
+        return title.includes(q) || cat.includes(q) || specsMatch;
       });
 
   return (
@@ -95,7 +104,7 @@ export default function SearchModal() {
                     </div>
                   </div>
                   <div className="search-res-action">
-                    <span className="search-res-price">${product.price.toLocaleString()}</span>
+                    <span className="search-res-price">{formatPrice(product.price)}</span>
                     <button
                       className="btn-primary search-add-btn"
                       onClick={() => {

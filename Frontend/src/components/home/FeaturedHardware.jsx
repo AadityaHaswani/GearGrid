@@ -1,12 +1,28 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PRODUCTS } from '../../data/hardwareData';
+import { getProducts } from '../../services/product.api';
 import ProductCard from '../shop/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import './FeaturedHardware.css';
 
 export default function FeaturedHardware() {
-  const flagshipProduct = PRODUCTS[0];
-  const supportingProducts = PRODUCTS.slice(1, 3);
+  const [items, setItems] = useState(PRODUCTS);
+
+  useEffect(() => {
+    let isMounted = true;
+    getProducts({ limit: 4 })
+      .then((res) => {
+        if (isMounted && res.data?.data?.products?.length > 0) {
+          setItems(res.data.data.products);
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
+  const flagshipProduct = items[0] || PRODUCTS[0];
+  const supportingProducts = items.slice(1, 3);
 
   return (
     <section className="featured-hardware-section">
