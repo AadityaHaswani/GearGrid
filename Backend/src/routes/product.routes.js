@@ -8,6 +8,7 @@ import {
 } from "../controllers/product.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { isAdmin } from "../middlewares/admin.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 import { createProductValidator } from "../validators/product.validators.js";
 import { validate } from "../middlewares/validator.middleware.js";
 
@@ -19,6 +20,7 @@ router.route("/")
     .post(
         verifyJWT,
         isAdmin,
+        upload.single("image"),
         createProductValidator(),
         validate,
         createProduct
@@ -31,6 +33,7 @@ router.route("/:productId")
     .put(
         verifyJWT,
         isAdmin,
+        upload.single("image"),
         updateProduct
     )
     .delete(

@@ -1,27 +1,27 @@
 import { useState, useEffect } from 'react';
-import { 
-  X, 
-  Lock, 
-  Mail, 
-  User, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  Zap, 
-  AlertCircle, 
-  CheckCircle2, 
-  ShieldCheck 
+import {
+  X,
+  Lock,
+  Mail,
+  User,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Zap,
+  AlertCircle,
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { authAPI } from '../../services/api';
 import './AuthModal.css';
 
 export default function AuthModal() {
-  const { 
-    isAuthOpen, 
-    setIsAuthOpen, 
-    loginUser, 
-    authPromptMessage, 
+  const {
+    isAuthOpen,
+    setIsAuthOpen,
+    loginUser,
+    authPromptMessage,
     pendingAuthAction,
   } = useShop();
 
@@ -226,35 +226,18 @@ export default function AuthModal() {
     }
   };
 
-  const handleDemoSignIn = () => {
-    setError('');
-    const demoUser = {
-      id: 'usr_demo_88',
-      name: 'Alex Miller',
-      email: 'alex.miller@geargrid.io',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role: 'builder'
-    };
 
-    setEmail(demoUser.email);
-    setPassword('••••••••••••');
-    
-    setTimeout(() => {
-      loginUser(demoUser);
-      setIsAuthOpen(false);
-    }, 350);
-  };
 
   return (
     <div className="auth-modal-overlay" onClick={handleClose}>
       <div className="auth-modal-window" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Background Visual Inside Modal */}
         <div className="auth-modal-backdrop-img" />
         <div className="auth-modal-backdrop-overlay" />
 
         <div className="auth-modal-content">
-          
+
           {/* Top Bar with Close */}
           <div className="auth-modal-topbar">
             <div className="auth-modal-brand-badge">
@@ -267,8 +250,8 @@ export default function AuthModal() {
                 {tab === 'verify_reset' && 'GEARGRID // PASSWORD RESET'}
               </span>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="auth-modal-close-btn"
               onClick={handleClose}
               aria-label="Close authentication modal"
@@ -344,7 +327,7 @@ export default function AuthModal() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="auth-modal-form">
-            
+
             {tab === 'register' && (
               <div className="modal-field-group">
                 <label className="modal-field-label" htmlFor="modal-name">Full Name</label>
@@ -514,10 +497,10 @@ export default function AuthModal() {
               <span>
                 {isSubmitting ? 'PROCESSING...' : (
                   tab === 'login' ? 'SIGN IN' :
-                  tab === 'register' ? 'CREATE ACCOUNT & SEND OTP' :
-                  tab === 'verify_email' ? 'VERIFY & ENTER STATION' :
-                  tab === 'forgot' ? 'SEND RECOVERY CODE' :
-                  'RESET PASSWORD & SIGN IN'
+                    tab === 'register' ? 'CREATE ACCOUNT & SEND OTP' :
+                      tab === 'verify_email' ? 'VERIFY & ENTER STATION' :
+                        tab === 'forgot' ? 'SEND RECOVERY CODE' :
+                          'RESET PASSWORD & SIGN IN'
                 )}
               </span>
               <ArrowRight size={15} />
@@ -538,17 +521,7 @@ export default function AuthModal() {
               </button>
             )}
 
-            {/* Demo Access Button (only in login) */}
-            {tab === 'login' && (
-              <button
-                type="button"
-                className="btn-outline auth-modal-demo-btn"
-                onClick={handleDemoSignIn}
-              >
-                <Zap size={13} className="modal-demo-icon" />
-                <span>Sign In as Demo Builder</span>
-              </button>
-            )}
+
 
           </form>
 

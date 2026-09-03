@@ -50,8 +50,26 @@ app.use("/api/v1/orders", ordersRouter);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+
+  if (err.name === "MulterError") {
+    statusCode = 400;
+    if (err.code === "LIMIT_FILE_SIZE") {
+      message = "Image file is too large. Maximum size allowed is 5MB.";
+    } else {
+      message = err.message || "File upload error";
+    }
+  } else if (err.name === "ValidationError" && err.errors) {
+    statusCode = 400;
+    message = Object.values(err.errors)
+      .map((val) => val.message)
+      .join(", ");
+  } else if (err.name === "CastError") {
+    statusCode = 400;
+    message = `Invalid format for field: ${err.path}`;
+  }
+
   return res.status(statusCode).json({
     statusCode,
     success: false,

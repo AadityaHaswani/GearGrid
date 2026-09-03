@@ -122,7 +122,7 @@ export function ShopProvider({ children }) {
 
   // Fetch real cart from backend
   const fetchCart = useCallback(async () => {
-    if (!localStorage.getItem('geargrid_token') && !user) return;
+    if (!localStorage.getItem('geargrid_token')) return;
     try {
       const res = await cartAPI.getCart();
       const items = res.data?.data?.items || [];
@@ -131,11 +131,11 @@ export function ShopProvider({ children }) {
     } catch {
       // Offline fallback
     }
-  }, [user]);
+  }, []);
 
   // Fetch real wishlist from backend
   const fetchWishlist = useCallback(async () => {
-    if (!localStorage.getItem('geargrid_token') && !user) return;
+    if (!localStorage.getItem('geargrid_token')) return;
     try {
       const res = await wishlistAPI.getWishlist();
       const products = res.data?.data?.products || [];
@@ -144,14 +144,16 @@ export function ShopProvider({ children }) {
     } catch {
       // Offline fallback
     }
-  }, [user]);
+  }, []);
 
-  // Initial user verification & cart/wishlist hydration
+  // Initial user verification & cart/wishlist hydration - runs ONCE on mount
   useEffect(() => {
     const token = localStorage.getItem('geargrid_token');
     if (token) {
+      let isMounted = true;
       authAPI.getCurrentUser()
         .then((res) => {
+          if (!isMounted) return;
           const u = res.data?.data;
           if (u) {
             const formatted = {
@@ -161,7 +163,12 @@ export function ShopProvider({ children }) {
               avatar: u.avatar?.url || null,
               role: u.role || 'user'
             };
-            setUser(formatted);
+            setUser((prev) => {
+              if (prev && prev.id === formatted.id && prev.email === formatted.email && prev.role === formatted.role) {
+                return prev;
+              }
+              return formatted;
+            });
             localStorage.setItem('geargrid_user', JSON.stringify(formatted));
           }
         })
@@ -170,6 +177,10 @@ export function ShopProvider({ children }) {
         });
       fetchCart();
       fetchWishlist();
+
+      return () => {
+        isMounted = false;
+      };
     }
   }, [fetchCart, fetchWishlist]);
 

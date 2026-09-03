@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Lock, 
-  Mail, 
-  User, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  ArrowLeft, 
-  ShieldCheck, 
-  AlertCircle, 
-  Zap, 
-  CheckCircle2, 
-  ShoppingCart, 
-  Heart, 
-  KeyRound, 
-  RotateCw 
+import {
+  Lock,
+  Mail,
+  User,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  AlertCircle,
+  Zap,
+  CheckCircle2,
+  ShoppingCart,
+  Heart,
+  KeyRound,
+  RotateCw
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { authAPI } from '../services/api';
@@ -69,14 +69,14 @@ export default function LoginPage({ initialMode = 'login' }) {
       <div className="login-page-root">
         <div className="login-backdrop-image" />
         <div className="login-backdrop-overlay" />
-        
+
         <header className="login-fullscreen-topbar">
           <Link to="/" className="login-topbar-brand">
             <div className="topbar-logo-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 17L12 22L22 17" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 12L12 17L22 12" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
             <span className="topbar-brand-title">Gear<span className="brand-accent">Grid</span></span>
@@ -106,8 +106,8 @@ export default function LoginPage({ initialMode = 'login' }) {
               <p className="auth-user-email">{user.email}</p>
             </div>
             <div className="auth-action-buttons">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-primary auth-submit-btn"
                 onClick={() => navigate(returnPath)}
               >
@@ -261,11 +261,11 @@ export default function LoginPage({ initialMode = 'login' }) {
 
       const backendUser = responseData?.user;
       const loggedUser = {
-        id: backendUser?._id || `usr_${Date.now()}`,
-        name: backendUser?.username || email.split('@')[0],
+        id: backendUser?._id,
+        name: backendUser?.username || backendUser?.name || email.split('@')[0],
         email: backendUser?.email || email.trim(),
         avatar: backendUser?.avatar?.url || null,
-        role: backendUser?.role || (email.trim().toLowerCase().includes('admin') ? 'admin' : 'builder'),
+        role: backendUser?.role || 'user',
       };
 
       loginUser(loggedUser, loggedUser.role === 'admin' && returnPath === '/' ? '/admin' : returnPath);
@@ -294,48 +294,11 @@ export default function LoginPage({ initialMode = 'login' }) {
     }
   };
 
-  // Instant Demo Logins
-  const handleDemoSignIn = () => {
-    setError('');
-    const demoUser = {
-      id: 'usr_demo_88',
-      name: 'Alex Miller',
-      email: 'alex.miller@geargrid.io',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role: 'builder'
-    };
 
-    setEmail(demoUser.email);
-    setPassword('••••••••••••');
-    setSuccessMsg('Authenticating verified demo account...');
-    
-    setTimeout(() => {
-      loginUser(demoUser, returnPath);
-    }, 400);
-  };
-
-  const handleAdminSignIn = () => {
-    setError('');
-    const adminUser = {
-      id: 'usr_admin_01',
-      name: 'Valen Drake',
-      email: 'admin@geargrid.io',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-      role: 'admin'
-    };
-
-    setEmail(adminUser.email);
-    setPassword('••••••••••••');
-    setSuccessMsg('Authenticating verified Administrator console...');
-    
-    setTimeout(() => {
-      loginUser(adminUser, '/admin');
-    }, 400);
-  };
 
   return (
     <div className="login-page-root">
-      
+
       {/* Full-screen Cinematic Hardware Background */}
       <div className="login-backdrop-image" />
       <div className="login-backdrop-overlay" />
@@ -345,9 +308,9 @@ export default function LoginPage({ initialMode = 'login' }) {
         <Link to="/" className="login-topbar-brand">
           <div className="topbar-logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 17L12 22L22 17" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 12L12 17L22 12" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="topbar-brand-title">Gear<span className="brand-accent">Grid</span></span>
@@ -360,7 +323,7 @@ export default function LoginPage({ initialMode = 'login' }) {
       </header>
 
       <div className="login-page-container">
-        
+
         {/* Left Side: Brand Narrative */}
         <div className="login-brand-narrative">
           <span className="narrative-tag">
@@ -396,7 +359,7 @@ export default function LoginPage({ initialMode = 'login' }) {
 
         {/* Right Side: Refined Auth Panel */}
         <div className={`login-panel ${mode === 'register' ? 'register-mode-panel' : ''}`}>
-          
+
           {/* Header Brand */}
           <div className="login-panel-header">
             <div className="auth-brand-badge">
@@ -460,7 +423,7 @@ export default function LoginPage({ initialMode = 'login' }) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className={`login-form-body ${mode === 'register' ? 'compact-register-form' : ''}`}>
-            
+
             {/* 1. REGISTER MODE: Full Name */}
             {mode === 'register' && (
               <div className="auth-input-group">
@@ -637,43 +600,16 @@ export default function LoginPage({ initialMode = 'login' }) {
               <span>
                 {isSubmitting ? 'PROCESSING...' : (
                   mode === 'login' ? 'SIGN IN' :
-                  mode === 'register' ? 'CREATE ACCOUNT & SEND OTP' :
-                  mode === 'verify_email' ? 'VERIFY & ENTER STATION' :
-                  mode === 'forgot' ? 'SEND RECOVERY CODE' :
-                  'RESET PASSWORD & SIGN IN'
+                    mode === 'register' ? 'CREATE ACCOUNT & SEND OTP' :
+                      mode === 'verify_email' ? 'VERIFY & ENTER STATION' :
+                        mode === 'forgot' ? 'SEND RECOVERY CODE' :
+                          'RESET PASSWORD & SIGN IN'
                 )}
               </span>
               <ArrowRight size={15} />
             </button>
 
-            {/* Quick Demo Access (only on Login) */}
-            {mode === 'login' && (
-              <>
-                <div className="auth-divider">
-                  <span>OR INSTANT PREVIEW</span>
-                </div>
 
-                <div className="auth-demo-grid">
-                  <button
-                    type="button"
-                    className="btn-outline auth-demo-btn"
-                    onClick={handleDemoSignIn}
-                  >
-                    <Zap size={13} className="demo-btn-icon" />
-                    <span>Sign In as Builder</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn-outline auth-demo-btn admin-demo-btn"
-                    onClick={handleAdminSignIn}
-                  >
-                    <ShieldCheck size={13} className="demo-btn-icon text-amber" />
-                    <span>Admin Operations</span>
-                  </button>
-                </div>
-              </>
-            )}
 
           </form>
 

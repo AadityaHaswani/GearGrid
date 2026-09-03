@@ -1,25 +1,25 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Layers, 
-  ShoppingBag, 
-  Plus, 
-  Search, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  CheckCircle2, 
-  AlertTriangle, 
-  X, 
-  ArrowLeft, 
-  TrendingUp, 
-  Clock, 
-  Truck, 
-  CheckCheck, 
-  Ban, 
-  Menu, 
+import {
+  LayoutDashboard,
+  Package,
+  Layers,
+  ShoppingBag,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  CheckCircle2,
+  AlertTriangle,
+  X,
+  ArrowLeft,
+  TrendingUp,
+  Clock,
+  Truck,
+  CheckCheck,
+  Ban,
+  Menu,
   SlidersHorizontal,
   LogOut,
   ShieldAlert,
@@ -70,21 +70,20 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Core Data State
-  const [products, setProducts] = useState(() => {
-    return PRODUCTS.map((p, idx) => ({
-      ...p,
-      stock: p.stock !== undefined ? p.stock : (idx % 3 === 0 ? 4 : idx % 5 === 0 ? 0 : 24),
-      status: p.stock === 0 ? 'Out of Stock' : (p.stock < 10 || idx % 3 === 0) ? 'Low Stock' : 'In Stock'
-    }));
-  });
+  // Helper for user-friendly error messages from backend
+  const extractErrorMessage = (err, fallback = 'Operation failed') => {
+    if (err.response?.data?.errors?.length) {
+      return err.response.data.errors.map(e => e.message || e.msg).join(', ');
+    }
+    return err.response?.data?.message || err.message || fallback;
+  };
 
-  const [categories, setCategories] = useState(() => {
-    return HARDWARE_CATEGORIES.filter(c => c.id !== 'all').map(c => ({
-      ...c,
-      description: `Enthusiast-grade ${c.label.toLowerCase()} curated for competitive hardware configurations.`
-    }));
-  });
+  // Core Data State - initialized empty, strictly loaded from real MongoDB
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
 
   const [orders, setOrders] = useState(INITIAL_ORDERS);
 
@@ -97,6 +96,8 @@ export default function AdminPage() {
   // Modal States
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null); // null = Add, object = Edit
+  const [productImageFile, setProductImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [productFormData, setProductFormData] = useState({
     name: '',
     category: 'gpus',
@@ -124,57 +125,62 @@ export default function AdminPage() {
     type: '', // 'product' | 'category'
     item: null
   });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [viewOrderModal, setViewOrderModal] = useState(null);
 
   // Live Backend Data Fetching
-  const fetchAdminProducts = useCallback(async () => {
+  const fetchAdminProducts = useCallback(async (showLoadingPlaceholder = false) => {
+    if (showLoadingPlaceholder) {
+      setLoadingProducts(true);
+    }
     try {
       const res = await productAPI.getProducts({ limit: 100 });
       const raw = res.data?.data?.products || [];
-      if (raw.length > 0) {
-        const mapped = raw.map((p) => ({
-          id: p._id,
-          _id: p._id,
-          name: p.title || 'Hardware Component',
-          category: p.category?._id || p.category?.slug || 'gpus',
-          categoryId: p.category?._id,
-          categoryLabel: p.category?.name || 'Hardware',
-          price: p.price,
-          originalPrice: p.discountPrice,
-          stock: p.stock ?? 10,
-          status: (p.stock === 0) ? 'Out of Stock' : ((p.stock || 0) < 10) ? 'Low Stock' : 'In Stock',
-          image: p.images?.[0]?.url || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
-          specs: p.specs || [p.brand || 'GearGrid', 'High Performance'],
-          description: p.description || '',
-          brand: p.brand || 'GearGrid',
-          rating: p.rating || 5.0,
-          reviews: p.numReviews || 0
-        }));
-        setProducts(mapped);
-      }
-    } catch {
-      // Fallback
+      const mapped = raw.map((p) => ({
+        id: p._id,
+        _id: p._id,
+        name: p.title || 'Hardware Component',
+        category: p.category?._id || p.category?.slug || (p.category?.name || 'Hardware'),
+        categoryId: p.category?._id,
+        categoryLabel: p.category?.name || 'Hardware',
+        price: p.price,
+        originalPrice: p.discountPrice,
+        stock: p.stock ?? 10,
+        status: (p.stock === 0) ? 'Out of Stock' : ((p.stock || 0) < 10) ? 'Low Stock' : 'In Stock',
+        image: p.images?.[0]?.url || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+        specs: p.specs || [p.brand || 'GearGrid', 'High Performance'],
+        description: p.description || '',
+        brand: p.brand || 'GearGrid',
+        rating: p.rating || 5.0,
+        reviews: p.numReviews || 0
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      console.error('Failed to load products from database:', err);
+    } finally {
+      setLoadingProducts(false);
     }
   }, []);
 
   const fetchAdminCategories = useCallback(async () => {
+    setLoadingCategories(true);
     try {
       const res = await categoryAPI.getCategories();
       const raw = res.data?.data || [];
-      if (raw.length > 0) {
-        const mapped = raw.map(c => ({
-          id: c._id,
-          _id: c._id,
-          label: c.name,
-          name: c.name,
-          slug: c.slug,
-          description: c.description || `Enthusiast-grade ${c.name.toLowerCase()} curated for competitive hardware configurations.`
-        }));
-        setCategories(mapped);
-      }
-    } catch {
-      // Fallback
+      const mapped = raw.map(c => ({
+        id: c._id,
+        _id: c._id,
+        label: c.name,
+        name: c.name,
+        slug: c.slug,
+        description: c.description || `Enthusiast-grade ${c.name.toLowerCase()} curated for competitive hardware configurations.`
+      }));
+      setCategories(mapped);
+    } catch (err) {
+      console.error('Failed to load categories from database:', err);
+    } finally {
+      setLoadingCategories(false);
     }
   }, []);
 
@@ -210,11 +216,12 @@ export default function AdminPage() {
     }
   }, [user]);
 
+  // Run data fetching ONCE when component mounts
   useEffect(() => {
-    fetchAdminProducts();
+    fetchAdminProducts(true);
     fetchAdminCategories();
     fetchAdminOrders();
-  }, [fetchAdminProducts, fetchAdminCategories, fetchAdminOrders]);
+  }, []);
 
   // Summary Metrics
   const metrics = useMemo(() => {
@@ -239,7 +246,7 @@ export default function AdminPage() {
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-                          (p.categoryLabel || '').toLowerCase().includes(productSearch.toLowerCase());
+        (p.categoryLabel || '').toLowerCase().includes(productSearch.toLowerCase());
       const matchCat = productCatFilter === 'all' || p.category === productCatFilter || p.categoryId === productCatFilter;
       return matchSearch && matchCat;
     });
@@ -249,8 +256,8 @@ export default function AdminPage() {
   const filteredOrders = useMemo(() => {
     return orders.filter(o => {
       const matchSearch = o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
-                          o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) ||
-                          o.customer.email.toLowerCase().includes(orderSearch.toLowerCase());
+        o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.customer.email.toLowerCase().includes(orderSearch.toLowerCase());
       const matchStatus = orderStatusFilter === 'all' || o.status === orderStatusFilter;
       return matchSearch && matchStatus;
     });
@@ -259,34 +266,44 @@ export default function AdminPage() {
   // --------------------------------------------------------------------------
   // Product CRUD Handlers
   // --------------------------------------------------------------------------
-  const openAddProduct = () => {
+  const resetProductForm = useCallback(() => {
     setEditingProduct(null);
+    setProductImageFile(null);
+    setImagePreview('');
+    const defaultCat = categories[0]?._id || categories[0]?.id || '';
+    const defaultCatLabel = categories[0]?.label || categories[0]?.name || '';
     setProductFormData({
       name: '',
-      category: categories[0]?.id || 'gpus',
-      categoryLabel: categories[0]?.label || 'Graphics Card',
+      category: defaultCat,
+      categoryLabel: defaultCatLabel,
       price: '',
       originalPrice: '',
       stock: '15',
-      image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+      image: '',
       specs: 'PCIe 5.0 Support, High Performance',
       wattage: '300',
       badge: '',
       description: ''
     });
+  }, [categories]);
+
+  const openAddProduct = () => {
+    resetProductForm();
     setProductModalOpen(true);
   };
 
   const openEditProduct = (prod) => {
     setEditingProduct(prod);
+    setProductImageFile(null);
+    setImagePreview(prod.image || '');
     setProductFormData({
-      name: prod.name,
-      category: prod.categoryId || prod.category,
+      name: prod.name || '',
+      category: prod.categoryId || prod.category || (categories[0]?._id || ''),
       categoryLabel: prod.categoryLabel || '',
-      price: prod.price.toString(),
+      price: prod.price !== undefined ? prod.price.toString() : '',
       originalPrice: prod.originalPrice ? prod.originalPrice.toString() : '',
-      stock: prod.stock.toString(),
-      image: prod.image,
+      stock: prod.stock !== undefined ? prod.stock.toString() : '0',
+      image: prod.image || '',
       specs: Array.isArray(prod.specs) ? prod.specs.join(', ') : (prod.specs || ''),
       wattage: prod.wattage ? prod.wattage.toString() : '',
       badge: prod.badge || '',
@@ -295,44 +312,110 @@ export default function AdminPage() {
     setProductModalOpen(true);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProductImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSaveProduct = async (e) => {
     e.preventDefault();
-    const priceNum = parseFloat(productFormData.price) || 0;
-    const origPriceNum = productFormData.originalPrice ? parseFloat(productFormData.originalPrice) : undefined;
-    const stockNum = parseInt(productFormData.stock, 10) || 0;
-    const specsArray = productFormData.specs
-      ? productFormData.specs.split(',').map(s => s.trim()).filter(Boolean)
-      : [];
 
-    const categoryObj = categories.find(c => c.id === productFormData.category || c._id === productFormData.category);
-    const categoryId = categoryObj?._id || categoryObj?.id || (categories[0]?._id || categories[0]?.id);
-
-    const payload = {
-      title: productFormData.name,
-      description: productFormData.description || `High performance enthusiast ${productFormData.name} hardware component.`,
-      price: priceNum,
-      discountPrice: origPriceNum,
-      category: categoryId,
-      brand: 'GearGrid Lab',
-      stock: stockNum,
-      featured: true
-    };
-
-    try {
-      if (editingProduct && (editingProduct._id || editingProduct.id)) {
-        const prodId = editingProduct._id || editingProduct.id;
-        await productAPI.updateProduct(prodId, payload);
-        showToast(`Updated "${productFormData.name}"`, 'amber');
-      } else {
-        await productAPI.createProduct(payload);
-        showToast(`Created hardware product "${productFormData.name}"`, 'amber');
-      }
-      await fetchAdminProducts();
-    } catch (err) {
-      showToast(err.response?.data?.message || err.message || 'Operation failed', 'red');
+    const trimmedName = productFormData.name.trim();
+    if (trimmedName.length < 3) {
+      showToast('Product name must be at least 3 characters long', 'red');
+      return;
     }
 
-    setProductModalOpen(false);
+    const priceNum = parseFloat(productFormData.price);
+    if (isNaN(priceNum) || priceNum < 0) {
+      showToast('Please enter a valid positive price', 'red');
+      return;
+    }
+
+    const origPriceNum = productFormData.originalPrice ? parseFloat(productFormData.originalPrice) : undefined;
+    const stockNum = parseInt(productFormData.stock, 10);
+    const validStock = isNaN(stockNum) ? 0 : Math.max(0, stockNum);
+
+    // Resolve category id: check _id, id, slug
+    const categoryObj = categories.find(c => c._id === productFormData.category || c.id === productFormData.category || c.slug === productFormData.category);
+    const categoryId = categoryObj?._id || categoryObj?.id || productFormData.category || (categories[0]?._id || categories[0]?.id);
+
+    if (!categoryId) {
+      showToast('Please select a valid hardware category', 'red');
+      return;
+    }
+
+    // Default description if too short or empty
+    const descInput = productFormData.description?.trim();
+    const descFinal = (descInput && descInput.length >= 10)
+      ? descInput
+      : `High performance enthusiast ${trimmedName} hardware component.`;
+
+    const brandFinal = (productFormData.specs?.split(',')[0]?.trim()) || 'GearGrid Lab';
+
+    setIsSavingProduct(true);
+
+    try {
+      if (productImageFile) {
+        // Use FormData when an image file is selected
+        const formData = new FormData();
+        formData.append('title', trimmedName);
+        formData.append('description', descFinal);
+        formData.append('price', priceNum);
+        if (origPriceNum !== undefined && !isNaN(origPriceNum)) {
+          formData.append('discountPrice', origPriceNum);
+        }
+        formData.append('category', categoryId);
+        formData.append('brand', brandFinal);
+        formData.append('stock', validStock);
+        formData.append('featured', true);
+        formData.append('image', productImageFile);
+
+        if (editingProduct && (editingProduct._id || editingProduct.id)) {
+          const prodId = editingProduct._id || editingProduct.id;
+          await productAPI.updateProduct(prodId, formData);
+          showToast(`Updated "${trimmedName}"`, 'amber');
+        } else {
+          await productAPI.createProduct(formData);
+          showToast(`Created hardware product "${trimmedName}"`, 'amber');
+        }
+      } else {
+        // Send clean JSON payload when NO file is selected (do NOT use multipart/form-data)
+        const payload = {
+          title: trimmedName,
+          description: descFinal,
+          price: priceNum,
+          discountPrice: (origPriceNum !== undefined && !isNaN(origPriceNum)) ? origPriceNum : 0,
+          category: categoryId,
+          brand: brandFinal,
+          stock: validStock,
+          featured: true,
+          ...(productFormData.image ? { image: productFormData.image } : {})
+        };
+
+        if (editingProduct && (editingProduct._id || editingProduct.id)) {
+          const prodId = editingProduct._id || editingProduct.id;
+          await productAPI.updateProduct(prodId, payload);
+          showToast(`Updated "${trimmedName}"`, 'amber');
+        } else {
+          await productAPI.createProduct(payload);
+          showToast(`Created hardware product "${trimmedName}"`, 'amber');
+        }
+      }
+
+      // Success: close modal, reset form, refetch from database
+      setProductModalOpen(false);
+      resetProductForm();
+      await fetchAdminProducts();
+    } catch (err) {
+      showToast(extractErrorMessage(err, 'Failed to save product'), 'red');
+      // Modal remains open on error so user can correct their input!
+    } finally {
+      setIsSavingProduct(false);
+    }
   };
 
   const confirmDeleteProduct = (prod) => {
@@ -389,18 +472,43 @@ export default function AdminPage() {
   const executeDelete = async () => {
     if (deleteConfirmModal.type === 'product' && deleteConfirmModal.item) {
       const prodId = deleteConfirmModal.item._id || deleteConfirmModal.item.id;
+      if (!prodId) {
+        showToast('Invalid product ID', 'red');
+        setDeleteConfirmModal({ open: false, type: '', item: null });
+        return;
+      }
+
+      setIsDeleting(true);
       try {
         await productAPI.deleteProduct(prodId);
-        showToast(`Deleted product "${deleteConfirmModal.item.name}"`, 'red');
+        showToast(`Deleted product "${deleteConfirmModal.item.name}"`, 'amber');
+        // Immediately remove product from list
+        setProducts((prev) => prev.filter((p) => (p._id || p.id) !== prodId));
+        setDeleteConfirmModal({ open: false, type: '', item: null });
+        // Refetch to sync state
         await fetchAdminProducts();
       } catch (err) {
-        showToast(err.response?.data?.message || err.message || 'Failed to delete product', 'red');
+        const status = err.response?.status;
+        let errMsg = err.response?.data?.message || err.message || 'Failed to delete product';
+
+        if (status === 401) {
+          errMsg = 'Session expired or unauthorized. Please log in again.';
+        } else if (status === 403) {
+          errMsg = 'Access denied. Administrator privileges required.';
+        } else if (status === 404) {
+          errMsg = 'Product not found or already deleted.';
+          setProducts((prev) => prev.filter((p) => (p._id || p.id) !== prodId));
+          setDeleteConfirmModal({ open: false, type: '', item: null });
+        }
+        showToast(errMsg, 'red');
+      } finally {
+        setIsDeleting(false);
       }
     } else if (deleteConfirmModal.type === 'category' && deleteConfirmModal.item) {
       setCategories(prev => prev.filter(c => c.id !== deleteConfirmModal.item.id));
-      showToast(`Deleted category "${deleteConfirmModal.item.label}"`, 'red');
+      showToast(`Deleted category "${deleteConfirmModal.item.label}"`, 'amber');
+      setDeleteConfirmModal({ open: false, type: '', item: null });
     }
-    setDeleteConfirmModal({ open: false, type: '', item: null });
   };
 
   // --------------------------------------------------------------------------
@@ -418,12 +526,12 @@ export default function AdminPage() {
 
   return (
     <div className="admin-console-root">
-      
+
       {/* Top Console Bar */}
       <header className="admin-top-bar">
         <div className="top-bar-left">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="admin-mobile-toggle"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label="Toggle admin sidebar"
@@ -448,8 +556,8 @@ export default function AdminPage() {
             <span className="admin-user-name">{user?.name || 'Administrator'}</span>
           </div>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="admin-logout-btn"
             onClick={() => {
               logoutUser();
@@ -464,15 +572,15 @@ export default function AdminPage() {
 
       {/* Main Console Workspace */}
       <div className="admin-workspace-layout">
-        
+
         {/* Left Navigation Sidebar */}
         <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-inner">
-            
+
             <div className="sidebar-section-label">MANAGEMENT</div>
             <nav className="sidebar-nav">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`sidebar-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
               >
@@ -480,8 +588,8 @@ export default function AdminPage() {
                 <span>Dashboard</span>
               </button>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`sidebar-nav-item ${activeTab === 'products' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('products'); setSidebarOpen(false); }}
               >
@@ -490,8 +598,8 @@ export default function AdminPage() {
                 <span className="sidebar-pill">{products.length}</span>
               </button>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`sidebar-nav-item ${activeTab === 'categories' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('categories'); setSidebarOpen(false); }}
               >
@@ -500,8 +608,8 @@ export default function AdminPage() {
                 <span className="sidebar-pill">{categories.length}</span>
               </button>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`sidebar-nav-item ${activeTab === 'orders' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('orders'); setSidebarOpen(false); }}
               >
@@ -523,20 +631,20 @@ export default function AdminPage() {
 
         {/* Center Workspace Content Area */}
         <main className="admin-main-content">
-          
+
           {/* ================================================================
               TAB 1: DASHBOARD
              ================================================================ */}
           {activeTab === 'dashboard' && (
             <div className="admin-tab-pane">
-              
+
               <div className="tab-pane-header">
                 <div>
                   <span className="pane-eyebrow">COMMAND CONSOLE</span>
                   <h1 className="pane-title">OPERATIONS DASHBOARD</h1>
                 </div>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-primary admin-primary-action"
                   onClick={openAddProduct}
                 >
@@ -586,13 +694,13 @@ export default function AdminPage() {
 
               {/* Dashboard Split View: Recent Orders & Low Stock */}
               <div className="dashboard-sections-grid">
-                
+
                 {/* Recent Orders Panel */}
                 <div className="admin-panel-card">
                   <div className="panel-card-header">
                     <h2 className="panel-card-title">Recent Order Manifests</h2>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="panel-link-btn"
                       onClick={() => setActiveTab('orders')}
                     >
@@ -624,8 +732,8 @@ export default function AdminPage() {
                               </span>
                             </td>
                             <td>
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="table-action-btn"
                                 onClick={() => setViewOrderModal(order)}
                                 title="View Order Manifest"
@@ -647,8 +755,8 @@ export default function AdminPage() {
                       <AlertTriangle size={16} className="text-amber" />
                       <h2 className="panel-card-title">Low Stock Hardware</h2>
                     </div>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="panel-link-btn"
                       onClick={() => setActiveTab('products')}
                     >
@@ -669,8 +777,8 @@ export default function AdminPage() {
                           <span className="stock-count-num">{prod.stock}</span>
                           <span className="stock-units">units</span>
                         </div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="table-action-btn edit-btn"
                           onClick={() => openEditProduct(prod)}
                           title="Restock / Edit"
@@ -692,14 +800,14 @@ export default function AdminPage() {
              ================================================================ */}
           {activeTab === 'products' && (
             <div className="admin-tab-pane">
-              
+
               <div className="tab-pane-header">
                 <div>
                   <span className="pane-eyebrow">HARDWARE CATALOG</span>
                   <h1 className="pane-title">PRODUCT MANAGEMENT</h1>
                 </div>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-primary admin-primary-action"
                   onClick={openAddProduct}
                 >
@@ -712,7 +820,7 @@ export default function AdminPage() {
               <div className="admin-toolbar-row">
                 <div className="admin-search-box">
                   <Search size={15} className="toolbar-search-icon" />
-                  <input 
+                  <input
                     type="text"
                     placeholder="Search by hardware name or category..."
                     value={productSearch}
@@ -723,7 +831,7 @@ export default function AdminPage() {
 
                 <div className="admin-filter-group">
                   <span className="filter-label">CATEGORY:</span>
-                  <select 
+                  <select
                     value={productCatFilter}
                     onChange={(e) => setProductCatFilter(e.target.value)}
                     className="admin-select"
@@ -751,7 +859,13 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.length === 0 ? (
+                      {loadingProducts && products.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" className="table-empty-cell">
+                            Loading hardware catalog from database...
+                          </td>
+                        </tr>
+                      ) : filteredProducts.length === 0 ? (
                         <tr>
                           <td colSpan="6" className="table-empty-cell">
                             No hardware products match the active query.
@@ -779,16 +893,16 @@ export default function AdminPage() {
                             </td>
                             <td className="text-right">
                               <div className="table-actions-group">
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="table-action-btn edit-btn"
                                   onClick={() => openEditProduct(prod)}
                                   title="Edit Product"
                                 >
                                   <Edit size={14} />
                                 </button>
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="table-action-btn delete-btn"
                                   onClick={() => confirmDeleteProduct(prod)}
                                   title="Delete Product"
@@ -813,14 +927,14 @@ export default function AdminPage() {
              ================================================================ */}
           {activeTab === 'categories' && (
             <div className="admin-tab-pane">
-              
+
               <div className="tab-pane-header">
                 <div>
                   <span className="pane-eyebrow">TAXONOMY</span>
                   <h1 className="pane-title">CATEGORY MANAGEMENT</h1>
                 </div>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-primary admin-primary-action"
                   onClick={openAddCategory}
                 >
@@ -853,16 +967,16 @@ export default function AdminPage() {
                             <td className="text-muted text-sm">{cat.description}</td>
                             <td className="text-right">
                               <div className="table-actions-group">
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="table-action-btn edit-btn"
                                   onClick={() => openEditCategory(cat)}
                                   title="Edit Category"
                                 >
                                   <Edit size={14} />
                                 </button>
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="table-action-btn delete-btn"
                                   onClick={() => confirmDeleteCategory(cat)}
                                   title="Delete Category"
@@ -887,7 +1001,7 @@ export default function AdminPage() {
              ================================================================ */}
           {activeTab === 'orders' && (
             <div className="admin-tab-pane">
-              
+
               <div className="tab-pane-header">
                 <div>
                   <span className="pane-eyebrow">FULFILLMENT</span>
@@ -899,7 +1013,7 @@ export default function AdminPage() {
               <div className="admin-toolbar-row">
                 <div className="admin-search-box">
                   <Search size={15} className="toolbar-search-icon" />
-                  <input 
+                  <input
                     type="text"
                     placeholder="Search by Order ID, customer name or email..."
                     value={orderSearch}
@@ -910,7 +1024,7 @@ export default function AdminPage() {
 
                 <div className="admin-filter-group">
                   <span className="filter-label">STATUS:</span>
-                  <select 
+                  <select
                     value={orderStatusFilter}
                     onChange={(e) => setOrderStatusFilter(e.target.value)}
                     className="admin-select"
@@ -961,7 +1075,7 @@ export default function AdminPage() {
                             <td>{order.items.length} {order.items.length === 1 ? 'part' : 'parts'}</td>
                             <td className="price-text font-bold">{formatPrice(order.total)}</td>
                             <td>
-                              <select 
+                              <select
                                 value={order.status}
                                 onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
                                 className={`order-status-select status-select-${order.status.toLowerCase()}`}
@@ -974,8 +1088,8 @@ export default function AdminPage() {
                               </select>
                             </td>
                             <td className="text-right">
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="table-action-btn"
                                 onClick={() => setViewOrderModal(order)}
                                 title="View Order Manifest"
@@ -1004,14 +1118,14 @@ export default function AdminPage() {
       {productModalOpen && (
         <div className="admin-modal-overlay" onClick={() => setProductModalOpen(false)}>
           <div className="admin-modal-panel large-modal" onClick={(e) => e.stopPropagation()}>
-            
+
             <div className="modal-header">
               <div>
                 <span className="modal-eyebrow">HARDWARE CATALOG</span>
                 <h3 className="modal-title">{editingProduct ? 'Edit Hardware Product' : 'Add New Hardware Product'}</h3>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="modal-close-btn"
                 onClick={() => setProductModalOpen(false)}
               >
@@ -1021,12 +1135,13 @@ export default function AdminPage() {
 
             <form onSubmit={handleSaveProduct} className="modal-body-form">
               <div className="modal-form-grid">
-                
+
                 <div className="modal-field full-width">
                   <label className="modal-label">Product Name *</label>
-                  <input 
-                    type="text" 
-                    required 
+                  <input
+                    type="text"
+                    required
+                    minLength={3}
                     placeholder="e.g. NVIDIA GeForce RTX 5090 Founders Edition"
                     value={productFormData.name}
                     onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
@@ -1036,7 +1151,7 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Category *</label>
-                  <select 
+                  <select
                     value={productFormData.category}
                     onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
                     className="modal-select"
@@ -1049,10 +1164,10 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Stock Quantity *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     min="0"
-                    required 
+                    required
                     value={productFormData.stock}
                     onChange={(e) => setProductFormData({ ...productFormData, stock: e.target.value })}
                     className="modal-input"
@@ -1061,10 +1176,10 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Price (₹) *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     min="1"
-                    required 
+                    required
                     placeholder="1999"
                     value={productFormData.price}
                     onChange={(e) => setProductFormData({ ...productFormData, price: e.target.value })}
@@ -1074,8 +1189,8 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Original Price (₹ optional)</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     min="0"
                     placeholder="2199"
                     value={productFormData.originalPrice}
@@ -1086,8 +1201,8 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Power Consumption (Wattage TDP)</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     placeholder="e.g. 500"
                     value={productFormData.wattage}
                     onChange={(e) => setProductFormData({ ...productFormData, wattage: e.target.value })}
@@ -1097,8 +1212,8 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Badge Tag (optional)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="e.g. Flagship / Best Seller"
                     value={productFormData.badge}
                     onChange={(e) => setProductFormData({ ...productFormData, badge: e.target.value })}
@@ -1107,21 +1222,36 @@ export default function AdminPage() {
                 </div>
 
                 <div className="modal-field full-width">
-                  <label className="modal-label">Image URL *</label>
-                  <input 
-                    type="url" 
-                    required 
-                    placeholder="https://images.unsplash.com/..."
-                    value={productFormData.image}
-                    onChange={(e) => setProductFormData({ ...productFormData, image: e.target.value })}
-                    className="modal-input"
+                  <label className="modal-label">
+                    Product Image {editingProduct ? '(Leave blank to keep existing)' : '(Optional file upload)'}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="modal-input modal-file-input"
+                    id="admin-product-image-file"
                   />
+                  {imagePreview && (
+                    <div className="modal-image-preview-wrapper">
+                      <span className="modal-image-preview-label">
+                        {productImageFile ? 'Selected Image Preview:' : 'Current Image Preview:'}
+                      </span>
+                      <div className="modal-image-preview-box">
+                        <img
+                          src={imagePreview}
+                          alt="Product preview"
+                          className="modal-image-preview-img"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="modal-field full-width">
                   <label className="modal-label">Key Specifications (Comma Separated)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="32GB GDDR7, 512-bit Memory Bus, PCIe 5.0 Support"
                     value={productFormData.specs}
                     onChange={(e) => setProductFormData({ ...productFormData, specs: e.target.value })}
@@ -1131,9 +1261,10 @@ export default function AdminPage() {
 
                 <div className="modal-field full-width">
                   <label className="modal-label">Product Description</label>
-                  <textarea 
+                  <textarea
                     rows="3"
-                    placeholder="Enter hardware architecture and technical details..."
+                    minLength={10}
+                    placeholder="Enter hardware architecture and technical details (min 10 characters)..."
                     value={productFormData.description}
                     onChange={(e) => setProductFormData({ ...productFormData, description: e.target.value })}
                     className="modal-textarea"
@@ -1143,15 +1274,20 @@ export default function AdminPage() {
               </div>
 
               <div className="modal-actions-bar">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-outline modal-cancel-btn"
                   onClick={() => setProductModalOpen(false)}
+                  disabled={isSavingProduct}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary modal-save-btn">
-                  <span>{editingProduct ? 'SAVE CHANGES' : 'CREATE PRODUCT'}</span>
+                <button
+                  type="submit"
+                  className="btn-primary modal-save-btn"
+                  disabled={isSavingProduct}
+                >
+                  <span>{isSavingProduct ? 'SAVING...' : (editingProduct ? 'SAVE CHANGES' : 'CREATE PRODUCT')}</span>
                 </button>
               </div>
             </form>
@@ -1166,14 +1302,14 @@ export default function AdminPage() {
       {categoryModalOpen && (
         <div className="admin-modal-overlay" onClick={() => setCategoryModalOpen(false)}>
           <div className="admin-modal-panel" onClick={(e) => e.stopPropagation()}>
-            
+
             <div className="modal-header">
               <div>
                 <span className="modal-eyebrow">TAXONOMY</span>
                 <h3 className="modal-title">{editingCategory ? 'Edit Category' : 'Add Category'}</h3>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="modal-close-btn"
                 onClick={() => setCategoryModalOpen(false)}
               >
@@ -1183,12 +1319,12 @@ export default function AdminPage() {
 
             <form onSubmit={handleSaveCategory} className="modal-body-form">
               <div className="modal-form-grid single-col">
-                
+
                 <div className="modal-field">
                   <label className="modal-label">Category Title *</label>
-                  <input 
-                    type="text" 
-                    required 
+                  <input
+                    type="text"
+                    required
                     placeholder="e.g. Liquid Coolers"
                     value={categoryFormData.label}
                     onChange={(e) => setCategoryFormData({ ...categoryFormData, label: e.target.value })}
@@ -1199,9 +1335,9 @@ export default function AdminPage() {
                 {!editingCategory && (
                   <div className="modal-field">
                     <label className="modal-label">Category Slug ID *</label>
-                    <input 
-                      type="text" 
-                      required 
+                    <input
+                      type="text"
+                      required
                       placeholder="e.g. liquid-coolers"
                       value={categoryFormData.id}
                       onChange={(e) => setCategoryFormData({ ...categoryFormData, id: e.target.value })}
@@ -1212,7 +1348,7 @@ export default function AdminPage() {
 
                 <div className="modal-field">
                   <label className="modal-label">Description</label>
-                  <textarea 
+                  <textarea
                     rows="3"
                     placeholder="Short description of this hardware family..."
                     value={categoryFormData.description}
@@ -1224,8 +1360,8 @@ export default function AdminPage() {
               </div>
 
               <div className="modal-actions-bar">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-outline modal-cancel-btn"
                   onClick={() => setCategoryModalOpen(false)}
                 >
@@ -1245,9 +1381,12 @@ export default function AdminPage() {
           MODAL 3: DELETE CONFIRMATION
          ==================================================================== */}
       {deleteConfirmModal.open && (
-        <div className="admin-modal-overlay" onClick={() => setDeleteConfirmModal({ open: false, type: '', item: null })}>
+        <div
+          className="admin-modal-overlay"
+          onClick={() => !isDeleting && setDeleteConfirmModal({ open: false, type: '', item: null })}
+        >
           <div className="admin-modal-panel confirm-modal" onClick={(e) => e.stopPropagation()}>
-            
+
             <div className="confirm-icon-box">
               <AlertTriangle size={24} className="text-red" />
             </div>
@@ -1259,19 +1398,21 @@ export default function AdminPage() {
             </p>
 
             <div className="confirm-actions-row">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-outline modal-cancel-btn"
                 onClick={() => setDeleteConfirmModal({ open: false, type: '', item: null })}
+                disabled={isDeleting}
               >
                 Cancel
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="admin-delete-confirm-btn"
                 onClick={executeDelete}
+                disabled={isDeleting}
               >
-                <span>DELETE PERMANENTLY</span>
+                <span>{isDeleting ? 'DELETING...' : 'DELETE PERMANENTLY'}</span>
               </button>
             </div>
 
@@ -1285,14 +1426,14 @@ export default function AdminPage() {
       {viewOrderModal && (
         <div className="admin-modal-overlay" onClick={() => setViewOrderModal(null)}>
           <div className="admin-modal-panel large-modal" onClick={(e) => e.stopPropagation()}>
-            
+
             <div className="modal-header">
               <div>
                 <span className="modal-eyebrow">ORDER RECONCILIATION</span>
                 <h3 className="modal-title">Order Manifest #{viewOrderModal.id}</h3>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="modal-close-btn"
                 onClick={() => setViewOrderModal(null)}
               >
@@ -1301,7 +1442,7 @@ export default function AdminPage() {
             </div>
 
             <div className="order-details-body">
-              
+
               <div className="order-details-grid">
                 <div className="order-info-card">
                   <span className="order-card-label">CUSTOMER DETAILS</span>
@@ -1323,7 +1464,7 @@ export default function AdminPage() {
 
                 <div className="order-info-card">
                   <span className="order-card-label">ORDER STATUS</span>
-                  <select 
+                  <select
                     value={viewOrderModal.status}
                     onChange={(e) => {
                       const newSt = e.target.value;
@@ -1374,8 +1515,8 @@ export default function AdminPage() {
             </div>
 
             <div className="modal-actions-bar">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-primary modal-save-btn"
                 onClick={() => setViewOrderModal(null)}
               >

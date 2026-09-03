@@ -17,24 +17,21 @@ const createProductValidator = () => {
       .withMessage("Price must be a positive number"),
 
     body("discountPrice")
-      .optional()
+      .optional({ checkFalsy: true })
       .isFloat({ min: 0 })
       .withMessage("Discount price must be a positive number"),
 
     body("category")
-    .notEmpty()
-    .withMessage("Category is required")
-    .bail()
-    .isMongoId()
-    .withMessage("Invalid category id"),
-    
-    body("brand")
       .trim()
       .notEmpty()
-      .withMessage("Brand is required"),
+      .withMessage("Category is required"),
+    
+    body("brand")
+      .optional({ checkFalsy: true })
+      .trim(),
 
     body("stock")
-      .optional()
+      .optional({ checkFalsy: true })
       .isInt({ min: 0 })
       .withMessage("Stock cannot be negative"),
   ];
