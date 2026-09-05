@@ -42,6 +42,7 @@ function App() {
             <Route path="shop" element={<ShopPage />} />
             <Route path="product/:id" element={<ProductDetailsPage />} />
             <Route path="build" element={<PCBuilderPage />} />
+            <Route path="pc-builder" element={<PCBuilderPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="wishlist" element={<WishlistPage />} />

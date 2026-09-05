@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Home, ArrowRight } from 'lucide-react';
+import SEO from '../components/common/SEO';
 import './NotFoundPage.css';
 
 export default function NotFoundPage() {
   return (
     <div className="notfound-page-root">
+      <SEO
+        title="Page Not Found | GearGrid"
+        description="The requested page could not be found on GearGrid."
+        noindex={true}
+      />
       <div className="container notfound-container">
         <div className="notfound-card">
           <span className="notfound-tag">404 ERROR</span>

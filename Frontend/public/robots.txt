@@ -1,0 +1,19 @@
+# GearGrid Production Robots Configuration
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /pc-builder
+Allow: /build
+Allow: /about
+Allow: /product/
+
+# Disallow Private & User Flow Routes
+Disallow: /cart
+Disallow: /wishlist
+Disallow: /checkout
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+
+# Sitemap Index
+Sitemap: https://geargrid-delta.vercel.app/sitemap.xml

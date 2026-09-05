@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { formatPrice } from '../utils/formatCurrency';
+import SEO from '../components/common/SEO';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -84,6 +85,11 @@ export default function CartPage() {
   if (cart.length === 0) {
     return (
       <div className="manifest-page-root">
+        <SEO
+          title="Your Staged Build Cart | GearGrid"
+          description="Review your custom PC hardware configuration, staged components, and power requirements."
+          noindex={true}
+        />
         <div className="manifest-page-container">
           
           <div className="manifest-empty-wrapper">
@@ -128,6 +134,11 @@ export default function CartPage() {
 
   return (
     <div className="manifest-page-root">
+      <SEO
+        title="Your Staged Build Cart | GearGrid"
+        description="Review your custom PC hardware configuration, staged components, and power requirements."
+        noindex={true}
+      />
       <div className="manifest-page-container">
         
         {/* Manifest Header */}

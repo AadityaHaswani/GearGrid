@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { authAPI } from '../services/api';
+import SEO from '../components/common/SEO';
 import './LoginPage.css';
 
 export default function LoginPage({ initialMode = 'login' }) {
@@ -67,6 +68,11 @@ export default function LoginPage({ initialMode = 'login' }) {
   if (user) {
     return (
       <div className="login-page-root">
+        <SEO
+          title={mode === 'register' ? 'Create Account | GearGrid' : 'Sign In | GearGrid'}
+          description="Sign in to GearGrid to manage your hardware orders, custom PC builds, and saved components."
+          noindex={true}
+        />
         <div className="login-backdrop-image" />
         <div className="login-backdrop-overlay" />
 
@@ -298,6 +304,11 @@ export default function LoginPage({ initialMode = 'login' }) {
 
   return (
     <div className="login-page-root">
+      <SEO
+        title={mode === 'register' ? 'Create Account | GearGrid' : 'Sign In | GearGrid'}
+        description="Sign in to GearGrid to access your custom PC builds, saved hardware arsenal, and order tracking."
+        noindex={true}
+      />
 
       {/* Full-screen Cinematic Hardware Background */}
       <div className="login-backdrop-image" />

@@ -19,6 +19,7 @@ import { useShop } from '../context/ShopContext';
 import orderAPI from '../services/order.api';
 import paymentAPI from '../services/payment.api';
 import { formatPrice } from '../utils/formatCurrency';
+import SEO from '../components/common/SEO';
 import './CheckoutPage.css';
 
 export default function CheckoutPage() {
@@ -187,6 +188,11 @@ export default function CheckoutPage() {
   if (orderCompleted) {
     return (
       <div className="checkout-page-root">
+        <SEO
+          title="Order Confirmed | GearGrid"
+          description="Your GearGrid hardware order has been registered and submitted for assembly."
+          noindex={true}
+        />
         <div className="checkout-container">
           <div className="order-confirmed-wrapper">
             
@@ -262,6 +268,11 @@ export default function CheckoutPage() {
   if (cart.length === 0) {
     return (
       <div className="checkout-page-root">
+        <SEO
+          title="Checkout — Secure Hardware Order | GearGrid"
+          description="Secure checkout for your custom PC hardware order."
+          noindex={true}
+        />
         <div className="checkout-container">
           <div className="checkout-empty-desk">
             <span className="checkout-eyebrow">GEARGRID // CHECKOUT</span>
@@ -284,6 +295,11 @@ export default function CheckoutPage() {
   // --------------------------------------------------------------------------
   return (
     <div className="checkout-page-root">
+      <SEO
+        title="Checkout — Secure Hardware Order | GearGrid"
+        description="Secure checkout for your custom PC hardware order."
+        noindex={true}
+      />
       <div className="checkout-container">
         
         {/* Page Header */}

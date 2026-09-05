@@ -24,6 +24,7 @@ import { getProductById } from '../services/product.api';
 import { useShop } from '../context/ShopContext';
 import ProductCard from '../components/shop/ProductCard';
 import QuickViewDrawer from '../components/shop/QuickViewDrawer';
+import SEO from '../components/common/SEO';
 import { formatPrice } from '../utils/formatCurrency';
 import './ProductDetailsPage.css';
 
@@ -166,8 +167,52 @@ export default function ProductDetailsPage() {
   // Related products in the same or adjacent categories
   const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id);
 
+  // Schema.org Product Structured Data
+  const productJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": gallery && gallery.length > 0 ? gallery : [product.image],
+    "description": product.description,
+    "sku": String(product.id),
+    ...(product.brand ? {
+      "brand": {
+        "@type": "Brand",
+        "name": product.brand
+      }
+    } : {}),
+    "offers": {
+      "@type": "Offer",
+      "url": `https://geargrid-delta.vercel.app/product/${product.id}`,
+      "priceCurrency": "INR",
+      "price": product.price,
+      "priceValidUntil": "2027-12-31",
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": (product.stock === undefined || product.stock > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
+    },
+    ...(product.reviews && product.rating ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": product.rating,
+        "reviewCount": product.reviews,
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    } : {})
+  };
+
   return (
     <div className="product-lab-page">
+      <SEO
+        title={`${product.name} | GearGrid`}
+        description={product.description || `${product.name} — available at GearGrid with official warranty, verified thermal performance, and compatibility testing.`}
+        canonical={`https://geargrid-delta.vercel.app/product/${product.id}`}
+        ogType="product"
+        ogImage={gallery && gallery.length > 0 ? gallery[0] : product.image}
+        jsonLd={productJsonLd}
+      />
       
       {/* Top Breadcrumbs & Back Navigation */}
       <div className="product-lab-nav-bar">

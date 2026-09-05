@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import SEO from '../components/common/SEO';
 import './AboutPage.css';
 
 const PRINCIPLES = [
@@ -68,6 +69,11 @@ const BUILD_STEPS = [
 export default function AboutPage() {
   return (
     <div className="about-manifesto-root">
+      <SEO
+        title="About GearGrid — Premium PC Hardware & Custom Builds"
+        description="Learn about GearGrid's engineering standards, thermal stress validation, component curation, and commitment to zero-compromise PC hardware."
+        canonical="https://geargrid-delta.vercel.app/about"
+      />
 
       {/* Section 1: Hero */}
       <section className="manifesto-hero-section">

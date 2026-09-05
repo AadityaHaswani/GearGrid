@@ -4,6 +4,7 @@ import { HARDWARE_CATEGORIES } from '../data/hardwareData';
 import { getProducts } from '../services/product.api';
 import ProductCard from '../components/shop/ProductCard';
 import QuickViewDrawer from '../components/shop/QuickViewDrawer';
+import SEO from '../components/common/SEO';
 import {
   Search,
   ArrowUpDown,
@@ -159,6 +160,12 @@ export default function ShopPage() {
 
   return (
     <div className="shop-page-root">
+      <SEO
+        title="Shop PC Hardware — Graphics Cards, CPUs, Monitors & More | GearGrid"
+        description="Browse enthusiast-grade graphics cards, elite processors, precision mechanical keyboards, high-speed NVMe storage, and liquid-cooled gaming configurations."
+        canonical="https://geargrid-delta.vercel.app/shop"
+        ogImage={heroImage}
+      />
 
       {/* Hardware Arsenal Hero Header */}
       <section className="shop-hero-header">

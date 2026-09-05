@@ -31,6 +31,7 @@ import productAPI from '../services/product.api';
 import categoryAPI from '../services/category.api';
 import orderAPI from '../services/order.api';
 import { formatPrice } from '../utils/formatCurrency';
+import SEO from '../components/common/SEO';
 import './AdminPage.css';
 
 // Initial Orders fallback structured for real API replacement
@@ -526,6 +527,11 @@ export default function AdminPage() {
 
   return (
     <div className="admin-console-root">
+      <SEO
+        title="Admin Operations Console | GearGrid"
+        description="GearGrid administrative operations, inventory, and order management."
+        noindex={true}
+      />
 
       {/* Top Console Bar */}
       <header className="admin-top-bar">

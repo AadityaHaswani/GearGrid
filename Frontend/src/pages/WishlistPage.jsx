@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { formatPrice } from '../utils/formatCurrency';
+import SEO from '../components/common/SEO';
 import './WishlistPage.css';
 
 export default function WishlistPage() {
@@ -80,6 +81,11 @@ export default function WishlistPage() {
   if (wishlist.length === 0) {
     return (
       <div className="arsenal-page-root">
+        <SEO
+          title="My Hardware Arsenal | GearGrid"
+          description="Your saved repository of enthusiast-grade PC components staged for upcoming configurations."
+          noindex={true}
+        />
         <div className="arsenal-page-container">
           
           <div className="arsenal-empty-wrapper">
@@ -128,6 +134,11 @@ export default function WishlistPage() {
 
   return (
     <div className="arsenal-page-root">
+      <SEO
+        title="My Hardware Arsenal | GearGrid"
+        description="Your saved repository of enthusiast-grade PC components staged for upcoming configurations."
+        noindex={true}
+      />
       <div className="arsenal-page-container">
         
         {/* Header Section */}

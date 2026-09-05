@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BUILDER_SLOTS } from '../data/hardwareData';
 import { useShop } from '../context/ShopContext';
 import BuildLabScene from '../components/builder/BuildLabScene';
+import SEO from '../components/common/SEO';
 import { formatPrice } from '../utils/formatCurrency';
 import {
   Zap,
@@ -95,6 +96,11 @@ export default function PCBuilderPage() {
 
   return (
     <div className="buildlab-page-root">
+      <SEO
+        title="PC Builder — Build Your Custom Gaming PC | GearGrid"
+        description="Design and configure your custom gaming desktop in real time with interactive 3D visualization, automated component compatibility checking, and wattage calculation."
+        canonical="https://geargrid-delta.vercel.app/pc-builder"
+      />
 
       {/* Top Header */}
       <section className="buildlab-header-section">
