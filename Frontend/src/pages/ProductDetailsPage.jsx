@@ -57,14 +57,14 @@ const getProductGallery = (product) => {
     ]
   };
 
-  const pid = product._id || product.id;
-  if (galleryPresets[pid]) {
-    return galleryPresets[pid];
-  }
-
   if (product.images && product.images.length > 0) {
     const urls = product.images.map(img => img.url || img).filter(Boolean);
     if (urls.length > 0) return urls;
+  }
+
+  const pid = product._id || product.id;
+  if (galleryPresets[pid]) {
+    return galleryPresets[pid];
   }
 
   return [
