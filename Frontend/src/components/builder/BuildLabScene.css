@@ -239,13 +239,21 @@
 /* Responsive */
 @media (max-width: 1080px) {
   .buildlab-viewport-container {
-    height: 440px;
+    height: 420px;
+  }
+}
+
+@media (max-width: 860px) {
+  .callout-overlay,
+  .callout-tag,
+  .callout-svg {
+    display: none;
   }
 }
 
 @media (max-width: 768px) {
   .buildlab-viewport-container {
-    height: 360px;
+    height: 330px;
   }
 
   .buildlab-viewport-topbar {
@@ -263,9 +271,55 @@
   .buildlab-hint-text {
     font-size: 0.65rem;
   }
+}
 
-  .callout-tag,
-  .callout-svg {
-    display: none;
+@media (max-width: 480px) {
+  .buildlab-viewport-container {
+    height: 290px;
+    border-radius: var(--radius-md);
+  }
+
+  .buildlab-viewport-topbar {
+    padding: 6px 10px;
+  }
+
+  .view-mode-title {
+    font-size: 0.62rem;
+  }
+
+  .buildlab-controls-toolbar {
+    gap: 3px;
+  }
+
+  .buildlab-view-btn {
+    padding: 4px 6px;
+  }
+
+  .buildlab-viewport-footer {
+    padding: 6px 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .buildlab-hint-text {
+    font-size: 0.62rem;
+  }
+
+  .buildlab-active-tag {
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .buildlab-viewport-container {
+    height: 260px;
+  }
+
+  .buildlab-viewport-topbar {
+    padding: 5px 8px;
+  }
+
+  .buildlab-viewport-footer {
+    padding: 4px 8px;
   }
 }

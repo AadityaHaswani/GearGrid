@@ -122,6 +122,63 @@ export default function PCBuilderPage() {
               onSelectSlot={(slotId) => setActiveCategory(slotId)}
             />
 
+            {/* Mobile Component Callouts / Information Hub */}
+            <div className="buildlab-mobile-callouts-section">
+              <div className="mobile-callouts-header">
+                <div className="mobile-callouts-title-wrap">
+                  <span className="mobile-callouts-tag">SYSTEM MANIFEST // CALLOUTS</span>
+                  <span className="mobile-callouts-subtitle">Tap component to inspect on 3D rig</span>
+                </div>
+                <span className="mobile-callouts-active-pill">
+                  {CATEGORY_SHORT_NAMES[activeCategory] || activeCategory.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="mobile-callouts-grid">
+                {BUILDER_SLOTS.map((slotGroup) => {
+                  const isActive = activeCategory === slotGroup.slot;
+                  const part = selectedBuild[slotGroup.slot];
+                  return (
+                    <button
+                      key={slotGroup.slot}
+                      type="button"
+                      className={`mobile-callout-card ${isActive ? 'active' : ''}`}
+                      onClick={() => setActiveCategory(slotGroup.slot)}
+                      aria-label={`Select ${slotGroup.name}`}
+                    >
+                      <div className="mobile-callout-card-top">
+                        <span className="mobile-callout-slot-badge">
+                          {CATEGORY_SHORT_NAMES[slotGroup.slot] || slotGroup.slot.toUpperCase()}
+                        </span>
+                        {isActive ? (
+                          <span className="mobile-callout-active-indicator">INSPECTING</span>
+                        ) : (
+                          <span className="mobile-callout-price-preview">{formatPrice(part?.price)}</span>
+                        )}
+                      </div>
+
+                      <div className="mobile-callout-card-name">
+                        {part?.name ? part.name.split('(')[0].trim() : 'Select Component'}
+                      </div>
+
+                      <div className="mobile-callout-card-bottom">
+                        {part?.wattage > 0 ? (
+                          <span className="mobile-callout-wattage">
+                            <Zap size={10} /> {part.wattage}W TDP
+                          </span>
+                        ) : (
+                          <span className="mobile-callout-wattage">Verified Fit</span>
+                        )}
+                        {isActive && (
+                          <span className="mobile-callout-card-price">{formatPrice(part?.price)}</span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Component Selection Hub */}
             <div className="buildlab-selection-hub">
 

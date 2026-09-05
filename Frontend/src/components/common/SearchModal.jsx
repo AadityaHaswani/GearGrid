@@ -15,7 +15,14 @@ export default function SearchModal() {
   const inputRef = useRef(null);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+
     if (isSearchOpen) {
+      window.addEventListener('keydown', handleKeyDown);
       setTimeout(() => inputRef.current?.focus(), 80);
       getProducts({ limit: 100 })
         .then((res) => {
@@ -27,7 +34,11 @@ export default function SearchModal() {
     } else {
       setQuery('');
     }
-  }, [isSearchOpen]);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchOpen, setIsSearchOpen]);
 
   if (!isSearchOpen) return null;
 
@@ -57,11 +68,29 @@ export default function SearchModal() {
             onChange={(e) => setQuery(e.target.value)}
           />
           {query && (
-            <button className="search-clear-btn" onClick={() => setQuery('')}>
+            <button 
+              type="button" 
+              className="search-clear-btn" 
+              onClick={() => {
+                setQuery('');
+                inputRef.current?.focus();
+              }}
+              title="Clear search"
+              aria-label="Clear search input"
+            >
               <X size={16} />
             </button>
           )}
           <span className="search-esc-tag">ESC</span>
+          <button
+            type="button"
+            className="search-close-btn"
+            onClick={() => setIsSearchOpen(false)}
+            title="Close search (Esc)"
+            aria-label="Close search overlay"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Suggested Searches */}

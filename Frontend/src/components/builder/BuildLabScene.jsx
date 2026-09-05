@@ -199,6 +199,27 @@ function CalloutOverlay({ activeSlot, projectedRef, containerRef, onSelectSlot }
   );
 }
 
+function ResponsiveCamera() {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const isNarrow = size.width < 460;
+    const isTablet = size.width >= 460 && size.width < 860;
+    if (isNarrow) {
+      camera.fov = 43;
+      camera.position.set(3.9, 0.9, 4.5);
+    } else if (isTablet) {
+      camera.fov = 39;
+      camera.position.set(3.4, 0.85, 4.0);
+    } else {
+      camera.fov = 36;
+      camera.position.set(3.2, 0.8, 3.8);
+    }
+    camera.updateProjectionMatrix();
+  }, [size.width, camera]);
+
+  return null;
+}
+
 export default function BuildLabScene({ activeSlot, onSelectSlot }) {
   const controlsRef = useRef();
   const projectedRef = useRef({});
@@ -207,9 +228,11 @@ export default function BuildLabScene({ activeSlot, onSelectSlot }) {
   const handleView = useCallback((preset) => {
     if (!controlsRef.current) return;
     const cam = controlsRef.current.object;
-    if (preset === 'iso') cam.position.set(3.2, 0.8, 3.8);
-    else if (preset === 'side') cam.position.set(4.6, 0.2, 0.5);
-    else if (preset === 'front') cam.position.set(0.2, 0.4, 4.8);
+    const isMobile = window.innerWidth < 600;
+    const distMult = isMobile ? 1.22 : 1.0;
+    if (preset === 'iso') cam.position.set(3.2 * distMult, 0.8 * distMult, 3.8 * distMult);
+    else if (preset === 'side') cam.position.set(4.6 * distMult, 0.2 * distMult, 0.5 * distMult);
+    else if (preset === 'front') cam.position.set(0.2 * distMult, 0.4 * distMult, 4.8 * distMult);
     controlsRef.current.target.set(0, 0, 0);
     controlsRef.current.update();
   }, []);
@@ -246,6 +269,7 @@ export default function BuildLabScene({ activeSlot, onSelectSlot }) {
           gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         >
           <Suspense fallback={null}>
+            <ResponsiveCamera />
             <StudioLighting activeSlot={activeSlot} />
             <PCModel />
             <ContactShadows

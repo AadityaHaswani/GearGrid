@@ -40,11 +40,11 @@ export default function IntroVideo({ onComplete }) {
       <video
         ref={videoRef}
         src="/videos/bro_enchance_its_quality_witho.mp4"
-        poster="/videos/intro-poster.jpg"
         className="intro-video-element"
         autoPlay
         muted
         playsInline
+        webkit-playsinline="true"
         preload="auto"
         onEnded={onComplete}
       />
