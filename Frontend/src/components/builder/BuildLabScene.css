@@ -275,7 +275,7 @@
 
 @media (max-width: 480px) {
   .buildlab-viewport-container {
-    height: 290px;
+    height: 310px;
     border-radius: var(--radius-md);
   }
 

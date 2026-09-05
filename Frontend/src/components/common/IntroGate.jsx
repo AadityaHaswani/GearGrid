@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IntroVideo from '../home/IntroVideo';
 import './IntroGate.css';
 
@@ -18,6 +18,16 @@ export default function IntroGate({ children }) {
 
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
+      setShowIntro(true);
+      setIsTransitioning(false);
+      try {
+        sessionStorage.removeItem(SESSION_KEY);
+      } catch {}
+    }
+  }, []);
+
   const handleComplete = () => {
     try {
       sessionStorage.setItem(SESSION_KEY, 'true');
@@ -34,9 +44,12 @@ export default function IntroGate({ children }) {
 
   if (showIntro) {
     return (
-      <div className={`intro-gate-container ${isTransitioning ? 'fade-out' : ''}`}>
-        <IntroVideo onComplete={handleComplete} />
-      </div>
+      <>
+        {isTransitioning && <div className="intro-gate-content">{children}</div>}
+        <div className={`intro-gate-container ${isTransitioning ? 'fade-out' : ''}`}>
+          <IntroVideo onComplete={handleComplete} />
+        </div>
+      </>
     );
   }
 

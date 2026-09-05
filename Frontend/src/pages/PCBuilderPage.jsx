@@ -122,68 +122,25 @@ export default function PCBuilderPage() {
               onSelectSlot={(slotId) => setActiveCategory(slotId)}
             />
 
-            {/* Mobile Component Callouts / Information Hub */}
-            <div className="buildlab-mobile-callouts-section">
-              <div className="mobile-callouts-header">
-                <div className="mobile-callouts-title-wrap">
-                  <span className="mobile-callouts-tag">SYSTEM MANIFEST // CALLOUTS</span>
-                  <span className="mobile-callouts-subtitle">Tap component to inspect on 3D rig</span>
-                </div>
-                <span className="mobile-callouts-active-pill">
-                  {CATEGORY_SHORT_NAMES[activeCategory] || activeCategory.toUpperCase()}
+            {/* Mobile Dedicated: Selected Component / Current Focus Header */}
+            <div className="buildlab-mobile-focus-bar">
+              <div className="mobile-focus-info">
+                <span className="mobile-focus-slot-label">
+                  SLOT // {CATEGORY_SHORT_NAMES[activeCategory] || activeCategory.toUpperCase()}
                 </span>
+                <h2 className="mobile-focus-title">{currentSlotGroup.name}</h2>
               </div>
-
-              <div className="mobile-callouts-grid">
-                {BUILDER_SLOTS.map((slotGroup) => {
-                  const isActive = activeCategory === slotGroup.slot;
-                  const part = selectedBuild[slotGroup.slot];
-                  return (
-                    <button
-                      key={slotGroup.slot}
-                      type="button"
-                      className={`mobile-callout-card ${isActive ? 'active' : ''}`}
-                      onClick={() => setActiveCategory(slotGroup.slot)}
-                      aria-label={`Select ${slotGroup.name}`}
-                    >
-                      <div className="mobile-callout-card-top">
-                        <span className="mobile-callout-slot-badge">
-                          {CATEGORY_SHORT_NAMES[slotGroup.slot] || slotGroup.slot.toUpperCase()}
-                        </span>
-                        {isActive ? (
-                          <span className="mobile-callout-active-indicator">INSPECTING</span>
-                        ) : (
-                          <span className="mobile-callout-price-preview">{formatPrice(part?.price)}</span>
-                        )}
-                      </div>
-
-                      <div className="mobile-callout-card-name">
-                        {part?.name ? part.name.split('(')[0].trim() : 'Select Component'}
-                      </div>
-
-                      <div className="mobile-callout-card-bottom">
-                        {part?.wattage > 0 ? (
-                          <span className="mobile-callout-wattage">
-                            <Zap size={10} /> {part.wattage}W TDP
-                          </span>
-                        ) : (
-                          <span className="mobile-callout-wattage">Verified Fit</span>
-                        )}
-                        {isActive && (
-                          <span className="mobile-callout-card-price">{formatPrice(part?.price)}</span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              <span className="mobile-focus-status-badge">
+                <span className="live-indicator-dot" />
+                <span>3D RIG FOCUS</span>
+              </span>
             </div>
 
             {/* Component Selection Hub */}
             <div className="buildlab-selection-hub">
 
-              {/* Category Navigation Bar */}
-              <div className="buildlab-category-nav-bar" role="tablist">
+              {/* Category Navigation Bar / Component Selector */}
+              <div className="buildlab-category-nav-bar" role="tablist" aria-label="Component categories">
                 {BUILDER_SLOTS.map((slotGroup) => {
                   const isActive = activeCategory === slotGroup.slot;
                   const equippedOption = selectedBuild[slotGroup.slot];
@@ -205,6 +162,25 @@ export default function PCBuilderPage() {
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Mobile Dedicated: Currently Equipped Component Information Card */}
+              <div className="buildlab-mobile-equipped-card">
+                <div className="equipped-card-header">
+                  <span className="equipped-card-badge">EQUIPPED IN RIG</span>
+                  <span className="equipped-card-price">{formatPrice(currentEquipped?.price)}</span>
+                </div>
+                <div className="equipped-card-name">{currentEquipped?.name}</div>
+                <div className="equipped-card-specs">
+                  {currentEquipped?.wattage > 0 && (
+                    <span className="equipped-spec-item">
+                      <Zap size={12} /> {currentEquipped.wattage}W TDP
+                    </span>
+                  )}
+                  <span className="equipped-spec-item verified">
+                    <Check size={12} /> 100% Compatible
+                  </span>
+                </div>
               </div>
 
               {/* Active Category Header & Options */}

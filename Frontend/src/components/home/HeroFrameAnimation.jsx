@@ -128,21 +128,23 @@ export default function HeroFrameAnimation({ scrollTriggerRef, isScrolling }) {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, cw, ch);
 
-      // Aspect ratio contain calculation (16:9 images)
+      // Aspect ratio contain calculation to preserve natural proportions without cropping or stretching
       const imgAspect = img.naturalWidth / img.naturalHeight || 16 / 9;
       const canvasAspect = cw / ch;
 
       let drawW, drawH, drawX, drawY;
 
       if (canvasAspect > imgAspect) {
+        // Canvas is wider than 16:9 (e.g. ultra-wide display)
         drawH = ch;
         drawW = ch * imgAspect;
         drawX = (cw - drawW) / 2;
-        drawY = 0;
+        drawY = (ch - drawH) / 2;
       } else {
+        // Canvas is narrower/taller than 16:9 (standard screen or mobile dedicated zone)
         drawW = cw;
         drawH = cw / imgAspect;
-        drawX = 0;
+        drawX = (cw - drawW) / 2;
         drawY = (ch - drawH) / 2;
       }
 

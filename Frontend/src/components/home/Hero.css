@@ -17,14 +17,38 @@
   height: calc(100vh - var(--navbar-height));
   height: calc(100dvh - var(--navbar-height));
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background-color: #000000;
+  gap: 18px;
 }
 
-/* Centered Editorial Overlay */
-.hero-editorial-overlay {
+/* On Desktop: Fullscreen Background Canvas Zone */
+.hero-canvas-zone {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-canvas-zone .hero-frame-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+  overflow: hidden;
+}
+
+/* Header Block on Desktop */
+.hero-header-block {
   position: relative;
   z-index: 5;
   display: flex;
@@ -103,7 +127,27 @@
   max-width: 580px;
 }
 
-/* CTAs */
+.hero-description-desktop {
+  display: block;
+}
+
+.hero-description-mobile {
+  display: none;
+}
+
+/* CTAs & Actions Block */
+.hero-actions-block {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
 .hero-actions-row {
   display: flex;
   align-items: center;
@@ -265,7 +309,7 @@
     height: 240vh;
   }
 
-  .hero-editorial-overlay {
+  .hero-header-block {
     gap: 14px;
     padding: 0 20px;
   }
@@ -280,39 +324,258 @@
   }
 }
 
-@media (max-width: 640px) {
+/* ==================================================
+   DEDICATED INTENTIONAL MOBILE COMPOSITION (<= 768px)
+   Hierarchy:
+   1. TOP: small "NEXT-GENERATION HARDWARE" eyebrow
+   2. CENTER: BUILD THE MACHINE. POWER THE EXPERIENCE.
+   3. THEN: shorter mobile-friendly supporting copy
+   4. THEN: large clearly visible PC visual (dedicated zone)
+   5. THEN: EXPLORE HARDWARE + BUILD YOUR RIG buttons
+   6. THEN: compact trust row
+   7. BOTTOM: SCROLL TO DISASSEMBLE
+================================================== */
+@media (max-width: 768px) {
   .hero-scroll-track {
-    height: 210vh;
+    height: 220vh;
   }
 
-  .hero-editorial-overlay {
-    gap: 12px;
-    padding: 0 16px;
+  .hero-sticky-viewport {
+    position: sticky;
+    top: var(--navbar-height);
+    width: 100%;
+    height: calc(100vh - var(--navbar-height));
+    height: calc(100dvh - var(--navbar-height));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px 54px 16px;
+    box-sizing: border-box;
+    text-align: center;
+    overflow: hidden;
+    background-color: #000000;
+    gap: 0;
+  }
+
+  /* 1. TOP BLOCK: Eyebrow + Heading + Supporting Copy */
+  .hero-header-block {
+    order: 1;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 420px;
+    flex-shrink: 0;
+    padding: 0;
+  }
+
+  .hero-tag-pill {
+    font-size: 0.64rem;
+    padding: 4px 10px;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .hero-dot {
+    width: 5px;
+    height: 5px;
   }
 
   .hero-heading {
-    font-size: 2.1rem;
+    font-size: clamp(1.42rem, 5.2vw, 1.85rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  /* Show concise mobile copy, hide verbose desktop copy */
+  .hero-description-desktop {
+    display: none;
+  }
+
+  .hero-description-mobile {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* 2. PC VISUAL: Dedicated frame animation canvas zone */
+  .hero-canvas-zone {
+    order: 2;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 170px;
+    max-height: 34vh;
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero-canvas-zone .hero-frame-wrapper {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+  }
+
+  .hero-canvas-zone .hero-frame-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #000000;
+  }
+
+  /* 3. ACTIONS BLOCK: Buttons + Trust Highlights */
+  .hero-actions-block {
+    order: 3;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .hero-actions-row {
     flex-direction: column;
     width: 100%;
+    gap: 8px;
+    margin-top: 0;
   }
 
   .hero-btn {
     justify-content: center;
     width: 100%;
+    padding: 10px 18px;
+    font-size: 0.82rem;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
   .hero-highlights-list {
-    gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 3px;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-highlight-item {
+    font-size: 0.65rem;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
   }
 
   .hero-highlight-divider {
     display: none;
   }
 
+  /* 4. BOTTOM: Scroll cue */
   .hero-scroll-hint {
-    bottom: 12px;
+    bottom: 6px;
+    z-index: 6;
+    gap: 3px;
+  }
+
+  .hero-scroll-mouse {
+    width: 13px;
+    height: 18px;
+    border-width: 1.2px;
+    padding-top: 2px;
+  }
+
+  .hero-scroll-wheel {
+    width: 2px;
+    height: 5px;
+  }
+
+  .hero-scroll-hint-text {
+    font-size: 0.58rem;
+    letter-spacing: 0.10em;
+  }
+
+  .hero-scroll-chevron {
+    display: none;
+  }
+}
+
+/* Very compact phones (<= 380px, e.g. iPhone SE, 360px, 320px) */
+@media (max-width: 380px) {
+  .hero-sticky-viewport {
+    padding: 8px 12px 40px 12px;
+  }
+
+  .hero-header-block {
+    gap: 4px;
+  }
+
+  .hero-tag-pill {
+    font-size: 0.60rem;
+    padding: 3px 8px;
+  }
+
+  .hero-heading {
+    font-size: 1.32rem;
+  }
+
+  .hero-description-mobile {
+    font-size: 0.72rem;
+    max-width: 280px;
+  }
+
+  .hero-canvas-zone {
+    min-height: 145px;
+    max-height: 30vh;
+    margin: 2px 0;
+  }
+
+  .hero-actions-block {
+    gap: 6px;
+    max-width: 320px;
+  }
+
+  .hero-actions-row {
+    gap: 6px;
+  }
+
+  .hero-btn {
+    padding: 9px 14px;
+    font-size: 0.76rem;
+    min-height: 42px;
+  }
+
+  .hero-highlights-list {
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .hero-highlight-item {
+    font-size: 0.58rem;
+    gap: 3px;
+    white-space: nowrap;
   }
 }
