@@ -1,29 +1,92 @@
-import express from "express"
-import cors from "cors"
-import cookieParser from "cookie-parser"
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
+// Ensure environment variables are loaded
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: "./.env" });
 
-const app = express()
-export default app
-app.use(express.json({limit:"16kb"}))
-app.use(express.urlencoded({extended:true,limit:"16kb"}))
-app.use(express.static("public"))
+const app = express();
 
+// Helper to determine allowed origins dynamically from CLIENT_URL and development defaults
+const getAllowedOrigins = () => {
+  const allowed = new Set([
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+  ]);
 
-app.use(cookieParser())
+  // Primary: Support CLIENT_URL from environment (e.g. http://localhost:5173 or Vercel production domain)
+  if (process.env.CLIENT_URL) {
+    process.env.CLIENT_URL.split(",").forEach((url) => {
+      const trimmed = url.trim().replace(/\/$/, "");
+      if (trimmed) allowed.add(trimmed);
+    });
+  }
 
+  // Fallback: Support CORS_ORIGIN for backward compatibility
+  if (process.env.CORS_ORIGIN) {
+    process.env.CORS_ORIGIN.split(",").forEach((url) => {
+      const trimmed = url.trim().replace(/\/$/, "");
+      if (trimmed) allowed.add(trimmed);
+    });
+  }
 
-app.use(cors({
-    origin:process.env.CORS_ORIGIN?.split(",")||"http://localhost:5173",
-    credentials:true,
-    methods :["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-    allowedHeaders:["Content-Type","Authorization"]
-}))
-app.get("/",(req, res)=>{
-    res.send("Welcome To My First Express Server");
-    
-      
-})
+  return allowed;
+};
+
+// Production CORS configuration
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. mobile apps, curl, Postman, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+    const allowedOrigins = getAllowedOrigins();
+
+    if (allowedOrigins.has(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    // Support production and preview Vercel domains if applicable
+    if (/^https:\/\/[\w.-]+\.vercel\.app$/.test(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin"
+  ],
+  exposedHeaders: ["Set-Cookie"],
+  optionsSuccessStatus: 204,
+};
+
+// 1. CORS Middleware - MUST run before body parsers and routes for proper preflight handling
+app.use(cors(corsOptions));
+
+// 2. Standard Parsers & Static Files
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.static("public"));
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.send("Welcome To My First Express Server");
+});
 
 import healthCheckRouter from "./routes/healthCheck.routes.js"
 import authRouter from "./routes/auth.routes.js"
@@ -78,4 +141,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-
+export default app;
