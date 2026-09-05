@@ -1,41 +1,52 @@
-import nodemailer from "nodemailer";
-
-const getTransporter = () => {
-  const pass = (process.env.MAIL_APP_PASSWORD || "").replace(/\s+/g, "");
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.MAIL_USER || "geargrid60@gmail.com",
-      pass,
-    },
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 10000,
-  });
-};
-
-const SENDER_EMAIL = process.env.MAIL_USER || "geargrid60@gmail.com";
-const SENDER_NAME = "GearGrid Operations";
+import { Resend } from "resend";
+import { ApiError } from "./ApiErrors.js";
 
 /**
- * Send an email with HTML and Plain Text fallback
+ * Initialize Resend client lazily to ensure environment variables are loaded
+ */
+const getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("[Email Service Error]: RESEND_API_KEY is not defined in environment variables.");
+    throw new ApiError(500, "Email service configuration is missing.");
+  }
+  return new Resend(apiKey);
+};
+
+/**
+ * Send an email with HTML and Plain Text fallback using Resend
  */
 export const sendEmail = async ({ to, subject, html, text }) => {
-  const transporter = getTransporter();
-  const mailOptions = {
-    from: `"${SENDER_NAME}" <${SENDER_EMAIL}>`,
-    to,
-    subject,
-    text,
-    html,
-  };
+  const from = process.env.MAIL_FROM;
+  if (!from) {
+    console.error("[Email Service Error]: MAIL_FROM is not defined in environment variables.");
+    throw new ApiError(500, "Email service configuration is missing.");
+  }
+
+  const resend = getResendClient();
+  const recipientList = Array.isArray(to) ? to : [to];
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    return info;
-  } catch (error) {
-    console.error("Email delivery failed:", error.message);
-    throw error;
+    const { data, error } = await resend.emails.send({
+      from,
+      to: recipientList,
+      subject,
+      html,
+      ...(text ? { text } : {}),
+    });
+
+    if (error) {
+      console.error("[Resend Error]:", error.name || "DeliveryError", "-", error.message);
+      throw new ApiError(500, `Email delivery failed: ${error.message}`);
+    }
+
+    return data;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      throw err;
+    }
+    console.error("[Email Service Exception]:", err.message);
+    throw new ApiError(500, "Failed to send email. Please try again later.");
   }
 };
 

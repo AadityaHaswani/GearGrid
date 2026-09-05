@@ -2,10 +2,15 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import slugify from "slugify";
 import dns from "dns";
+import path from "path";
+import { fileURLToPath } from "url";
 import { Category } from "./models/category.models.js";
 import { Product } from "./models/product.models.js";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 dotenv.config({ path: "./.env" });
 
 const CATEGORIES_DATA = [
@@ -141,6 +146,38 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "gpu_5070ti_2" }
     ]
   },
+  {
+    title: "Gigabyte GeForce RTX 4090 Gaming OC 24GB GDDR6X",
+    category: catMap["Graphics Cards"],
+    brand: "Gigabyte",
+    price: 209990,
+    discountPrice: 199990,
+    stock: 7,
+    rating: 4.9,
+    numReviews: 64,
+    featured: true,
+    description: "Legendary Ada Lovelace halo GPU featuring 24GB GDDR6X, WINDFORCE cooling with alternate spinning 110mm fans, vapor chamber direct-touch GPU contact, dual BIOS, and RGB Fusion lighting.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "gpu_4090_1" },
+      { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "gpu_4090_2" }
+    ]
+  },
+  {
+    title: "ASUS ROG Strix GeForce RTX 5080 OC 16GB GDDR7",
+    category: catMap["Graphics Cards"],
+    brand: "ASUS",
+    price: 184990,
+    discountPrice: 178990,
+    stock: 12,
+    rating: 4.9,
+    numReviews: 38,
+    featured: true,
+    description: "Peak luxury Blackwell graphics card with diecast metal shroud and frame, patented vapor chamber, 3.5-slot cooling finstack, Aura Sync ARGB lighting, and extreme factory GPU overclock.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "gpu_rog5080_1" },
+      { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "gpu_rog5080_2" }
+    ]
+  },
 
   // -------------------------------------------------------------
   // 2. PROCESSORS
@@ -223,6 +260,38 @@ const getRawProducts = (catMap) => [
     images: [
       { url: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_285k_1" },
       { url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_285k_2" }
+    ]
+  },
+  {
+    title: "Intel Core i9-14900K Desktop Processor (24 Cores / 32 Threads)",
+    category: catMap["Processors"],
+    brand: "Intel",
+    price: 51990,
+    discountPrice: 48990,
+    stock: 20,
+    rating: 4.8,
+    numReviews: 76,
+    featured: false,
+    description: "High-clock Raptor Lake Refresh flagship desktop CPU with 8 Performance-cores and 16 Efficient-cores reaching up to 6.0 GHz with Intel Thermal Velocity Boost. Delivers exceptional productivity compute and tournament frame rates.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_14900k_1" },
+      { url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_14900k_2" }
+    ]
+  },
+  {
+    title: "AMD Ryzen 9 7950X3D Desktop Processor (16 Cores / 32 Threads)",
+    category: catMap["Processors"],
+    brand: "AMD",
+    price: 58990,
+    discountPrice: 54990,
+    stock: 14,
+    rating: 4.9,
+    numReviews: 52,
+    featured: true,
+    description: "Dual-CCD powerhouse featuring 144MB total cache and 3D V-Cache technology on Zen 4 architecture. Masterfully blends high-FPS gaming prowess with extreme 32-thread content creation and rendering throughput.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_7950x3d_1" },
+      { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "cpu_7950x3d_2" }
     ]
   },
 
@@ -309,6 +378,22 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "mb_asrock_prors_2" }
     ]
   },
+  {
+    title: "ASUS ROG Crosshair X670E Hero Motherboard",
+    category: catMap["Motherboards"],
+    brand: "ASUS",
+    price: 64990,
+    discountPrice: 59990,
+    stock: 9,
+    rating: 4.9,
+    numReviews: 27,
+    featured: true,
+    description: "Flagship AM5 enthusiast motherboard engineered for uncompromised Ryzen 9000/7000 overclocking with 18+2 teamed power stages (110A), dual USB4 Type-C 40Gbps ports, PCIe 5.0 x16, and Polymo lighting.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&q=80", publicId: "mb_crosshair_hero_1" },
+      { url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80", publicId: "mb_crosshair_hero_2" }
+    ]
+  },
 
   // -------------------------------------------------------------
   // 4. GAMING MONITORS
@@ -391,6 +476,22 @@ const getRawProducts = (catMap) => [
     images: [
       { url: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200&q=80", publicId: "mon_benq_pd2706u_1" },
       { url: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=1200&q=80", publicId: "mon_benq_pd2706u_2" }
+    ]
+  },
+  {
+    title: "LG UltraGear 27GR95QE-B 27-inch QHD OLED 240Hz Gaming Monitor",
+    category: catMap["Gaming Monitors"],
+    brand: "LG",
+    price: 69990,
+    discountPrice: 64990,
+    stock: 16,
+    rating: 4.8,
+    numReviews: 68,
+    featured: true,
+    description: "World-class 27-inch OLED tournament display featuring 2560x1440 resolution, blazing 240Hz refresh rate, 0.03ms (GtG) response time, anti-glare low reflection coating, and 98.5% DCI-P3 color gamut.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=1200&q=80", publicId: "mon_lg_oled_1" },
+      { url: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200&q=80", publicId: "mon_lg_oled_2" }
     ]
   },
 
@@ -493,6 +594,22 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200&q=80", publicId: "periph_mxmaster3s_2" }
     ]
   },
+  {
+    title: "Wooting 80HE Rapid Trigger Magnetic Gaming Keyboard",
+    category: catMap["Peripherals"],
+    brand: "Wooting",
+    price: 22990,
+    discountPrice: 20990,
+    stock: 18,
+    rating: 5.0,
+    numReviews: 95,
+    featured: true,
+    description: "World's most responsive competitive esports keyboard featuring Gateron Lekker Hall-effect magnetic analog switches, true 0.1mm Rapid Trigger, 8000Hz polling rate, and PBT dye-sub keycaps.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=1200&q=80", publicId: "periph_wooting80he_1" },
+      { url: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200&q=80", publicId: "periph_wooting80he_2" }
+    ]
+  },
 
   // -------------------------------------------------------------
   // 6. COOLING & CASES
@@ -591,6 +708,22 @@ const getRawProducts = (catMap) => [
     images: [
       { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "case_lancool216_1" },
       { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "case_lancool216_2" }
+    ]
+  },
+  {
+    title: "Corsair 5000D Airflow Tempered Glass Mid-Tower Case",
+    category: catMap["Cooling & Cases"],
+    brand: "Corsair",
+    price: 14990,
+    discountPrice: 13490,
+    stock: 24,
+    rating: 4.8,
+    numReviews: 110,
+    featured: false,
+    description: "High-airflow mid-tower ATX chassis engineered with steel front ventilation, RapidRoute cable management system, spacious interior supporting dual 360mm radiators, and two AirGuide fans.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "case_corsair5000d_1" },
+      { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "case_corsair5000d_2" }
     ]
   },
 
@@ -780,6 +913,70 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "sys_apex_1" },
       { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "sys_apex_2" },
       { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "sys_apex_3" }
+    ]
+  },
+  {
+    title: "GearGrid Titan 5080 4K Gaming Rig",
+    category: catMap["Custom Systems / Workstations"],
+    brand: "GearGrid",
+    price: 299990,
+    discountPrice: 284990,
+    stock: 6,
+    rating: 4.9,
+    numReviews: 29,
+    featured: true,
+    description: "Premium 4K ultra gaming desktop built for maxed-out ray tracing and simultaneous high-bitrate AV1 streaming.\n\n• CPU: AMD Ryzen 9 9950X3D (16C/32T, 144MB Cache, 5.7 GHz)\n• GPU: ASUS TUF Gaming GeForce RTX 5080 OC Edition 16GB GDDR7\n• RAM: G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5-6000 CL30\n• Storage: 2TB Samsung 990 PRO NVMe PCIe 4.0 M.2 SSD (7450 MB/s)\n• PSU: Corsair RM1000e 1000W 80+ Gold ATX 3.0 Modular\n• Cooling: Arctic Liquid Freezer III 360 Black AIO Liquid Cooler\n• Chassis: Lian Li Lancool 216 RGB Mid-Tower High-Airflow Mesh\n• Intended Workload: 4K Ultra Gaming @ 120+ FPS, Ray Traced Cyberpunk & Alan Wake 2, 4K OBS Streaming.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "sys_titan_1" },
+      { url: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200&q=80", publicId: "sys_titan_2" }
+    ]
+  },
+  {
+    title: "GearGrid Velocity 5070 Ti High-Framerate Gaming Rig",
+    category: catMap["Custom Systems / Workstations"],
+    brand: "GearGrid",
+    price: 229990,
+    discountPrice: 219990,
+    stock: 7,
+    rating: 4.9,
+    numReviews: 22,
+    featured: true,
+    description: "High-end 1440p gaming machine optimized for ultra-high refresh rates, flawless frame pacing, and competitive esports.\n\n• CPU: AMD Ryzen 7 7800X3D (8C/16T, 96MB 3D V-Cache, 5.0 GHz)\n• GPU: NVIDIA GeForce RTX 5070 Ti 16GB GDDR7\n• RAM: Corsair Vengeance RGB 32GB (2x16GB) DDR5-6000 CL36\n• Storage: 2TB Crucial T705 PCIe Gen5 NVMe SSD (14,500 MB/s)\n• PSU: Seasonic Focus GX-850 850W 80+ Gold\n• Cooling: DeepCool AK620 High-Performance Dual-Tower Air Cooler\n• Chassis: Fractal Design North Charcoal Black (Real Walnut Front)\n• Intended Workload: 1440p Competitive Gaming @ 240Hz+, Sim-Racing (iRacing, Assetto Corsa), Flight Simulators.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "sys_velocity_1" },
+      { url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "sys_velocity_2" }
+    ]
+  },
+  {
+    title: "GearGrid Phantom Competitive Gaming Rig",
+    category: catMap["Custom Systems / Workstations"],
+    brand: "GearGrid",
+    price: 249990,
+    discountPrice: 239990,
+    stock: 8,
+    rating: 4.8,
+    numReviews: 19,
+    featured: false,
+    description: "Tournament-grade gaming weapon engineered for minimum click-to-photon latency and blistering competitive framerates.\n\n• CPU: Intel Core Ultra 7 265K (20 Cores / 20 Threads, 5.5 GHz Turbo)\n• GPU: MSI GeForce RTX 5080 16G VENTUS 3X OC 16GB GDDR7\n• RAM: Kingston Fury Beast RGB 32GB (2x16GB) DDR5-6000 CL36\n• Storage: 1TB Kingston KC3000 Gen4 NVMe (7000 MB/s) + 1TB Secondary SSD\n• PSU: Seasonic Focus GX-850 850W 80+ Gold\n• Cooling: Arctic Liquid Freezer III 360 Black AIO\n• Chassis: Lian Li Lancool 216 RGB Mid-Tower\n• Intended Workload: Sub-5ms System Latency with NVIDIA Reflex, 360Hz/540Hz CS2, Valorant, Apex Legends Tournament Play.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "sys_phantom_1" },
+      { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "sys_phantom_2" }
+    ]
+  },
+  {
+    title: "GearGrid Forge 1440p Performance Gaming Rig",
+    category: catMap["Custom Systems / Workstations"],
+    brand: "GearGrid",
+    price: 199990,
+    discountPrice: 189990,
+    stock: 10,
+    rating: 4.8,
+    numReviews: 36,
+    featured: false,
+    description: "The gold-standard price-to-performance 1440p gaming setup with quiet thermals and clean Scandinavian aesthetics.\n\n• CPU: AMD Ryzen 7 7700X (8C/16T, 5.4 GHz Max Boost)\n• GPU: ASUS PRIME GeForce RTX 5080 OC 16GB GDDR7\n• RAM: G.Skill Trident Z5 Neo RGB 32GB (2x16GB) DDR5-6000 CL30\n• Storage: 1TB Samsung 990 PRO NVMe Gen4 SSD (7450 MB/s)\n• PSU: Corsair RM750e 750W 80+ Gold\n• Cooling: DeepCool AK620 Dual-Tower High-Airflow Cooler\n• Chassis: Corsair 4000D Airflow High-Airflow Black\n• Intended Workload: 1440p Ultra Settings in Cyberpunk 2077, Black Myth: Wukong, Call of Duty: Warzone, Helldivers 2.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1200&q=80", publicId: "sys_forge_1" },
+      { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "sys_forge_2" }
     ]
   },
   {

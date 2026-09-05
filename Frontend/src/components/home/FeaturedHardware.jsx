@@ -11,14 +11,61 @@ export default function FeaturedHardware() {
 
   useEffect(() => {
     let isMounted = true;
-    getProducts({ limit: 4 })
-      .then((res) => {
-        if (isMounted && res.data?.data?.products?.length > 0) {
-          setItems(res.data.data.products);
+
+    const fetchFeaturedHardware = async () => {
+      try {
+        let products = [];
+
+        // Primary query: Fetch systems and workstations category
+        const catRes = await getProducts({ category: 'custom-systems-workstations', limit: 12 });
+        if (catRes.data?.data?.products?.length > 0) {
+          products = catRes.data.data.products;
+        } else {
+          // Fallback query if category slug differs
+          const allRes = await getProducts({ limit: 40 });
+          if (allRes.data?.data?.products?.length > 0) {
+            products = allRes.data.data.products;
+          }
         }
-      })
-      .catch(() => {});
-    return () => { isMounted = false; };
+
+        if (!isMounted || products.length === 0) return;
+
+        // Identify gaming configuration product vs workstation / professional systems
+        const isGamingProduct = (p) => {
+          const title = (p.title || p.name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          return (
+            title.includes('gaming rig') ||
+            title.includes('gaming pc') ||
+            title.includes('gaming configuration') ||
+            title.includes('apex gaming') ||
+            desc.includes('gaming battle station') ||
+            (title.includes('gaming') && !title.includes('monitor') && !title.includes('mouse') && !title.includes('keyboard'))
+          );
+        };
+
+        const gamingSystem = products.find(isGamingProduct);
+        const workstationSystems = products.filter((p) => !isGamingProduct(p));
+
+        if (gamingSystem && workstationSystems.length >= 2) {
+          // Showcase balanced between professional/workstation and gaming hardware:
+          // Visual selection: 2 professional/workstation systems + exactly 1 gaming configuration
+          // Left side (flagship): Primary professional workstation
+          // Right side (supporting): Gaming configuration + secondary professional workstation
+          setItems([workstationSystems[0], gamingSystem, workstationSystems[1]]);
+        } else if (products.length >= 3) {
+          setItems(products.slice(0, 3));
+        }
+      } catch (err) {
+        console.error('Failed to load featured hardware products:', err);
+      }
+    };
+
+    fetchFeaturedHardware();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const flagshipProduct = items[0] || PRODUCTS[0];
@@ -55,7 +102,7 @@ export default function FeaturedHardware() {
           {/* Supporting Products Stack */}
           <div className="featured-supporting-stack">
             {supportingProducts.map((product) => (
-              <ProductCard key={product.id} product={product} variant="compact" />
+              <ProductCard key={product._id || product.id} product={product} variant="compact" />
             ))}
           </div>
 

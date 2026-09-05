@@ -84,7 +84,7 @@ export default function ShopPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getProducts({ page: 1, limit: 8 });
+      const res = await getProducts({ limit: 100 });
       const productList = res.data?.data?.products || res.data?.data || [];
       setProducts(productList);
     } catch (err) {

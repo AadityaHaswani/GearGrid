@@ -6,6 +6,68 @@ import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
+const CATEGORY_ALIASES = {
+    'gpus': 'graphics-cards',
+    'gpu': 'graphics-cards',
+    'graphics': 'graphics-cards',
+    'graphics-card': 'graphics-cards',
+    'graphics-cards': 'graphics-cards',
+    'graphics cards': 'graphics-cards',
+    'cpus': 'processors',
+    'cpu': 'processors',
+    'processor': 'processors',
+    'processors': 'processors',
+    'motherboards': 'motherboards',
+    'motherboard': 'motherboards',
+    'monitors': 'gaming-monitors',
+    'monitor': 'gaming-monitors',
+    'gaming-monitor': 'gaming-monitors',
+    'gaming monitors': 'gaming-monitors',
+    'gaming-monitors': 'gaming-monitors',
+    'peripherals': 'peripherals',
+    'peripheral': 'peripherals',
+    'keyboards': 'peripherals',
+    'keyboard': 'peripherals',
+    'mice': 'peripherals',
+    'mouse': 'peripherals',
+    'cooling': 'cooling-cases',
+    'cases': 'cooling-cases',
+    'cooling-cases': 'cooling-cases',
+    'cooling & cases': 'cooling-cases',
+    'prebuilt': 'custom-systems-workstations',
+    'custom-systems': 'custom-systems-workstations',
+    'custom systems': 'custom-systems-workstations',
+    'workstations': 'custom-systems-workstations',
+    'workstation': 'custom-systems-workstations',
+    'systems': 'custom-systems-workstations',
+    'gaming-pc': 'custom-systems-workstations',
+    'custom-systems-workstations': 'custom-systems-workstations',
+    'custom systems / workstations': 'custom-systems-workstations',
+    'storage': 'storage',
+    'ram': 'memory-ram',
+    'memory': 'memory-ram',
+    'memory-ram': 'memory-ram',
+    'memory / ram': 'memory-ram'
+};
+
+const resolveCategoryDoc = async (categoryQuery, lean = false) => {
+    if (!categoryQuery) return null;
+    if (mongoose.Types.ObjectId.isValid(categoryQuery)) {
+        return lean ? await Category.findById(categoryQuery).select("_id").lean() : await Category.findById(categoryQuery);
+    }
+    const rawCat = String(categoryQuery).trim().toLowerCase();
+    const targetSlug = CATEGORY_ALIASES[rawCat] || rawCat.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const query = Category.findOne({
+        $or: [
+            { slug: targetSlug },
+            { slug: rawCat },
+            { name: { $regex: new RegExp(`^${categoryQuery.trim()}$`, "i") } },
+            { name: { $regex: new RegExp(categoryQuery.trim(), "i") } }
+        ]
+    });
+    return lean ? await query.select("_id").lean() : await query;
+};
+
 const createProduct = asyncHandler(async (req, res) => {
     const {
         title,
@@ -18,17 +80,7 @@ const createProduct = asyncHandler(async (req, res) => {
         featured,
     } = req.body;
 
-    let categoryDoc = null;
-    if (mongoose.Types.ObjectId.isValid(category)) {
-        categoryDoc = await Category.findById(category);
-    } else {
-        categoryDoc = await Category.findOne({
-            $or: [
-                { slug: String(category).toLowerCase() },
-                { name: { $regex: new RegExp(`^${category}$`, "i") } }
-            ]
-        });
-    }
+    const categoryDoc = await resolveCategoryDoc(category, false);
 
     if (!categoryDoc) {
         throw new ApiError(404, "Category not found");
@@ -99,22 +151,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
     }
 
     if (category) {
-        if (mongoose.Types.ObjectId.isValid(category)) {
-            filter.category = category;
-        } else {
-            const foundCategory = await Category.findOne({
-                $or: [
-                    { slug: category.toLowerCase() },
-                    { name: { $regex: new RegExp(`^${category}$`, "i") } }
-                ]
-            }).select("_id").lean();
-
-            if (foundCategory) {
-                filter.category = foundCategory._id;
-            } else {
-                filter.category = null;
-            }
-        }
+        const foundCategory = await resolveCategoryDoc(category, true);
+        filter.category = foundCategory ? foundCategory._id : null;
     }
 
     if (brand) {
