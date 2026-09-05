@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Product } from "../models/product.models.js";
 import { Category } from "../models/category.models.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
