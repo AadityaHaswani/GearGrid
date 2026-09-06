@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Shield, Wrench, Truck, Headphones, ArrowRight } from 'lucide-react';
+import GearGridLogo from './GearGridLogo';
 import './Footer.css';
 
 export default function Footer() {
@@ -58,7 +59,8 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="footer-col brand-col">
-            <div className="footer-brand">
+            <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <GearGridLogo size={24} />
               <span className="footer-logo-text">Gear<span className="text-amber">Grid</span></span>
             </div>
             <p className="footer-about-text">

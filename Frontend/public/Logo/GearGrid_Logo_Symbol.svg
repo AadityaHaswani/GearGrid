@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" fill="none">
+  <!-- GearGrid Polished Brand Mark -->
+  <defs>
+    <mask id="gearGridHoleMask">
+      <!-- Outer canvas -->
+      <rect width="500" height="500" fill="#FFFFFF" />
+      <!-- Circular negative space channel between outer and inner gear -->
+      <path d="M 250 82 A 168 168 0 1 0 418 250 L 378 250 A 128 128 0 1 1 250 122 Z" fill="#000000" />
+      <!-- Center hole negative space of the G -->
+      <circle cx="250" cy="250" r="54" fill="#000000" />
+      <!-- Cutout under the G crossbar for negative space -->
+      <path d="M 235 250 L 340 250 L 340 310 L 290 340 L 250 340 Z" fill="#000000" />
+    </mask>
+  </defs>
+
+  <g id="geargrid-symbol">
+    <!-- Outer Gear Wheel (14 Precision Teeth, Solid Black) -->
+    <!-- Integrated with the bold right extension of the G -->
+    <path fill="#0C0D10" fill-rule="evenodd" d="
+      M 235 40 L 265 40 L 268 76 A 176 176 0 0 1 315 88 L 338 61 L 362 75 L 346 108 A 176 176 0 0 1 386 137 L 420 124 L 434 150 L 406 176 A 176 176 0 0 1 422 216 L 458 224 L 458 276 L 422 284 A 176 176 0 0 1 406 324 L 434 350 L 420 376 L 386 363 A 176 176 0 0 1 346 392 L 362 425 L 338 439 L 315 412 A 176 176 0 0 1 268 424 L 265 460 L 235 460 L 232 424 A 176 176 0 0 1 185 412 L 162 439 L 138 425 L 154 392 A 176 176 0 0 1 114 363 L 80 376 L 66 350 L 94 324 A 176 176 0 0 1 78 284 L 42 276 L 42 224 L 78 216 A 176 176 0 0 1 94 176 L 66 150 L 80 124 L 114 137 A 176 176 0 0 1 154 108 L 138 75 L 162 61 L 185 88 A 176 176 0 0 1 232 76 Z
+    " />
+
+    <!-- Channel Cutout creating the ring separation -->
+    <path fill="#FFFFFF" d="
+      M 250 94
+      A 156 156 0 1 0 406 250
+      L 340 250
+      A 90 90 0 1 1 250 160
+      Z
+    " />
+
+    <!-- Inner Gear Structure & Stylized G Crossbar -->
+    <!-- Inner teeth radiating along the G's curve -->
+    <path fill="#0C0D10" d="
+      M 250 160
+      A 90 90 0 0 0 160 250
+      A 90 90 0 0 0 250 340
+      A 90 90 0 0 0 315 313
+      L 315 272
+      L 235 272
+      L 235 228
+      L 355 228
+      L 355 250
+      A 105 105 0 0 1 250 355
+      A 105 105 0 0 1 145 250
+      A 105 105 0 0 1 250 145
+      L 250 160
+      Z
+    " />
+
+    <!-- Inner Cog Teeth along the G Spine -->
+    <g fill="#0C0D10">
+      <!-- Tooth Top-Left -->
+      <path d="M 198 148 L 210 124 L 230 132 L 222 155 Z" />
+      <!-- Tooth Left-Top -->
+      <path d="M 152 192 L 126 182 L 134 162 L 162 176 Z" />
+      <!-- Tooth Left-Center -->
+      <path d="M 145 238 L 120 238 L 120 262 L 145 262 Z" />
+      <!-- Tooth Left-Bottom -->
+      <path d="M 152 308 L 126 318 L 134 338 L 162 324 Z" />
+      <!-- Tooth Bottom-Left -->
+      <path d="M 198 352 L 210 376 L 230 368 L 222 345 Z" />
+      <!-- Tooth Bottom -->
+      <path d="M 238 355 L 238 380 L 262 380 L 262 355 Z" />
+    </g>
+
+    <!-- Bold G Terminal Block on Right -->
+    <path fill="#0C0D10" d="
+      M 235 228
+      L 356 228
+      L 356 320
+      L 312 320
+      L 312 268
+      L 235 268
+      Z
+    " />
+
+    <!-- Signature Warm Amber / Gold Precision Accent (#D49B42) -->
+    <!-- Underlines the crossbar, drops vertically, and follows the inner counter -->
+    <path 
+      d="M 250 268 L 312 268 L 312 318 L 285 345 L 265 345" 
+      stroke="#D49B42" 
+      stroke-width="12" 
+      stroke-linecap="square" 
+      stroke-linejoin="miter" 
+      stroke-miterlimit="4"
+    />
+  </g>
+</svg>

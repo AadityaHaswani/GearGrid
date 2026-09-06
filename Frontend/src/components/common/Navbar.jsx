@@ -17,6 +17,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
+import GearGridLogo from './GearGridLogo';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -103,11 +104,7 @@ export default function Navbar() {
         {/* Brand Logo */}
         <Link to="/" className="navbar-brand">
           <div className="brand-logo-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="var(--accent-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <GearGridLogo size={22} />
           </div>
           <span className="brand-title">Gear<span className="brand-accent">Grid</span></span>
         </Link>
