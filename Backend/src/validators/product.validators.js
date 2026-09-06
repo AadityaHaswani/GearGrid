@@ -34,6 +34,36 @@ const createProductValidator = () => {
       .optional({ checkFalsy: true })
       .isInt({ min: 0 })
       .withMessage("Stock cannot be negative"),
+
+    body("specifications")
+      .optional()
+      .custom((value) => {
+        if (typeof value === "object" && value !== null) return true;
+        if (typeof value === "string") {
+          try {
+            JSON.parse(value);
+            return true;
+          } catch {
+            throw new Error("Specifications must be a valid JSON object");
+          }
+        }
+        throw new Error("Specifications must be an object");
+      }),
+
+    body("useCaseProfile")
+      .optional()
+      .custom((value) => {
+        if (typeof value === "object" && value !== null) return true;
+        if (typeof value === "string") {
+          try {
+            JSON.parse(value);
+            return true;
+          } catch {
+            throw new Error("Use case profile must be a valid JSON object");
+          }
+        }
+        throw new Error("Use case profile must be an object");
+      }),
   ];
 };
 

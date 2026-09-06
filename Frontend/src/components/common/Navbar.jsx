@@ -14,7 +14,8 @@ import {
   LogOut,
   Package,
   Sliders,
-  ShieldAlert
+  ShieldAlert,
+  Cpu
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import GearGridLogo from './GearGridLogo';
@@ -131,6 +132,14 @@ export default function Navbar() {
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
             PC Builder
+          </NavLink>
+
+          <NavLink 
+            to="/configure" 
+            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            title="GearGrid Configure — Intelligent System Recommendation"
+          >
+            Configure
           </NavLink>
 
           <NavLink 
@@ -344,6 +353,10 @@ export default function Navbar() {
             <NavLink to="/build" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <Wrench size={18} />
               <span>Custom PC Builder</span>
+            </NavLink>
+            <NavLink to="/configure" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              <Cpu size={18} />
+              <span>GearGrid Configure</span>
             </NavLink>
             <NavLink to="/about" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <HelpCircle size={18} />

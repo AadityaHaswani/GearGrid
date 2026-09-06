@@ -84,6 +84,8 @@ const createProduct = asyncHandler(async (req, res) => {
         brand,
         stock,
         featured,
+        specifications,
+        useCaseProfile,
     } = req.body;
 
     const categoryDoc = await resolveCategoryDoc(category, false);
@@ -114,6 +116,24 @@ const createProduct = asyncHandler(async (req, res) => {
         });
     }
 
+    let parsedSpecs = {};
+    if (specifications) {
+        try {
+            parsedSpecs = typeof specifications === "string" ? JSON.parse(specifications) : specifications;
+        } catch {
+            parsedSpecs = {};
+        }
+    }
+
+    let parsedProfile = {};
+    if (useCaseProfile) {
+        try {
+            parsedProfile = typeof useCaseProfile === "string" ? JSON.parse(useCaseProfile) : useCaseProfile;
+        } catch {
+            parsedProfile = {};
+        }
+    }
+
     const product = await Product.create({
         title: title.trim(),
         description: description?.trim() || `High performance enthusiast ${title.trim()} hardware component.`,
@@ -124,6 +144,8 @@ const createProduct = asyncHandler(async (req, res) => {
         stock: stock !== undefined && !isNaN(Number(stock)) ? Number(stock) : 0,
         featured: featured === true || featured === "true",
         images,
+        specifications: parsedSpecs,
+        useCaseProfile: parsedProfile,
         createdBy: req.user?._id,
     });
 
@@ -214,7 +236,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     const [totalProducts, products] = await Promise.all([
         Product.countDocuments(filter),
         Product.find(filter)
-            .select("_id title price discountPrice brand stock rating numReviews images category featured createdAt")
+            .select("_id title price discountPrice brand stock rating numReviews images category featured specifications useCaseProfile createdAt")
             .populate("category", "name slug")
             .sort(sortOption)
             .skip(skip)
@@ -286,6 +308,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         brand,
         stock,
         featured,
+        specifications,
+        useCaseProfile,
     } = req.body;
 
     if (category) {
@@ -341,6 +365,30 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (brand !== undefined && brand.trim()) product.brand = brand.trim();
     if (stock !== undefined && stock !== "" && !isNaN(Number(stock))) product.stock = Number(stock);
     if (featured !== undefined) product.featured = featured === true || featured === "true";
+
+    if (specifications !== undefined) {
+        let parsedSpecs = specifications;
+        if (typeof specifications === "string") {
+            try {
+                parsedSpecs = JSON.parse(specifications);
+            } catch {
+                parsedSpecs = product.specifications;
+            }
+        }
+        product.specifications = parsedSpecs;
+    }
+
+    if (useCaseProfile !== undefined) {
+        let parsedProfile = useCaseProfile;
+        if (typeof useCaseProfile === "string") {
+            try {
+                parsedProfile = JSON.parse(useCaseProfile);
+            } catch {
+                parsedProfile = product.useCaseProfile;
+            }
+        }
+        product.useCaseProfile = parsedProfile;
+    }
 
     await product.save();
 

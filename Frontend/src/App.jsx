@@ -14,6 +14,7 @@ import WishlistPage from './pages/WishlistPage';
 import CheckoutPage from './pages/CheckoutPage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
+import ConfigurePage from './pages/ConfigurePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
             <Route path="product/:id" element={<ProductDetailsPage />} />
             <Route path="build" element={<PCBuilderPage />} />
             <Route path="pc-builder" element={<PCBuilderPage />} />
+            <Route path="configure" element={<ConfigurePage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="wishlist" element={<WishlistPage />} />

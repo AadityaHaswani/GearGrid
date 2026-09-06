@@ -66,7 +66,1711 @@ const CATEGORIES_DATA = [
   },
 ];
 
+const PRODUCT_SPECS_DATA = {
+  "ZOTAC Gaming GeForce RTX 4060 8GB Twin Edge": {
+  "specifications": {
+    "chipset": "GeForce RTX 4060",
+    "vram": 8,
+    "vramType": "GDDR6",
+    "recommendedPsu": 550,
+    "powerDraw": 115,
+    "length": 224
+  },
+  "useCaseProfile": {
+    "gaming": 7.5,
+    "productivity": 7,
+    "editing": 7,
+    "rendering": 6.5,
+    "programming": 7.5,
+    "ai": 6.5,
+    "streaming": 7.5
+  }
+},
+  "MSI GeForce RTX 4060 Ti VENTUS 2X Black 8G OC": {
+  "specifications": {
+    "chipset": "GeForce RTX 4060 Ti",
+    "vram": 8,
+    "vramType": "GDDR6",
+    "recommendedPsu": 550,
+    "powerDraw": 160,
+    "length": 199
+  },
+  "useCaseProfile": {
+    "gaming": 8.2,
+    "productivity": 7.5,
+    "editing": 7.8,
+    "rendering": 7.2,
+    "programming": 7.8,
+    "ai": 7,
+    "streaming": 8
+  }
+},
+  "ASUS Dual GeForce RTX 4070 Super EVO 12GB GDDR6X": {
+  "specifications": {
+    "chipset": "GeForce RTX 4070 Super",
+    "vram": 12,
+    "vramType": "GDDR6X",
+    "recommendedPsu": 650,
+    "powerDraw": 220,
+    "length": 227
+  },
+  "useCaseProfile": {
+    "gaming": 9,
+    "productivity": 8.5,
+    "editing": 8.8,
+    "rendering": 8.5,
+    "programming": 8.2,
+    "ai": 8.2,
+    "streaming": 8.8
+  }
+},
+  "Gigabyte GeForce RTX 4070 Ti Super Windforce OC 16GB GDDR6X": {
+  "specifications": {
+    "chipset": "GeForce RTX 4070 Ti Super",
+    "vram": 16,
+    "vramType": "GDDR6X",
+    "recommendedPsu": 700,
+    "powerDraw": 285,
+    "length": 261
+  },
+  "useCaseProfile": {
+    "gaming": 9.3,
+    "productivity": 9,
+    "editing": 9.2,
+    "rendering": 9,
+    "programming": 8.5,
+    "ai": 8.8,
+    "streaming": 9.2
+  }
+},
+  "AMD Ryzen 5 7600 Desktop Processor (6 Cores / 12 Threads)": {
+  "specifications": {
+    "socket": "AM5",
+    "cores": 6,
+    "threads": 12,
+    "baseClock": 3.8,
+    "boostClock": 5.1,
+    "tdp": 65,
+    "integratedGraphics": true
+  },
+  "useCaseProfile": {
+    "gaming": 8.5,
+    "productivity": 7.8,
+    "editing": 7.5,
+    "rendering": 7,
+    "programming": 8,
+    "ai": 6.5,
+    "streaming": 7.8
+  }
+},
+  "AMD Ryzen 5 7600X Desktop Processor (6 Cores / 12 Threads)": {
+  "specifications": {
+    "socket": "AM5",
+    "cores": 6,
+    "threads": 12,
+    "baseClock": 4.7,
+    "boostClock": 5.3,
+    "tdp": 105,
+    "integratedGraphics": true
+  },
+  "useCaseProfile": {
+    "gaming": 8.8,
+    "productivity": 8,
+    "editing": 7.8,
+    "rendering": 7.2,
+    "programming": 8.2,
+    "ai": 6.8,
+    "streaming": 8
+  }
+},
+  "Intel Core i5-14400F Desktop Processor (10 Cores / 16 Threads)": {
+  "specifications": {
+    "socket": "LGA1700",
+    "cores": 10,
+    "threads": 16,
+    "baseClock": 2.5,
+    "boostClock": 4.7,
+    "tdp": 65,
+    "integratedGraphics": false
+  },
+  "useCaseProfile": {
+    "gaming": 8,
+    "productivity": 8,
+    "editing": 7.8,
+    "rendering": 7.2,
+    "programming": 8.2,
+    "ai": 6.5,
+    "streaming": 7.5
+  }
+},
+  "Intel Core i7-14700K Desktop Processor (20 Cores / 28 Threads)": {
+  "specifications": {
+    "socket": "LGA1700",
+    "cores": 20,
+    "threads": 28,
+    "baseClock": 3.4,
+    "boostClock": 5.6,
+    "tdp": 125,
+    "integratedGraphics": true
+  },
+  "useCaseProfile": {
+    "gaming": 9.2,
+    "productivity": 9.5,
+    "editing": 9.5,
+    "rendering": 9.2,
+    "programming": 9.5,
+    "ai": 8.2,
+    "streaming": 9.2
+  }
+},
+  "MSI PRO B650M-P Micro-ATX Motherboard": {
+  "specifications": {
+    "socket": "AM5",
+    "chipset": "AMD B650",
+    "formFactor": "Micro-ATX",
+    "memoryType": "DDR5",
+    "maxMemory": 192,
+    "memorySlots": 4,
+    "maxMemorySpeed": 6400,
+    "pciExpressGeneration": "PCIe 4.0"
+  },
+  "useCaseProfile": {
+    "gaming": 8,
+    "productivity": 8,
+    "editing": 7.8,
+    "rendering": 7.5,
+    "programming": 8,
+    "ai": 7.5,
+    "streaming": 7.8
+  }
+},
+  "ASRock B760M Pro RS WiFi Motherboard": {
+  "specifications": {
+    "socket": "LGA1700",
+    "chipset": "Intel B760",
+    "formFactor": "Micro-ATX",
+    "memoryType": "DDR5",
+    "maxMemory": 192,
+    "memorySlots": 4,
+    "maxMemorySpeed": 7200,
+    "pciExpressGeneration": "PCIe 5.0"
+  },
+  "useCaseProfile": {
+    "gaming": 8.5,
+    "productivity": 8.5,
+    "editing": 8.2,
+    "rendering": 8,
+    "programming": 8.5,
+    "ai": 7.8,
+    "streaming": 8.2
+  }
+},
+  "ASUS Prime Z890-P WiFi Motherboard": {
+  "specifications": {
+    "socket": "LGA1851",
+    "chipset": "Intel Z890",
+    "formFactor": "ATX",
+    "memoryType": "DDR5",
+    "maxMemory": 192,
+    "memorySlots": 4,
+    "maxMemorySpeed": 8400,
+    "pciExpressGeneration": "PCIe 5.0"
+  },
+  "useCaseProfile": {
+    "gaming": 9.2,
+    "productivity": 9.5,
+    "editing": 9.5,
+    "rendering": 9.5,
+    "programming": 9.5,
+    "ai": 9,
+    "streaming": 9.2
+  }
+},
+  "Crucial 16GB (2x8GB) DDR5-4800 CL40 Desktop Memory": {
+  "specifications": {
+    "memoryType": "DDR5",
+    "capacity": 16,
+    "speed": 4800,
+    "modules": "2x8GB",
+    "formFactor": "DIMM"
+  },
+  "useCaseProfile": {
+    "gaming": 7.5,
+    "productivity": 7.5,
+    "editing": 7,
+    "rendering": 6.5,
+    "programming": 7.5,
+    "ai": 6,
+    "streaming": 7
+  }
+},
+  "Corsair Vengeance 32GB (2x16GB) DDR5-5200 CL40": {
+  "specifications": {
+    "memoryType": "DDR5",
+    "capacity": 32,
+    "speed": 5200,
+    "modules": "2x16GB",
+    "formFactor": "DIMM"
+  },
+  "useCaseProfile": {
+    "gaming": 8.8,
+    "productivity": 8.8,
+    "editing": 8.5,
+    "rendering": 8,
+    "programming": 8.8,
+    "ai": 7.5,
+    "streaming": 8.5
+  }
+},
+  "Crucial P3 Plus 500GB PCIe 4.0 NVMe M.2 SSD": {
+  "specifications": {
+    "type": "NVMe SSD",
+    "interface": "PCIe 4.0 x4",
+    "capacity": 500,
+    "readSpeed": 4700,
+    "writeSpeed": 1900,
+    "formFactor": "M.2 2280"
+  },
+  "useCaseProfile": {
+    "gaming": 7.5,
+    "productivity": 7.5,
+    "editing": 7,
+    "rendering": 6.5,
+    "programming": 7.5,
+    "ai": 6,
+    "streaming": 7
+  }
+},
+  "Western Digital Blue SN580 1TB PCIe Gen4 NVMe M.2 SSD": {
+  "specifications": {
+    "type": "NVMe SSD",
+    "interface": "PCIe 4.0 x4",
+    "capacity": 1000,
+    "readSpeed": 4150,
+    "writeSpeed": 4150,
+    "formFactor": "M.2 2280"
+  },
+  "useCaseProfile": {
+    "gaming": 8.2,
+    "productivity": 8.2,
+    "editing": 8,
+    "rendering": 7.5,
+    "programming": 8.2,
+    "ai": 7,
+    "streaming": 8
+  }
+},
+  "DeepCool AG400 Single-Tower CPU Air Cooler": {
+  "specifications": {
+    "coolerType": "Air Cooler",
+    "supportedSockets": [
+      "AM5",
+      "AM4",
+      "LGA1700",
+      "LGA1851",
+      "LGA1200"
+    ],
+    "height": 150,
+    "maxTdp": 220
+  },
+  "useCaseProfile": {
+    "gaming": 7.8,
+    "productivity": 7.8,
+    "editing": 7.5,
+    "rendering": 7,
+    "programming": 7.8,
+    "ai": 7,
+    "streaming": 7.5
+  }
+},
+  "Thermalright Peerless Assassin 120 SE Air Cooler": {
+  "specifications": {
+    "coolerType": "Air Cooler",
+    "supportedSockets": [
+      "AM5",
+      "AM4",
+      "LGA1700",
+      "LGA1851",
+      "LGA1200"
+    ],
+    "height": 155,
+    "maxTdp": 245
+  },
+  "useCaseProfile": {
+    "gaming": 8.8,
+    "productivity": 8.8,
+    "editing": 8.5,
+    "rendering": 8.2,
+    "programming": 8.8,
+    "ai": 8,
+    "streaming": 8.5
+  }
+},
+  "Ant Esports ICE-112 Mid-Tower Gaming Case": {
+  "specifications": {
+    "formFactorSupport": [
+      "ATX",
+      "Micro-ATX",
+      "Mini-ITX"
+    ],
+    "gpuMaxLength": 320,
+    "coolerMaxHeight": 160,
+    "radiatorSupport": [
+      "240mm",
+      "120mm"
+    ]
+  },
+  "useCaseProfile": {
+    "gaming": 7.5,
+    "productivity": 7.5,
+    "editing": 7.2,
+    "rendering": 7,
+    "programming": 7.5,
+    "ai": 7,
+    "streaming": 7.2
+  }
+},
+  "DeepCool CC560 V2 High-Airflow Mid-Tower Case": {
+  "specifications": {
+    "formFactorSupport": [
+      "ATX",
+      "Micro-ATX",
+      "Mini-ITX"
+    ],
+    "gpuMaxLength": 370,
+    "coolerMaxHeight": 163,
+    "radiatorSupport": [
+      "360mm",
+      "280mm",
+      "240mm",
+      "120mm"
+    ]
+  },
+  "useCaseProfile": {
+    "gaming": 8.5,
+    "productivity": 8.5,
+    "editing": 8.2,
+    "rendering": 8.2,
+    "programming": 8.5,
+    "ai": 8,
+    "streaming": 8.2
+  }
+},
+  "DeepCool PK650D 650W 80 Plus Bronze Power Supply": {
+  "specifications": {
+    "wattage": 650,
+    "efficiency": "80+ Bronze",
+    "modular": "Non",
+    "atx3Support": false
+  },
+  "useCaseProfile": {
+    "gaming": 7.8,
+    "productivity": 7.8,
+    "editing": 7.5,
+    "rendering": 7.2,
+    "programming": 7.8,
+    "ai": 7,
+    "streaming": 7.5
+  }
+},
+  "Cooler Master MWE 750 Bronze V2 750W Power Supply": {
+  "specifications": {
+    "wattage": 750,
+    "efficiency": "80+ Bronze",
+    "modular": "Non",
+    "atx3Support": false
+  },
+  "useCaseProfile": {
+    "gaming": 8.5,
+    "productivity": 8.5,
+    "editing": 8.2,
+    "rendering": 8,
+    "programming": 8.2,
+    "ai": 7.8,
+    "streaming": 8.2
+  }
+},
+  "NVIDIA GeForce RTX 5090 32GB GDDR7": {
+    "specifications": {
+      "chipset": "GeForce RTX 5090",
+      "vram": 32,
+      "vramType": "GDDR7",
+      "recommendedPsu": 1000,
+      "powerDraw": 600,
+      "length": 304
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 9.5,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 9,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "ASUS TUF Gaming GeForce RTX 5080 OC Edition 16GB GDDR7": {
+    "specifications": {
+      "chipset": "GeForce RTX 5080",
+      "vram": 16,
+      "vramType": "GDDR7",
+      "recommendedPsu": 850,
+      "powerDraw": 400,
+      "length": 348
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 8.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "ASUS PRIME GeForce RTX 5080 OC 16GB GDDR7": {
+    "specifications": {
+      "chipset": "GeForce RTX 5080",
+      "vram": 16,
+      "vramType": "GDDR7",
+      "recommendedPsu": 850,
+      "powerDraw": 400,
+      "length": 305
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 8.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "MSI GeForce RTX 5080 16G VENTUS 3X OC": {
+    "specifications": {
+      "chipset": "GeForce RTX 5080",
+      "vram": 16,
+      "vramType": "GDDR7",
+      "recommendedPsu": 850,
+      "powerDraw": 400,
+      "length": 305
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 8.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "NVIDIA GeForce RTX 5070 Ti 16GB GDDR7": {
+    "specifications": {
+      "chipset": "GeForce RTX 5070 Ti",
+      "vram": 16,
+      "vramType": "GDDR7",
+      "recommendedPsu": 750,
+      "powerDraw": 285,
+      "length": 285
+    },
+    "useCaseProfile": {
+      "gaming": 9,
+      "productivity": 8.5,
+      "editing": 8.5,
+      "rendering": 8.5,
+      "programming": 8,
+      "ai": 8.5,
+      "streaming": 9
+    }
+  },
+  "Gigabyte GeForce RTX 4090 Gaming OC 24GB GDDR6X": {
+    "specifications": {
+      "chipset": "GeForce RTX 4090",
+      "vram": 24,
+      "vramType": "GDDR6X",
+      "recommendedPsu": 1000,
+      "powerDraw": 450,
+      "length": 340
+    },
+    "useCaseProfile": {
+      "gaming": 9.7,
+      "productivity": 9.5,
+      "editing": 9.8,
+      "rendering": 10,
+      "programming": 9,
+      "ai": 9.8,
+      "streaming": 9.5
+    }
+  },
+  "ASUS ROG Strix GeForce RTX 5080 OC 16GB GDDR7": {
+    "specifications": {
+      "chipset": "GeForce RTX 5080",
+      "vram": 16,
+      "vramType": "GDDR7",
+      "recommendedPsu": 850,
+      "powerDraw": 400,
+      "length": 358
+    },
+    "useCaseProfile": {
+      "gaming": 9.6,
+      "productivity": 9,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 8.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "AMD Ryzen 7 9800X3D Processor (8 Cores / 16 Threads)": {
+    "specifications": {
+      "socket": "AM5",
+      "cores": 8,
+      "threads": 16,
+      "baseClock": 4.7,
+      "boostClock": 5.2,
+      "tdp": 120,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 8.5,
+      "editing": 8.5,
+      "rendering": 8.5,
+      "programming": 9,
+      "ai": 7.5,
+      "streaming": 9.5
+    }
+  },
+  "AMD Ryzen 9 9950X3D Processor (16 Cores / 32 Threads)": {
+    "specifications": {
+      "socket": "AM5",
+      "cores": 16,
+      "threads": 32,
+      "baseClock": 4.3,
+      "boostClock": 5.7,
+      "tdp": 170,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 9.5,
+      "streaming": 10
+    }
+  },
+  "AMD Ryzen 7 7800X3D Processor (8 Cores / 16 Threads)": {
+    "specifications": {
+      "socket": "AM5",
+      "cores": 8,
+      "threads": 16,
+      "baseClock": 4.2,
+      "boostClock": 5,
+      "tdp": 120,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.7,
+      "productivity": 8,
+      "editing": 8,
+      "rendering": 8,
+      "programming": 8.5,
+      "ai": 7,
+      "streaming": 9
+    }
+  },
+  "Intel Core Ultra 7 265K Desktop Processor (20 Cores / 20 Threads)": {
+    "specifications": {
+      "socket": "LGA1851",
+      "cores": 20,
+      "threads": 20,
+      "baseClock": 3.9,
+      "boostClock": 5.5,
+      "tdp": 125,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 8.8,
+      "productivity": 9.5,
+      "editing": 9.5,
+      "rendering": 9,
+      "programming": 9.5,
+      "ai": 9,
+      "streaming": 9
+    }
+  },
+  "Intel Core Ultra 9 285K Flagship Processor (24 Cores / 24 Threads)": {
+    "specifications": {
+      "socket": "LGA1851",
+      "cores": 24,
+      "threads": 24,
+      "baseClock": 3.7,
+      "boostClock": 5.7,
+      "tdp": 125,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.2,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 9.8,
+      "programming": 10,
+      "ai": 9.5,
+      "streaming": 9.5
+    }
+  },
+  "Intel Core i9-14900K Desktop Processor (24 Cores / 32 Threads)": {
+    "specifications": {
+      "socket": "LGA1700",
+      "cores": 24,
+      "threads": 32,
+      "baseClock": 3.2,
+      "boostClock": 6,
+      "tdp": 125,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.3,
+      "productivity": 9.8,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.8,
+      "ai": 8.5,
+      "streaming": 9.5
+    }
+  },
+  "AMD Ryzen 9 7950X3D Desktop Processor (16 Cores / 32 Threads)": {
+    "specifications": {
+      "socket": "AM5",
+      "cores": 16,
+      "threads": 32,
+      "baseClock": 4.2,
+      "boostClock": 5.7,
+      "tdp": 120,
+      "integratedGraphics": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9.8,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.8,
+      "ai": 9,
+      "streaming": 9.8
+    }
+  },
+  "ASUS ROG Strix B650-A Gaming WiFi Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD B650",
+      "formFactor": "ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 7600,
+      "pciExpressGeneration": "PCIe 5.0"
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 9,
+      "programming": 9,
+      "ai": 8.5,
+      "streaming": 9
+    }
+  },
+  "Gigabyte B650 Eagle AX WiFi Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD B650",
+      "formFactor": "ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 7600,
+      "pciExpressGeneration": "PCIe 5.0"
+    },
+    "useCaseProfile": {
+      "gaming": 8.5,
+      "productivity": 8.5,
+      "editing": 8,
+      "rendering": 8,
+      "programming": 8.5,
+      "ai": 8,
+      "streaming": 8.5
+    }
+  },
+  "Gigabyte B650 Gaming X AX V2 WiFi Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD B650",
+      "formFactor": "ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 8000,
+      "pciExpressGeneration": "PCIe 5.0"
+    },
+    "useCaseProfile": {
+      "gaming": 8.8,
+      "productivity": 8.5,
+      "editing": 8.5,
+      "rendering": 8.5,
+      "programming": 8.5,
+      "ai": 8,
+      "streaming": 8.5
+    }
+  },
+  "MSI MAG B650M Mortar WiFi Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD B650",
+      "formFactor": "Micro-ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 7600,
+      "pciExpressGeneration": "PCIe 4.0"
+    },
+    "useCaseProfile": {
+      "gaming": 8.8,
+      "productivity": 8.5,
+      "editing": 8.5,
+      "rendering": 8.5,
+      "programming": 8.5,
+      "ai": 8,
+      "streaming": 8.5
+    }
+  },
+  "ASRock B650 Pro RS Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD B650",
+      "formFactor": "ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 7200,
+      "pciExpressGeneration": "PCIe 5.0"
+    },
+    "useCaseProfile": {
+      "gaming": 8.5,
+      "productivity": 8.5,
+      "editing": 8,
+      "rendering": 8,
+      "programming": 8.5,
+      "ai": 8,
+      "streaming": 8
+    }
+  },
+  "ASUS ROG Crosshair X670E Hero Motherboard": {
+    "specifications": {
+      "socket": "AM5",
+      "chipset": "AMD X670E",
+      "formFactor": "ATX",
+      "memoryType": "DDR5",
+      "maxMemory": 192,
+      "memorySlots": 4,
+      "maxMemorySpeed": 8000,
+      "pciExpressGeneration": "PCIe 5.0"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "ASUS ROG Swift OLED PG27AQDM 27-inch 240Hz Gaming Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "2560x1440 (QHD)",
+      "refreshRate": 240,
+      "panelType": "OLED",
+      "responseTime": 0.03,
+      "connectionType": "DisplayPort 1.4, HDMI 2.0"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 7.5,
+      "editing": 8.5,
+      "rendering": 7.5,
+      "programming": 7.5,
+      "ai": 6,
+      "streaming": 9
+    }
+  },
+  "ASUS TUF Gaming VG27AQ3A 27-inch 180Hz QHD IPS Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "2560x1440 (QHD)",
+      "refreshRate": 180,
+      "panelType": "Fast IPS",
+      "responseTime": 1,
+      "connectionType": "DisplayPort 1.2, HDMI 2.0"
+    },
+    "useCaseProfile": {
+      "gaming": 8.5,
+      "productivity": 8.5,
+      "editing": 8,
+      "rendering": 7.5,
+      "programming": 8.5,
+      "ai": 6,
+      "streaming": 8
+    }
+  },
+  "Dell UltraSharp U2724D 27-inch IPS Black 120Hz Professional Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "2560x1440 (QHD)",
+      "refreshRate": 120,
+      "panelType": "IPS Black",
+      "responseTime": 5,
+      "connectionType": "DisplayPort 1.4, HDMI, USB-C"
+    },
+    "useCaseProfile": {
+      "gaming": 7,
+      "productivity": 10,
+      "editing": 9.5,
+      "rendering": 9,
+      "programming": 10,
+      "ai": 7,
+      "streaming": 8
+    }
+  },
+  "Samsung Odyssey OLED G6 (G60SD) 27-inch 360Hz Gaming Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "2560x1440 (QHD)",
+      "refreshRate": 360,
+      "panelType": "OLED",
+      "responseTime": 0.03,
+      "connectionType": "DisplayPort 1.4, HDMI 2.1"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 7,
+      "editing": 8,
+      "rendering": 7,
+      "programming": 7,
+      "ai": 6,
+      "streaming": 9
+    }
+  },
+  "BenQ PD2706U 27-inch 4K UHD DesignVue Creator Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "3840x2160 (4K UHD)",
+      "refreshRate": 60,
+      "panelType": "IPS",
+      "responseTime": 5,
+      "connectionType": "Thunderbolt 3 / USB-C, DisplayPort 1.4, HDMI 2.0"
+    },
+    "useCaseProfile": {
+      "gaming": 5.5,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 9.5,
+      "programming": 9.5,
+      "ai": 7.5,
+      "streaming": 7.5
+    }
+  },
+  "LG UltraGear 27GR95QE-B 27-inch QHD OLED 240Hz Gaming Monitor": {
+    "specifications": {
+      "screenSize": 27,
+      "resolution": "2560x1440 (QHD)",
+      "refreshRate": 240,
+      "panelType": "OLED",
+      "responseTime": 0.03,
+      "connectionType": "DisplayPort 1.4, HDMI 2.1"
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 7.5,
+      "editing": 8.5,
+      "rendering": 7.5,
+      "programming": 7.5,
+      "ai": 6,
+      "streaming": 9
+    }
+  },
+  "Logitech G Pro X Superlight 2 Wireless Gaming Mouse": {
+    "specifications": {
+      "connectionType": "LIGHTSPEED Wireless, USB-C",
+      "responseTime": 0.25
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 8,
+      "editing": 7.5,
+      "rendering": 7,
+      "programming": 8,
+      "ai": 5,
+      "streaming": 9
+    }
+  },
+  "Logitech G502 X Lightspeed Wireless RGB Gaming Mouse": {
+    "specifications": {
+      "connectionType": "LIGHTSPEED Wireless, USB-C",
+      "responseTime": 1
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 8.5,
+      "programming": 9,
+      "ai": 5,
+      "streaming": 9
+    }
+  },
+  "Razer BlackWidow V4 75% Mechanical Gaming Keyboard": {
+    "specifications": {
+      "switchType": "Razer Orange Tactile (Hot-swappable)",
+      "connectionType": "Detachable USB-C"
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 8.5,
+      "editing": 8,
+      "rendering": 7,
+      "programming": 9,
+      "ai": 5,
+      "streaming": 9
+    }
+  },
+  "Keychron Q1 Pro QMK/VIA Wireless Custom Mechanical Keyboard": {
+    "specifications": {
+      "switchType": "Keychron K Pro Red (Hot-swappable)",
+      "connectionType": "Bluetooth 5.1 & Type-C"
+    },
+    "useCaseProfile": {
+      "gaming": 8.5,
+      "productivity": 10,
+      "editing": 9.5,
+      "rendering": 8.5,
+      "programming": 10,
+      "ai": 6,
+      "streaming": 8.5
+    }
+  },
+  "Keychron K2 V2 Wireless Bluetooth Mechanical Keyboard": {
+    "specifications": {
+      "switchType": "Gateron G Pro Brown",
+      "connectionType": "Bluetooth 5.1 & Type-C"
+    },
+    "useCaseProfile": {
+      "gaming": 8,
+      "productivity": 9.5,
+      "editing": 8.5,
+      "rendering": 7.5,
+      "programming": 9.5,
+      "ai": 5,
+      "streaming": 8
+    }
+  },
+  "Logitech MX Master 3S Wireless Performance Mouse": {
+    "specifications": {
+      "connectionType": "Bluetooth Low Energy & Logi Bolt",
+      "responseTime": 4
+    },
+    "useCaseProfile": {
+      "gaming": 6,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 9.5,
+      "programming": 10,
+      "ai": 6,
+      "streaming": 8.5
+    }
+  },
+  "Wooting 80HE Rapid Trigger Magnetic Gaming Keyboard": {
+    "specifications": {
+      "switchType": "Lekker Hall Effect Magnetic Switches (Analog)",
+      "connectionType": "USB-C"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 8,
+      "editing": 7.5,
+      "rendering": 7,
+      "programming": 8.5,
+      "ai": 5,
+      "streaming": 9
+    }
+  },
+  "NZXT Kraken 360 RGB Liquid Cooler (360mm AIO)": {
+    "specifications": {
+      "coolerType": "AIO Liquid Cooler",
+      "supportedSockets": [
+        "AM5",
+        "AM4",
+        "LGA1700",
+        "LGA1851",
+        "LGA1200"
+      ],
+      "radiatorSize": 360,
+      "maxTdp": 300
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9.5,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 9,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "Arctic Liquid Freezer III 360 Black Liquid Cooler": {
+    "specifications": {
+      "coolerType": "AIO Liquid Cooler",
+      "supportedSockets": [
+        "AM5",
+        "AM4",
+        "LGA1700",
+        "LGA1851"
+      ],
+      "radiatorSize": 360,
+      "maxTdp": 320
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 9.5,
+      "ai": 9.5,
+      "streaming": 9.8
+    }
+  },
+  "DeepCool AK620 High-Performance Dual Tower Air Cooler": {
+    "specifications": {
+      "coolerType": "Air Cooler",
+      "supportedSockets": [
+        "AM5",
+        "AM4",
+        "LGA1700",
+        "LGA1851",
+        "LGA1200"
+      ],
+      "height": 160,
+      "maxTdp": 260
+    },
+    "useCaseProfile": {
+      "gaming": 9,
+      "productivity": 9,
+      "editing": 8.8,
+      "rendering": 8.8,
+      "programming": 9,
+      "ai": 8.5,
+      "streaming": 9
+    }
+  },
+  "Noctua NH-D15 chromax.black Dual-Tower CPU Cooler": {
+    "specifications": {
+      "coolerType": "Air Cooler",
+      "supportedSockets": [
+        "AM5",
+        "AM4",
+        "LGA1700",
+        "LGA1851",
+        "LGA1200"
+      ],
+      "height": 165,
+      "maxTdp": 250
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9.5,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 9.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "Fractal Design North Charcoal Black Mid-Tower Case": {
+    "specifications": {
+      "formFactorSupport": [
+        "ATX",
+        "Micro-ATX",
+        "Mini-ITX"
+      ],
+      "gpuMaxLength": 355,
+      "coolerMaxHeight": 170,
+      "radiatorSupport": [
+        "360mm",
+        "280mm",
+        "240mm",
+        "120mm"
+      ]
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 9.5,
+      "programming": 10,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "Lian Li Lancool 216 RGB Mid-Tower Gaming Case": {
+    "specifications": {
+      "formFactorSupport": [
+        "E-ATX",
+        "ATX",
+        "Micro-ATX",
+        "Mini-ITX"
+      ],
+      "gpuMaxLength": 392,
+      "coolerMaxHeight": 180,
+      "radiatorSupport": [
+        "360mm",
+        "280mm",
+        "240mm"
+      ]
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 9.5,
+      "programming": 9,
+      "ai": 9.5,
+      "streaming": 9.5
+    }
+  },
+  "Corsair 5000D Airflow Tempered Glass Mid-Tower Case": {
+    "specifications": {
+      "formFactorSupport": [
+        "ATX",
+        "Micro-ATX",
+        "Mini-ITX"
+      ],
+      "gpuMaxLength": 400,
+      "coolerMaxHeight": 170,
+      "radiatorSupport": [
+        "360mm",
+        "280mm",
+        "240mm",
+        "120mm"
+      ]
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 9.5,
+      "editing": 9.5,
+      "rendering": 10,
+      "programming": 9.5,
+      "ai": 9.5,
+      "streaming": 9.8
+    }
+  },
+  "WD Black SN850X 2TB NVMe PCIe Gen4 M.2 SSD": {
+    "specifications": {
+      "type": "NVMe SSD",
+      "interface": "PCIe 4.0 x4",
+      "capacity": 2000,
+      "readSpeed": 7300,
+      "writeSpeed": 6600,
+      "formFactor": "M.2 2280"
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 9.5,
+      "editing": 9.5,
+      "rendering": 9.5,
+      "programming": 9.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "Samsung 990 PRO 2TB NVMe PCIe 4.0 M.2 SSD": {
+    "specifications": {
+      "type": "NVMe SSD",
+      "interface": "PCIe 4.0 x4",
+      "capacity": 2000,
+      "readSpeed": 7450,
+      "writeSpeed": 6900,
+      "formFactor": "M.2 2280"
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 9.8,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 9.8,
+      "ai": 9.5,
+      "streaming": 9.8
+    }
+  },
+  "Samsung 990 PRO 4TB NVMe PCIe 4.0 M.2 SSD": {
+    "specifications": {
+      "type": "NVMe SSD",
+      "interface": "PCIe 4.0 x4",
+      "capacity": 4000,
+      "readSpeed": 7450,
+      "writeSpeed": 6900,
+      "formFactor": "M.2 2280"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "Crucial T705 2TB PCIe Gen5 NVMe M.2 SSD with Heatsink": {
+    "specifications": {
+      "type": "NVMe SSD",
+      "interface": "PCIe 5.0 x4",
+      "capacity": 2000,
+      "readSpeed": 14500,
+      "writeSpeed": 12700,
+      "formFactor": "M.2 2280"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "Kingston KC3000 1TB PCIe 4.0 NVMe M.2 SSD": {
+    "specifications": {
+      "type": "NVMe SSD",
+      "interface": "PCIe 4.0 x4",
+      "capacity": 1000,
+      "readSpeed": 7000,
+      "writeSpeed": 6000,
+      "formFactor": "M.2 2280"
+    },
+    "useCaseProfile": {
+      "gaming": 9,
+      "productivity": 9,
+      "editing": 8.8,
+      "rendering": 8.8,
+      "programming": 9,
+      "ai": 8,
+      "streaming": 9
+    }
+  },
+  "G.Skill Trident Z5 Neo RGB 32GB (2x16GB) DDR5-6000 CL30": {
+    "specifications": {
+      "memoryType": "DDR5",
+      "capacity": 32,
+      "speed": 6000,
+      "modules": "2x16GB",
+      "formFactor": "DIMM"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 8.5,
+      "programming": 9,
+      "ai": 8,
+      "streaming": 9.5
+    }
+  },
+  "Corsair Vengeance RGB 32GB (2x16GB) DDR5-6000 CL36": {
+    "specifications": {
+      "memoryType": "DDR5",
+      "capacity": 32,
+      "speed": 6000,
+      "modules": "2x16GB",
+      "formFactor": "DIMM"
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 8.5,
+      "programming": 9,
+      "ai": 8,
+      "streaming": 9
+    }
+  },
+  "Kingston Fury Beast RGB 32GB (2x16GB) DDR5-6000 CL36": {
+    "specifications": {
+      "memoryType": "DDR5",
+      "capacity": 32,
+      "speed": 6000,
+      "modules": "2x16GB",
+      "formFactor": "DIMM"
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 9,
+      "editing": 9,
+      "rendering": 8.5,
+      "programming": 9,
+      "ai": 8,
+      "streaming": 9
+    }
+  },
+  "G.Skill Trident Z5 RGB 64GB (2x32GB) DDR5-6000 CL30": {
+    "specifications": {
+      "memoryType": "DDR5",
+      "capacity": 64,
+      "speed": 6000,
+      "modules": "2x32GB",
+      "formFactor": "DIMM"
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 9.5,
+      "streaming": 10
+    }
+  },
+  "Corsair Vengeance 96GB (2x48GB) DDR5-5600 CL40 Workstation Kit": {
+    "specifications": {
+      "memoryType": "DDR5",
+      "capacity": 96,
+      "speed": 5600,
+      "modules": "2x48GB",
+      "formFactor": "DIMM"
+    },
+    "useCaseProfile": {
+      "gaming": 9,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "GearGrid Apex Gaming Rig (Blackwell Extreme Edition)": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "gpu": "NVIDIA GeForce RTX 5090 32GB",
+        "ram": "64GB DDR5-6000",
+        "storage": "2TB Gen4 NVMe",
+        "psu": "1200W ATX 3.0",
+        "cooling": "360mm AIO Liquid Cooler",
+        "chassis": "Fractal Design North XL"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 9.8,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 9.8,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "GearGrid Titan 5080 4K Gaming Rig": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "AMD Ryzen 9 9950X3D",
+        "gpu": "ASUS TUF RTX 5080 16GB",
+        "ram": "32GB DDR5-6000",
+        "storage": "2TB Gen4 NVMe",
+        "psu": "1000W 80+ Gold",
+        "cooling": "360mm AIO Liquid Cooler",
+        "chassis": "Lian Li Lancool 216"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 10,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.8,
+      "ai": 9.5,
+      "streaming": 10
+    }
+  },
+  "GearGrid Velocity 5070 Ti High-Framerate Gaming Rig": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "gpu": "NVIDIA GeForce RTX 5070 Ti 16GB",
+        "ram": "32GB DDR5-6000",
+        "storage": "2TB Gen5 NVMe",
+        "psu": "850W 80+ Gold",
+        "cooling": "DeepCool AK620 Dual-Tower",
+        "chassis": "Fractal Design North"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.5,
+      "productivity": 8.5,
+      "editing": 8.5,
+      "rendering": 8.5,
+      "programming": 8.8,
+      "ai": 8.5,
+      "streaming": 9.2
+    }
+  },
+  "GearGrid Phantom Competitive Gaming Rig": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "Intel Core Ultra 7 265K",
+        "gpu": "MSI GeForce RTX 5080 16GB",
+        "ram": "32GB DDR5-6000",
+        "storage": "2TB NVMe",
+        "psu": "850W 80+ Gold",
+        "cooling": "Arctic Liquid Freezer III 360",
+        "chassis": "Lian Li Lancool 216"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.6,
+      "productivity": 9.5,
+      "editing": 9.2,
+      "rendering": 9.2,
+      "programming": 9.5,
+      "ai": 9,
+      "streaming": 9.5
+    }
+  },
+  "GearGrid Forge 1440p Performance Gaming Rig": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "AMD Ryzen 7 7700X",
+        "gpu": "ASUS PRIME GeForce RTX 5080 16GB",
+        "ram": "32GB DDR5-6000",
+        "storage": "1TB Gen4 NVMe",
+        "psu": "750W 80+ Gold",
+        "cooling": "DeepCool AK620 Air Cooler",
+        "chassis": "Corsair 4000D Airflow"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.4,
+      "productivity": 8.8,
+      "editing": 8.8,
+      "rendering": 8.8,
+      "programming": 9,
+      "ai": 8.5,
+      "streaming": 9
+    }
+  },
+  "GearGrid 4K Creator Studio PC": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "AMD Ryzen 9 9950X3D",
+        "gpu": "ASUS TUF RTX 5080 16GB",
+        "ram": "64GB DDR5-6000",
+        "storage": "6TB Gen4 NVMe (2TB + 4TB)",
+        "psu": "1000W 80+ Gold",
+        "cooling": "Arctic Liquid Freezer III 360",
+        "chassis": "Lian Li Lancool 216 Mesh"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.6,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 9.5,
+      "streaming": 9.8
+    }
+  },
+  "GearGrid Studio Workstation (3D & AI Acceleration)": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "Intel Core Ultra 9 285K",
+        "gpu": "NVIDIA GeForce RTX 5080 16GB",
+        "ram": "96GB DDR5-5600",
+        "storage": "6TB NVMe (2TB Gen5 + 4TB Gen4)",
+        "psu": "1000W 80+ Gold",
+        "cooling": "Noctua NH-D15 chromax.black",
+        "chassis": "Fractal Design North Mesh"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 9.2,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 9.5
+    }
+  },
+  "HP Z2 Tower G9 Workstation Configuration": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "Intel Core i9-14900K",
+        "gpu": "NVIDIA RTX 4080 Super 16GB",
+        "ram": "64GB DDR5 ECC",
+        "storage": "2TB Gen4 NVMe",
+        "psu": "700W 92% Efficiency",
+        "cooling": "HP Vented Liquid Cooling",
+        "chassis": "HP Z2 Industrial Tower"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 8.8,
+      "productivity": 9.8,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.8,
+      "ai": 9.2,
+      "streaming": 9
+    }
+  },
+  "Dell Precision 3680 Tower Workstation Configuration": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "Intel Core i9-14900",
+        "gpu": "NVIDIA RTX 4080 16GB",
+        "ram": "64GB DDR5 ECC",
+        "storage": "2TB Gen4 NVMe",
+        "psu": "1000W Platinum Certified",
+        "cooling": "Dell Precision Dual-Fan",
+        "chassis": "Dell Precision 3680 Security Tower"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 8.5,
+      "productivity": 9.8,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.8,
+      "ai": 9,
+      "streaming": 9
+    }
+  },
+  "GearGrid Horizon Office & Pro Station": {
+    "specifications": {
+      "prebuiltSpecs": {
+        "cpu": "Intel Core Ultra 7 265K",
+        "gpu": "Intel Iris Xe Integrated / RTX 5070 Ti Ready",
+        "ram": "32GB DDR5-5600",
+        "storage": "1TB Gen4 NVMe",
+        "psu": "750W 80+ Gold",
+        "cooling": "DeepCool Air Cooler",
+        "chassis": "Fractal Design Mesh"
+      }
+    },
+    "useCaseProfile": {
+      "gaming": 6.5,
+      "productivity": 9.5,
+      "editing": 8.5,
+      "rendering": 8,
+      "programming": 9.5,
+      "ai": 8,
+      "streaming": 8
+    }
+  },
+  "Corsair RM1000x 1000W 80+ Gold Fully Modular Power Supply": {
+    "specifications": {
+      "wattage": 1000,
+      "efficiency": "80+ Gold",
+      "modular": "Full",
+      "atx3Support": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.8,
+      "productivity": 9.8,
+      "editing": 9.8,
+      "rendering": 9.8,
+      "programming": 9.5,
+      "ai": 9.8,
+      "streaming": 9.8
+    }
+  },
+  "Seasonic Focus GX-850 850W 80+ Gold Modular Power Supply": {
+    "specifications": {
+      "wattage": 850,
+      "efficiency": "80+ Gold",
+      "modular": "Full",
+      "atx3Support": false
+    },
+    "useCaseProfile": {
+      "gaming": 9.2,
+      "productivity": 9.2,
+      "editing": 9.2,
+      "rendering": 9.2,
+      "programming": 9.2,
+      "ai": 9,
+      "streaming": 9.2
+    }
+  },
+  "be quiet! Pure Power 12 M 850W 80+ Gold ATX 3.0 Power Supply": {
+    "specifications": {
+      "wattage": 850,
+      "efficiency": "80+ Gold",
+      "modular": "Full",
+      "atx3Support": true
+    },
+    "useCaseProfile": {
+      "gaming": 9.4,
+      "productivity": 9.4,
+      "editing": 9.4,
+      "rendering": 9.4,
+      "programming": 9.2,
+      "ai": 9.2,
+      "streaming": 9.4
+    }
+  },
+  "Corsair RM1200x Shift 1200W 80+ Gold Fully Modular ATX 3.0 PSU": {
+    "specifications": {
+      "wattage": 1200,
+      "efficiency": "80+ Gold",
+      "modular": "Full",
+      "atx3Support": true
+    },
+    "useCaseProfile": {
+      "gaming": 10,
+      "productivity": 10,
+      "editing": 10,
+      "rendering": 10,
+      "programming": 10,
+      "ai": 10,
+      "streaming": 10
+    }
+  },
+  "Corsair RM750e 750W 80+ Gold Fully Modular Power Supply": {
+    "specifications": {
+      "wattage": 750,
+      "efficiency": "80+ Gold",
+      "modular": "Full",
+      "atx3Support": true
+    },
+    "useCaseProfile": {
+      "gaming": 8.8,
+      "productivity": 8.8,
+      "editing": 8.8,
+      "rendering": 8.8,
+      "programming": 8.8,
+      "ai": 8.5,
+      "streaming": 8.8
+    }
+  }
+};
+
 const getRawProducts = (catMap) => [
+
   // -------------------------------------------------------------
   // 1. GRAPHICS CARDS
   // -------------------------------------------------------------
@@ -1147,7 +2851,284 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1551640179-9e39f8055291?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm750e_750w_img1" },
       { url: "https://images.unsplash.com/photo-1555618565-9f2b0323a10d?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm750e_750w_img2" }
     ]
-  }
+  },
+
+  // -------------------------------------------------------------
+  // MAINSTREAM HARDWARE EXPANSION (FOR MAINSTREAM BUDGET TIERS)
+  // -------------------------------------------------------------
+  {
+    title: "ZOTAC Gaming GeForce RTX 4060 8GB Twin Edge",
+    category: catMap["Graphics Cards"],
+    brand: "ZOTAC",
+    price: 28990,
+    discountPrice: 27990,
+    stock: 25,
+    rating: 4.7,
+    numReviews: 88,
+    featured: false,
+    description: "Compact dual-fan Ada Lovelace graphics card with 8GB GDDR6 memory, DLSS 3 frame generation, and IceStorm 2.0 advanced cooling for 1080p and 1440p gaming.",
+    images: [{ url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "zotac_rtx_4060_img1" }]
+  },
+  {
+    title: "MSI GeForce RTX 4060 Ti VENTUS 2X Black 8G OC",
+    category: catMap["Graphics Cards"],
+    brand: "MSI",
+    price: 38490,
+    discountPrice: 37490,
+    stock: 20,
+    rating: 4.7,
+    numReviews: 64,
+    featured: false,
+    description: "Factory-overclocked dual-fan RTX 4060 Ti with TORX Fan 4.0, reinforcing backplate, and full DLSS 3 support for 1440p high-refresh gaming.",
+    images: [{ url: "https://images.unsplash.com/photo-1555618254-84e2cf498b01?auto=format&fit=crop&w=1200&q=80", publicId: "msi_rtx_4060ti_img1" }]
+  },
+  {
+    title: "ASUS Dual GeForce RTX 4070 Super EVO 12GB GDDR6X",
+    category: catMap["Graphics Cards"],
+    brand: "ASUS",
+    price: 58990,
+    discountPrice: 56990,
+    stock: 18,
+    rating: 4.9,
+    numReviews: 52,
+    featured: true,
+    description: "High-performance 1440p/4K graphics card featuring 12GB GDDR6X, Axial-tech fan design, 0dB technology, and dual BIOS.",
+    images: [{ url: "https://images.unsplash.com/photo-1601153211050-ae2e1fa428d7?auto=format&fit=crop&w=1200&q=80", publicId: "asus_dual_rtx_4070s_img1" }]
+  },
+  {
+    title: "Gigabyte GeForce RTX 4070 Ti Super Windforce OC 16GB GDDR6X",
+    category: catMap["Graphics Cards"],
+    brand: "Gigabyte",
+    price: 79990,
+    discountPrice: 77490,
+    stock: 15,
+    rating: 4.8,
+    numReviews: 44,
+    featured: true,
+    description: "16GB GDDR6X powerhouse with 256-bit memory bus, WINDFORCE cooling system, and protective metal backplate.",
+    images: [{ url: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1200&q=80", publicId: "gigabyte_rtx_4070tis_img1" }]
+  },
+  {
+    title: "AMD Ryzen 5 7600 Desktop Processor (6 Cores / 12 Threads)",
+    category: catMap["Processors"],
+    brand: "AMD",
+    price: 18490,
+    discountPrice: 17990,
+    stock: 30,
+    rating: 4.8,
+    numReviews: 120,
+    featured: false,
+    description: "Efficient Zen 4 desktop processor with 6 cores and 12 threads, 38MB cache, 65W TDP, and bundled Wraith Stealth cooler.",
+    images: [{ url: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1200&q=80", publicId: "amd_ryzen_5_7600_img1" }]
+  },
+  {
+    title: "AMD Ryzen 5 7600X Desktop Processor (6 Cores / 12 Threads)",
+    category: catMap["Processors"],
+    brand: "AMD",
+    price: 20490,
+    discountPrice: 19990,
+    stock: 25,
+    rating: 4.8,
+    numReviews: 95,
+    featured: false,
+    description: "High-clock AM5 gaming processor with 5.3 GHz boost, 38MB cache, and unlocked multiplier for overclocking.",
+    images: [{ url: "https://images.unsplash.com/photo-1555617766-c94804975da3?auto=format&fit=crop&w=1200&q=80", publicId: "amd_ryzen_5_7600x_img1" }]
+  },
+  {
+    title: "Intel Core i5-14400F Desktop Processor (10 Cores / 16 Threads)",
+    category: catMap["Processors"],
+    brand: "Intel",
+    price: 18200,
+    discountPrice: 17500,
+    stock: 28,
+    rating: 4.7,
+    numReviews: 70,
+    featured: false,
+    description: "10-core hybrid processor (6 Performance + 4 Efficient) reaching up to 4.7 GHz max boost on LGA1700 socket.",
+    images: [{ url: "https://images.unsplash.com/photo-1555616635-640b71bdb185?auto=format&fit=crop&w=1200&q=80", publicId: "intel_i5_14400f_img1" }]
+  },
+  {
+    title: "Intel Core i7-14700K Desktop Processor (20 Cores / 28 Threads)",
+    category: catMap["Processors"],
+    brand: "Intel",
+    price: 36990,
+    discountPrice: 35490,
+    stock: 18,
+    rating: 4.8,
+    numReviews: 55,
+    featured: true,
+    description: "20-core Raptor Lake Refresh powerhouse (8 P-cores + 12 E-cores) up to 5.6 GHz for gaming and content creation.",
+    images: [{ url: "https://images.unsplash.com/photo-1540829917886-91ab031b1764?auto=format&fit=crop&w=1200&q=80", publicId: "intel_i7_14700k_img1" }]
+  },
+  {
+    title: "MSI PRO B650M-P Micro-ATX Motherboard",
+    category: catMap["Motherboards"],
+    brand: "MSI",
+    price: 9990,
+    discountPrice: 9490,
+    stock: 35,
+    rating: 4.6,
+    numReviews: 82,
+    featured: false,
+    description: "High-value AM5 Micro-ATX board with DDR5 support, PCIe 4.0 x16 Steel Armor, and M.2 Shield Frozr.",
+    images: [{ url: "https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=1200&q=80", publicId: "msi_pro_b650m_p_img1" }]
+  },
+  {
+    title: "ASRock B760M Pro RS WiFi Motherboard",
+    category: catMap["Motherboards"],
+    brand: "ASRock",
+    price: 12490,
+    discountPrice: 11990,
+    stock: 24,
+    rating: 4.7,
+    numReviews: 48,
+    featured: false,
+    description: "White-themed Intel LGA1700 motherboard with DDR5 support, PCIe 5.0 slot, dual Hyper M.2 slots, and Wi-Fi 6E.",
+    images: [{ url: "https://images.unsplash.com/photo-1579803166678-7acf374cfe52?auto=format&fit=crop&w=1200&q=80", publicId: "asrock_b760m_pro_rs_img1" }]
+  },
+  {
+    title: "ASUS Prime Z890-P WiFi Motherboard",
+    category: catMap["Motherboards"],
+    brand: "ASUS",
+    price: 22990,
+    discountPrice: 21990,
+    stock: 16,
+    rating: 4.8,
+    numReviews: 30,
+    featured: false,
+    description: "Intel LGA1851 motherboard engineered for Core Ultra processors with DDR5, PCIe 5.0, Thunderbolt 4, and WiFi 7.",
+    images: [{ url: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&q=80", publicId: "asus_prime_z890p_img1" }]
+  },
+  {
+    title: "Crucial 16GB (2x8GB) DDR5-4800 CL40 Desktop Memory",
+    category: catMap["Memory / RAM"],
+    brand: "Crucial",
+    price: 4990,
+    discountPrice: 4690,
+    stock: 45,
+    rating: 4.6,
+    numReviews: 110,
+    featured: false,
+    description: "Reliable dual-channel DDR5 desktop RAM kit running at 4800 MHz CL40 for mainstream builds.",
+    images: [{ url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "crucial_16gb_ddr5_img1" }]
+  },
+  {
+    title: "Corsair Vengeance 32GB (2x16GB) DDR5-5200 CL40",
+    category: catMap["Memory / RAM"],
+    brand: "Corsair",
+    price: 8990,
+    discountPrice: 8490,
+    stock: 32,
+    rating: 4.7,
+    numReviews: 75,
+    featured: false,
+    description: "Low-profile solid aluminum heatspreader DDR5 memory optimized for Intel and AMD motherboards.",
+    images: [{ url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_32gb_5200_img1" }]
+  },
+  {
+    title: "Crucial P3 Plus 500GB PCIe 4.0 NVMe M.2 SSD",
+    category: catMap["Storage"],
+    brand: "Crucial",
+    price: 3790,
+    discountPrice: 3490,
+    stock: 40,
+    rating: 4.6,
+    numReviews: 95,
+    featured: false,
+    description: "Fast Gen4 NVMe storage reaching up to 4700 MB/s read speeds for responsive OS booting.",
+    images: [{ url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "crucial_p3plus_500gb_img1" }]
+  },
+  {
+    title: "Western Digital Blue SN580 1TB PCIe Gen4 NVMe M.2 SSD",
+    category: catMap["Storage"],
+    brand: "Western Digital",
+    price: 5690,
+    discountPrice: 5390,
+    stock: 38,
+    rating: 4.8,
+    numReviews: 130,
+    featured: false,
+    description: "High-value NVMe SSD with nCache 4.0 technology delivering up to 4150 MB/s read and write speeds.",
+    images: [{ url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "wd_blue_sn580_1tb_img1" }]
+  },
+  {
+    title: "DeepCool AG400 Single-Tower CPU Air Cooler",
+    category: catMap["Cooling & Cases"],
+    brand: "DeepCool",
+    price: 1990,
+    discountPrice: 1850,
+    stock: 50,
+    rating: 4.7,
+    numReviews: 140,
+    featured: false,
+    description: "Compact 120mm air cooler with 4 direct-contact heat pipes capable of cooling up to 220W TDP.",
+    images: [{ url: "https://images.unsplash.com/photo-1576669801838-1b1c52121e6a?auto=format&fit=crop&w=1200&q=80", publicId: "deepcool_ag400_img1" }]
+  },
+  {
+    title: "Thermalright Peerless Assassin 120 SE Air Cooler",
+    category: catMap["Cooling & Cases"],
+    brand: "Thermalright",
+    price: 3490,
+    discountPrice: 3290,
+    stock: 35,
+    rating: 4.9,
+    numReviews: 160,
+    featured: false,
+    description: "Dual-tower 6-heatpipe air cooler with dual 120mm PWM fans delivering legendary thermal dissipation.",
+    images: [{ url: "https://images.unsplash.com/photo-1576750540989-682154c115d8?auto=format&fit=crop&w=1200&q=80", publicId: "thermalright_pa120_img1" }]
+  },
+  {
+    title: "Ant Esports ICE-112 Mid-Tower Gaming Case",
+    category: catMap["Cooling & Cases"],
+    brand: "Ant Esports",
+    price: 3290,
+    discountPrice: 2990,
+    stock: 30,
+    rating: 4.5,
+    numReviews: 75,
+    featured: false,
+    description: "Budget mid-tower chassis with mesh front panel, 4 pre-installed RGB fans, and tempered glass side window.",
+    images: [{ url: "https://images.unsplash.com/photo-1582954820640-42c30eeabe35?auto=format&fit=crop&w=1200&q=80", publicId: "ant_ice112_img1" }]
+  },
+  {
+    title: "DeepCool CC560 V2 High-Airflow Mid-Tower Case",
+    category: catMap["Cooling & Cases"],
+    brand: "DeepCool",
+    price: 4190,
+    discountPrice: 3990,
+    stock: 28,
+    rating: 4.7,
+    numReviews: 85,
+    featured: false,
+    description: "High-airflow mid-tower case with 4 pre-installed LED fans, full-length PSU shroud, and 360mm radiator support.",
+    images: [{ url: "https://images.unsplash.com/photo-1583001393568-39b4fc60d2ba?auto=format&fit=crop&w=1200&q=80", publicId: "deepcool_cc560_img1" }]
+  },
+  {
+    title: "DeepCool PK650D 650W 80 Plus Bronze Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "DeepCool",
+    price: 4490,
+    discountPrice: 4190,
+    stock: 40,
+    rating: 4.6,
+    numReviews: 90,
+    featured: false,
+    description: "Reliable 650W 80 PLUS Bronze certified power supply with flat black cables and 120mm silent fan.",
+    images: [{ url: "https://images.unsplash.com/photo-1551640179-9e39f8055291?auto=format&fit=crop&w=1200&q=80", publicId: "deepcool_pk650d_img1" }]
+  },
+  {
+    title: "Cooler Master MWE 750 Bronze V2 750W Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "Cooler Master",
+    price: 6490,
+    discountPrice: 6190,
+    stock: 30,
+    rating: 4.8,
+    numReviews: 105,
+    featured: false,
+    description: "750W 80 PLUS Bronze non-modular power supply with DC-to-DC circuit design and 120mm HDB fan.",
+    images: [{ url: "https://images.unsplash.com/photo-1555618565-9f2b0323a10d?auto=format&fit=crop&w=1200&q=80", publicId: "coolermaster_mwe750_img1" }]
+  },
 ];
 
 async function seedDatabase() {
@@ -1194,7 +3175,14 @@ async function seedDatabase() {
 
     // Insert Products
     console.log("\nSeeding authentic Indian-market hardware products...");
-    const rawProducts = getRawProducts(categoryMap);
+    const rawProducts = getRawProducts(categoryMap).map((prod) => {
+      const specData = PRODUCT_SPECS_DATA[prod.title] || {};
+      return {
+        ...prod,
+        specifications: specData.specifications || {},
+        useCaseProfile: specData.useCaseProfile || { gaming: 5, productivity: 5, editing: 5, rendering: 5, programming: 5, ai: 5, streaming: 5 },
+      };
+    });
     const productDocs = await Product.insertMany(rawProducts);
     console.log(` Created ${productDocs.length} products.`);
 
