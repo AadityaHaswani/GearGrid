@@ -239,6 +239,66 @@ export function ShopProvider({ children }) {
     return true;
   };
 
+  // Batch Add Custom PC Build Components to Cart
+  const addBuildToCart = async (components) => {
+    const validItems = (Array.isArray(components) ? components : Object.values(components || {}))
+      .filter(item => item && (item._id || item.id));
+
+    if (validItems.length === 0) {
+      showToast('No valid hardware components configured', 'red');
+      return false;
+    }
+
+    if (!user) {
+      const pending = {
+        type: 'build-cart',
+        products: validItems,
+        from: location.pathname + location.search
+      };
+      try {
+        sessionStorage.setItem('geargrid_pending_action', JSON.stringify(pending));
+      } catch {}
+      setPendingAuthAction(pending);
+      navigate('/login', { state: { from: location.pathname + location.search } });
+      return false;
+    }
+
+    try {
+      for (const item of validItems) {
+        const productId = item._id || item.id;
+        await cartAPI.addToCart(productId);
+      }
+      const res = await cartAPI.getCart();
+      const items = res.data?.data?.items || [];
+      const normalized = items.map(normalizeCartItem).filter(Boolean);
+      setCart(normalized);
+    } catch {
+      // Local optimistic update
+      setCart((prev) => {
+        let updated = [...prev];
+        for (const item of validItems) {
+          const productId = item._id || item.id;
+          const norm = normalizeProduct(item);
+          const existing = updated.find((cartItem) => (cartItem.product._id || cartItem.product.id) === productId);
+          if (existing) {
+            updated = updated.map((cartItem) =>
+              (cartItem.product._id || cartItem.product.id) === productId
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+            );
+          } else {
+            updated.push({ product: norm, quantity: 1 });
+          }
+        }
+        return updated;
+      });
+    }
+
+    showToast(`Added PC Build (${validItems.length} verified parts) to Cart`, 'amber');
+    setIsCartOpen(true);
+    return true;
+  };
+
   const removeFromCart = async (productId) => {
     try {
       const res = await cartAPI.removeFromCart(productId);
@@ -358,6 +418,8 @@ export function ShopProvider({ children }) {
     if (action) {
       if (action.type === 'cart' && action.product) {
         addToCart(action.product, action.qty || 1);
+      } else if (action.type === 'build-cart' && action.products) {
+        addBuildToCart(action.products);
       } else if (action.type === 'wishlist' && action.product) {
         toggleWishlist(action.product);
       }
@@ -404,6 +466,7 @@ export function ShopProvider({ children }) {
         cart,
         fetchCart,
         addToCart,
+        addBuildToCart,
         removeFromCart,
         updateQuantity,
         clearCart,

@@ -59,6 +59,11 @@ const CATEGORIES_DATA = [
     description: "Turnkey custom-built liquid-cooled battle stations, 8K creative workstations, and ISV-certified enterprise towers tested for zero-compromise reliability.",
     image: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=800&q=80",
   },
+  {
+    name: "Power Supplies",
+    description: "Ultra-efficient 80+ Gold and Platinum certified modular power supplies with native ATX 3.0 support, PCIe 5.0 12V-2x6 power delivery, and silent zero-RPM fan modes.",
+    image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=800&q=80",
+  },
 ];
 
 const getRawProducts = (catMap) => [
@@ -1058,6 +1063,90 @@ const getRawProducts = (catMap) => [
       { url: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=1200&q=80", publicId: "geargrid_horizon_office__img1" },
       { url: "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?auto=format&fit=crop&w=1200&q=80", publicId: "geargrid_horizon_office__img2" }
     ]
+  },
+
+  // -------------------------------------------------------------
+  // 10. POWER SUPPLIES
+  // -------------------------------------------------------------
+  {
+    title: "Corsair RM1000x 1000W 80+ Gold Fully Modular Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "Corsair",
+    price: 18990,
+    discountPrice: 17490,
+    stock: 25,
+    rating: 4.9,
+    numReviews: 84,
+    featured: true,
+    description: "Enthusiast-grade 1000W 80 PLUS Gold certified fully modular PSU featuring Japanese 105°C capacitors, Zero RPM fan mode for ultra-quiet operation, and native ATX 3.0 support.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm1000x_1000w_img1" },
+      { url: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm1000x_1000w_img2" }
+    ]
+  },
+  {
+    title: "Seasonic Focus GX-850 850W 80+ Gold Modular Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "Seasonic",
+    price: 14490,
+    discountPrice: 13490,
+    stock: 30,
+    rating: 4.9,
+    numReviews: 62,
+    featured: true,
+    description: "Legendary reliability with 850W 80 PLUS Gold efficiency, fluid dynamic bearing fan, compact 140mm chassis, tight voltage regulation, and 10-year manufacturer warranty.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1555618254-84e2cf498b01?auto=format&fit=crop&w=1200&q=80", publicId: "seasonic_focus_gx850_img1" },
+      { url: "https://images.unsplash.com/photo-1601153211050-ae2e1fa428d7?auto=format&fit=crop&w=1200&q=80", publicId: "seasonic_focus_gx850_img2" }
+    ]
+  },
+  {
+    title: "be quiet! Pure Power 12 M 850W 80+ Gold ATX 3.0 Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "be quiet!",
+    price: 12990,
+    discountPrice: 11990,
+    stock: 20,
+    rating: 4.8,
+    numReviews: 45,
+    featured: false,
+    description: "Whisper-quiet 850W ATX 3.0 power supply with PCIe 5.0 12VHPWR 600W cable, 80 PLUS Gold certified up to 93.2% efficiency, and silence-optimized 120mm be quiet! fan.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80", publicId: "be_quiet_pure_power_12_img1" },
+      { url: "https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=1200&q=80", publicId: "be_quiet_pure_power_12_img2" }
+    ]
+  },
+  {
+    title: "Corsair RM1200x Shift 1200W 80+ Gold Fully Modular ATX 3.0 PSU",
+    category: catMap["Power Supplies"],
+    brand: "Corsair",
+    price: 24990,
+    discountPrice: 22990,
+    stock: 15,
+    rating: 5.0,
+    numReviews: 38,
+    featured: true,
+    description: "Revolutionary side-mounted modular cable interface for effortless cable routing, 1200W ATX 3.0 certified with native PCIe 5.0 power delivery and 100% Japanese capacitors.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1604754742629-3e5728249d73?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm1200x_shift_img1" },
+      { url: "https://images.unsplash.com/photo-1531500435567-d5a03bbb46a6?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm1200x_shift_img2" }
+    ]
+  },
+  {
+    title: "Corsair RM750e 750W 80+ Gold Fully Modular Power Supply",
+    category: catMap["Power Supplies"],
+    brand: "Corsair",
+    price: 10490,
+    discountPrice: 9490,
+    stock: 35,
+    rating: 4.7,
+    numReviews: 78,
+    featured: false,
+    description: "Compact 140mm modular 750W 80 PLUS Gold power supply with low-noise 120mm fan, resonant LLC topology with DC-DC conversion, and robust dual EPS12V connectors.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1551640179-9e39f8055291?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm750e_750w_img1" },
+      { url: "https://images.unsplash.com/photo-1555618565-9f2b0323a10d?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_rm750e_750w_img2" }
+    ]
   }
 ];
 
@@ -1083,7 +1172,7 @@ async function seedDatabase() {
     console.log(` Cleared ${deletedProducts.deletedCount} products and ${deletedCategories.deletedCount} categories.`);
 
     // Insert Categories
-    console.log("\nSeeding 9 hardware categories...");
+    console.log("\nSeeding 10 hardware categories...");
     const categoryDocs = [];
     for (const cat of CATEGORIES_DATA) {
       const slug = slugify(cat.name, { lower: true, strict: true });

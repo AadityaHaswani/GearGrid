@@ -141,69 +141,49 @@ export const PRODUCTS = [
   }
 ];
 
-// PC Builder Slots
+// PC Builder Slot Definitions (Mapped to authentic MongoDB Categories)
 export const BUILDER_SLOTS = [
   {
     slot: 'cpu',
     name: 'Processor (CPU)',
-    options: [
-      { id: 'b-cpu-1', name: 'AMD Ryzen 7 7800X3D (8 Cores, 5.0 GHz)', price: 449, wattage: 120 },
-      { id: 'b-cpu-2', name: 'Intel Core i9-14900K (24 Cores, 6.0 GHz)', price: 579, wattage: 253 },
-      { id: 'b-cpu-3', name: 'AMD Ryzen 5 7600X (6 Cores, 5.3 GHz)', price: 219, wattage: 105 }
-    ]
+    category: 'Processors',
+    categorySlug: 'processors'
   },
   {
     slot: 'gpu',
     name: 'Graphics Card (GPU)',
-    options: [
-      { id: 'b-gpu-1', name: 'NVIDIA GeForce RTX 5090 32GB GDDR7', price: 1999, wattage: 500 },
-      { id: 'b-gpu-2', name: 'NVIDIA GeForce RTX 4080 Super 16GB', price: 999, wattage: 320 },
-      { id: 'b-gpu-3', name: 'AMD Radeon RX 7900 XTX 24GB', price: 899, wattage: 355 }
-    ]
+    category: 'Graphics Cards',
+    categorySlug: 'graphics-cards'
   },
   {
     slot: 'motherboard',
     name: 'Motherboard',
-    options: [
-      { id: 'b-mb-1', name: 'ASUS ROG Crosshair X670E Hero (PCIe 5.0, WiFi 6E)', price: 649, wattage: 50 },
-      { id: 'b-mb-2', name: 'MSI MAG B650 Tomahawk WiFi', price: 219, wattage: 40 },
-      { id: 'b-mb-3', name: 'Gigabyte Z790 AORUS Elite AX', price: 259, wattage: 45 }
-    ]
+    category: 'Motherboards',
+    categorySlug: 'motherboards'
   },
   {
     slot: 'ram',
     name: 'System Memory (RAM)',
-    options: [
-      { id: 'b-ram-1', name: '32GB (2x16GB) DDR5-6000 CL30 RGB', price: 129, wattage: 10 },
-      { id: 'b-ram-2', name: '64GB (2x32GB) DDR5-6000 CL30 RGB', price: 219, wattage: 15 },
-      { id: 'b-ram-3', name: '128GB (4x32GB) DDR5-5600 Pro Workstation', price: 429, wattage: 25 }
-    ]
+    category: 'Memory / RAM',
+    categorySlug: 'memory-ram'
   },
   {
     slot: 'storage',
     name: 'Primary Storage (NVMe M.2)',
-    options: [
-      { id: 'b-ssd-1', name: '2TB Samsung 990 PRO Gen4 NVMe SSD (7450 MB/s)', price: 179, wattage: 8 },
-      { id: 'b-ssd-2', name: '4TB Crucial T700 PCIe 5.0 NVMe SSD (12400 MB/s)', price: 399, wattage: 12 },
-      { id: 'b-ssd-3', name: '1TB Kingston KC3000 Gen4 NVMe SSD', price: 99, wattage: 6 }
-    ]
+    category: 'Storage',
+    categorySlug: 'storage'
   },
   {
     slot: 'cooling',
     name: 'Cooling Solution',
-    options: [
-      { id: 'b-cool-1', name: 'NZXT Kraken Elite 360 RGB AIO Liquid Cooler', price: 279, wattage: 25 },
-      { id: 'b-cool-2', name: 'Noctua NH-D15 chromax.black Dual-Tower Air Cooler', price: 119, wattage: 10 },
-      { id: 'b-cool-3', name: 'Corsair iCUE LINK H150i RGB 360mm AIO', price: 239, wattage: 25 }
-    ]
+    category: 'Cooling & Cases',
+    categorySlug: 'cooling-and-cases'
   },
   {
     slot: 'psu',
     name: 'Power Supply (PSU)',
-    options: [
-      { id: 'b-psu-1', name: 'Corsair RM1000x 1000W 80+ Gold Fully Modular', price: 189, wattage: 0 },
-      { id: 'b-psu-2', name: 'Seasonic Vertex GX-1200 1200W ATX 3.0 Gold', price: 249, wattage: 0 },
-      { id: 'b-psu-3', name: 'be quiet! Pure Power 12 M 850W 80+ Gold', price: 139, wattage: 0 }
-    ]
+    category: 'Power Supplies',
+    categorySlug: 'power-supplies'
   }
 ];
+

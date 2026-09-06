@@ -30,10 +30,11 @@ const CATEGORY_ALIASES = {
     'keyboard': 'peripherals',
     'mice': 'peripherals',
     'mouse': 'peripherals',
-    'cooling': 'cooling-cases',
-    'cases': 'cooling-cases',
-    'cooling-cases': 'cooling-cases',
-    'cooling & cases': 'cooling-cases',
+    'cooling': 'cooling-and-cases',
+    'cases': 'cooling-and-cases',
+    'cooling-cases': 'cooling-and-cases',
+    'cooling-and-cases': 'cooling-and-cases',
+    'cooling & cases': 'cooling-and-cases',
     'prebuilt': 'custom-systems-workstations',
     'custom-systems': 'custom-systems-workstations',
     'custom systems': 'custom-systems-workstations',
@@ -47,7 +48,12 @@ const CATEGORY_ALIASES = {
     'ram': 'memory-ram',
     'memory': 'memory-ram',
     'memory-ram': 'memory-ram',
-    'memory / ram': 'memory-ram'
+    'memory / ram': 'memory-ram',
+    'psu': 'power-supplies',
+    'psus': 'power-supplies',
+    'power-supply': 'power-supplies',
+    'power-supplies': 'power-supplies',
+    'power supplies': 'power-supplies'
 };
 
 const resolveCategoryDoc = async (categoryQuery, lean = false) => {
