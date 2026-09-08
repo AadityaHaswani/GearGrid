@@ -69,6 +69,35 @@ const specificationsSchema = new mongoose.Schema(
 
     // Prebuilt / Custom Systems
     prebuiltSpecs: { type: mongoose.Schema.Types.Mixed },
+
+    // Laptop-specific structured fields for Configure engine
+    model: { type: String, trim: true },
+    processor: { type: String, trim: true },
+    processorFamily: { type: String, trim: true },
+    cpuArchitecture: { type: String, trim: true },
+    powerClass: { type: String, trim: true },
+    gpu: { type: String, trim: true },
+    gpuModel: { type: String, trim: true },
+    gpuVram: { type: Number, min: 0 },
+    gpuClass: { type: String, trim: true },
+    tgp: { type: Number, min: 0 },
+    ram: { type: String, trim: true },
+    ramType: { type: String, trim: true },
+    ramUpgradeability: { type: String, trim: true },
+    storage: { type: String, trim: true },
+    storageType: { type: String, trim: true },
+    storageInterface: { type: String, trim: true },
+    displaySize: { type: Number, min: 0 },
+    colorCoverage: { type: String, trim: true },
+    battery: { type: String, trim: true },
+    operatingSystem: { type: String, trim: true },
+    weight: { type: String, trim: true },
+    ports: [{ type: String, trim: true }],
+    wifi: { type: String, trim: true },
+    bluetooth: { type: String, trim: true },
+    webcam: { type: String, trim: true },
+    keyboard: { type: String, trim: true },
+    warranty: { type: String, trim: true },
   },
   { _id: false, strict: false }
 );
@@ -170,6 +199,14 @@ const productSchema = new mongoose.Schema(
       default: () => ({}),
     },
 
+    productType: {
+      type: String,
+      enum: ["desktop", "laptop"],
+      default: "desktop",
+      trim: true,
+      index: true,
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -182,6 +219,7 @@ const productSchema = new mongoose.Schema(
 
 // Strategic indexes for Shop list queries, filters, and Configure recommendation engine
 productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ productType: 1, category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ brand: 1 });
@@ -191,5 +229,7 @@ productSchema.index({ title: 1 });
 productSchema.index({ "specifications.socket": 1 });
 productSchema.index({ "specifications.memoryType": 1 });
 productSchema.index({ "specifications.wattage": 1 });
+productSchema.index({ "specifications.gpuModel": 1 });
+productSchema.index({ "specifications.processorFamily": 1 });
 
 export const Product = mongoose.model("Product", productSchema);

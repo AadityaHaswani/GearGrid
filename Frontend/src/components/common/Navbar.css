@@ -69,7 +69,13 @@
 .navbar-nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
+}
+
+@media (min-width: 1200px) {
+  .navbar-nav {
+    gap: 26px;
+  }
 }
 
 .nav-link {
@@ -610,7 +616,7 @@
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .navbar-nav {
     display: none;
   }

@@ -158,18 +158,24 @@ export function ShopProvider({ children }) {
           if (u) {
             const formatted = {
               id: u._id,
-              name: u.username || u.name,
+              name: u.fullName || u.username || u.name,
+              username: u.username || '',
+              fullName: u.fullName || '',
               email: u.email,
-              avatar: u.avatar?.url || null,
-              role: u.role || 'user'
+              phone: u.phone || '',
+              address: u.address || '',
+              city: u.city || '',
+              state: u.state || '',
+              postalCode: u.postalCode || '',
+              country: u.country || 'India',
+              avatar: (typeof u.avatar === 'string' ? u.avatar : u.avatar?.url) || null,
+              role: u.role || 'user',
+              createdAt: u.createdAt
             };
-            setUser((prev) => {
-              if (prev && prev.id === formatted.id && prev.email === formatted.email && prev.role === formatted.role) {
-                return prev;
-              }
-              return formatted;
-            });
-            localStorage.setItem('geargrid_user', JSON.stringify(formatted));
+            setUser(formatted);
+            try {
+              localStorage.setItem('geargrid_user', JSON.stringify(formatted));
+            } catch {}
           }
         })
         .catch(() => {
@@ -437,6 +443,31 @@ export function ShopProvider({ children }) {
     }
   };
 
+  // Update user profile in state and localStorage
+  const updateUser = (updatedUser) => {
+    if (!updatedUser) return;
+    const formatted = {
+      id: updatedUser._id || updatedUser.id,
+      name: updatedUser.fullName || updatedUser.username || updatedUser.name,
+      username: updatedUser.username || '',
+      fullName: updatedUser.fullName || '',
+      email: updatedUser.email,
+      phone: updatedUser.phone || '',
+      address: updatedUser.address || '',
+      city: updatedUser.city || '',
+      state: updatedUser.state || '',
+      postalCode: updatedUser.postalCode || '',
+      country: updatedUser.country || 'India',
+      avatar: (typeof updatedUser.avatar === 'string' ? updatedUser.avatar : updatedUser.avatar?.url) || null,
+      role: updatedUser.role || 'user',
+      createdAt: updatedUser.createdAt
+    };
+    setUser(formatted);
+    try {
+      localStorage.setItem('geargrid_user', JSON.stringify(formatted));
+    } catch {}
+  };
+
   // Logout handler
   const logoutUser = async () => {
     try {
@@ -461,6 +492,7 @@ export function ShopProvider({ children }) {
         user,
         loginUser,
         logoutUser,
+        updateUser,
         pendingAuthAction,
         setPendingAuthAction,
         cart,

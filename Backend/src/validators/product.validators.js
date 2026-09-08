@@ -35,6 +35,11 @@ const createProductValidator = () => {
       .isInt({ min: 0 })
       .withMessage("Stock cannot be negative"),
 
+    body("productType")
+      .optional()
+      .isIn(["desktop", "laptop"])
+      .withMessage("Product type must be either desktop or laptop"),
+
     body("specifications")
       .optional()
       .custom((value) => {

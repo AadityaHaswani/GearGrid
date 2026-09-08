@@ -1,13 +1,15 @@
 // Realistic Gaming Hardware Catalog for GearGrid
 export const HARDWARE_CATEGORIES = [
-  { id: 'all', label: 'All Products', icon: 'Cpu' },
+  { id: 'all', label: 'All Products', icon: 'LayoutGrid' },
   { id: 'gpus', label: 'Graphics Cards', icon: 'Zap' },
   { id: 'cpus', label: 'Processors', icon: 'Cpu' },
   { id: 'motherboards', label: 'Motherboards', icon: 'Layers' },
+  { id: 'memory-ram', label: 'Memory / RAM', icon: 'MemoryStick' },
+  { id: 'storage', label: 'Storage', icon: 'HardDrive' },
   { id: 'monitors', label: 'Gaming Monitors', icon: 'Monitor' },
   { id: 'peripherals', label: 'Peripherals', icon: 'Keyboard' },
   { id: 'cooling', label: 'Cooling & Cases', icon: 'Fan' },
-  { id: 'prebuilt', label: 'Custom Systems', icon: 'Server' }
+  { id: 'prebuilt', label: 'Custom Systems / Workstations', icon: 'Server' }
 ];
 
 export const PRODUCTS = [

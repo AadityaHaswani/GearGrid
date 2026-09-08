@@ -6,6 +6,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Category } from "./models/category.models.js";
 import { Product } from "./models/product.models.js";
+import { LAPTOP_CATEGORIES_DATA, getLaptopProducts } from "./laptopSeedData.js";
+import { AFFORDABLE_SPECS_DATA, getAffordableDesktopProducts } from "./affordableSeedData.js";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -3010,7 +3012,10 @@ const getRawProducts = (catMap) => [
     numReviews: 110,
     featured: false,
     description: "Reliable dual-channel DDR5 desktop RAM kit running at 4800 MHz CL40 for mainstream builds.",
-    images: [{ url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "crucial_16gb_ddr5_img1" }]
+    images: [
+      { url: "/images/affordable/crucial_16gb_ddr5_4800_1.jpg", publicId: "crucial_16gb_ddr5_4800_1" },
+      { url: "/images/affordable/crucial_16gb_ddr5_4800_2.jpg", publicId: "crucial_16gb_ddr5_4800_2" }
+    ]
   },
   {
     title: "Corsair Vengeance 32GB (2x16GB) DDR5-5200 CL40",
@@ -3023,7 +3028,10 @@ const getRawProducts = (catMap) => [
     numReviews: 75,
     featured: false,
     description: "Low-profile solid aluminum heatspreader DDR5 memory optimized for Intel and AMD motherboards.",
-    images: [{ url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", publicId: "corsair_32gb_5200_img1" }]
+    images: [
+      { url: "/images/affordable/corsair_vengeance_32gb_ddr5_1.jpg", publicId: "corsair_vengeance_32gb_ddr5_1" },
+      { url: "/images/affordable/corsair_vengeance_32gb_ddr5_2.jpg", publicId: "corsair_vengeance_32gb_ddr5_2" }
+    ]
   },
   {
     title: "Crucial P3 Plus 500GB PCIe 4.0 NVMe M.2 SSD",
@@ -3153,9 +3161,10 @@ async function seedDatabase() {
     console.log(` Cleared ${deletedProducts.deletedCount} products and ${deletedCategories.deletedCount} categories.`);
 
     // Insert Categories
-    console.log("\nSeeding 10 hardware categories...");
+    console.log("\nSeeding categories (10 PC Hardware + 3 Laptop Categories)...");
+    const ALL_CATEGORIES = [...CATEGORIES_DATA, ...LAPTOP_CATEGORIES_DATA];
     const categoryDocs = [];
-    for (const cat of CATEGORIES_DATA) {
+    for (const cat of ALL_CATEGORIES) {
       const slug = slugify(cat.name, { lower: true, strict: true });
       const doc = await Category.create({
         name: cat.name,
@@ -3174,27 +3183,88 @@ async function seedDatabase() {
     }
 
     // Insert Products
-    console.log("\nSeeding authentic Indian-market hardware products...");
-    const rawProducts = getRawProducts(categoryMap).map((prod) => {
-      const specData = PRODUCT_SPECS_DATA[prod.title] || {};
+    console.log("\nSeeding authentic Indian-market hardware & laptop products...");
+    const allSpecsData = { ...PRODUCT_SPECS_DATA, ...AFFORDABLE_SPECS_DATA };
+    const rawPremiumDesktop = getRawProducts(categoryMap);
+    const rawAffordableDesktop = getAffordableDesktopProducts(categoryMap);
+    const allRawDesktop = [...rawPremiumDesktop, ...rawAffordableDesktop];
+
+    const desktopProducts = allRawDesktop.map((prod) => {
+      const specData = allSpecsData[prod.title] || {};
       return {
         ...prod,
+        productType: "desktop",
         specifications: specData.specifications || {},
         useCaseProfile: specData.useCaseProfile || { gaming: 5, productivity: 5, editing: 5, rendering: 5, programming: 5, ai: 5, streaming: 5 },
       };
     });
-    const productDocs = await Product.insertMany(rawProducts);
-    console.log(` Created ${productDocs.length} products.`);
+
+    const laptopProducts = getLaptopProducts(categoryMap);
+
+    const allProducts = [...desktopProducts, ...laptopProducts];
+    const productDocs = await Product.insertMany(allProducts);
+    console.log(` Created ${productDocs.length} total products (${desktopProducts.length} desktop [${rawPremiumDesktop.length} premium + ${rawAffordableDesktop.length} affordable] + ${laptopProducts.length} laptops).`);
+
+    // Category Counts
+    const gpuCount = await Product.countDocuments({ category: categoryMap["Graphics Cards"] });
+    const cpuCount = await Product.countDocuments({ category: categoryMap["Processors"] });
+    const moboCount = await Product.countDocuments({ category: categoryMap["Motherboards"] });
+    const monitorCount = await Product.countDocuments({ category: categoryMap["Gaming Monitors"] });
+    const periphCount = await Product.countDocuments({ category: categoryMap["Peripherals"] });
+    const coolingCaseCount = await Product.countDocuments({ category: categoryMap["Cooling & Cases"] });
+    const customCount = await Product.countDocuments({ category: categoryMap["Custom Systems / Workstations"] });
+    const storageCount = await Product.countDocuments({ category: categoryMap["Storage"] });
+    const ramCount = await Product.countDocuments({ category: categoryMap["Memory / RAM"] });
+    const psuCount = await Product.countDocuments({ category: categoryMap["Power Supplies"] });
+
+    const desktopCount = await Product.countDocuments({ productType: "desktop" });
+    const laptopCount = await Product.countDocuments({ productType: "laptop" });
+
+    // Identify affordable counts
+    const affordableGpuCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Graphics Cards"].toString()).length;
+    const affordableCpuCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Processors"].toString()).length;
+    const affordableMoboCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Motherboards"].toString()).length;
+    const affordableRamCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Memory / RAM"].toString()).length;
+    const affordableStorageCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Storage"].toString()).length;
+    const affordablePsuCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Power Supplies"].toString()).length;
+    const affordableCoolerCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Cooling & Cases"].toString() && (p.title.includes("Cooler") || p.title.includes("Air"))).length;
+    const affordableCaseCount = rawAffordableDesktop.filter(p => p.category.toString() === categoryMap["Cooling & Cases"].toString() && (p.title.includes("Case") || p.title.includes("Cabinet") || p.title.includes("Chassis"))).length;
 
     console.log("\n==================================================");
-    console.log("  SEED SUMMARY:");
-    console.log(`  Categories Created : ${categoryDocs.length}`);
-    console.log(`  Products Created   : ${productDocs.length}`);
-    console.log("  Currency           : INR (₹)");
-    console.log("  Status             : SUCCESS");
+    console.log("  GEARGRID SEED SUMMARY REPORT:");
+    console.log("==================================================");
+    console.log(`  Total Categories                : ${categoryDocs.length}`);
+    console.log(`  Total Products                  : ${productDocs.length}`);
+    console.log(`  Desktop Products                : ${desktopCount}`);
+    console.log(`  Laptop Products                 : ${laptopCount}`);
+    console.log("--------------------------------------------------");
+    console.log(`  Graphics Cards                  : ${gpuCount}`);
+    console.log(`  Processors                      : ${cpuCount}`);
+    console.log(`  Motherboards                    : ${moboCount}`);
+    console.log(`  Gaming Monitors                 : ${monitorCount}`);
+    console.log(`  Peripherals                     : ${periphCount}`);
+    console.log(`  Cooling & Cases                 : ${coolingCaseCount}`);
+    console.log(`  Custom Systems / Workstations   : ${customCount}`);
+    console.log(`  Storage                         : ${storageCount}`);
+    console.log(`  Memory / RAM                    : ${ramCount}`);
+    console.log(`  Power Supplies                  : ${psuCount}`);
+    console.log("--------------------------------------------------");
+    console.log("  NEW AFFORDABLE CATALOG BREAKDOWN:");
+    console.log(`  Affordable GPUs                 : ${affordableGpuCount}`);
+    console.log(`  Affordable CPUs                 : ${affordableCpuCount}`);
+    console.log(`  Affordable Motherboards         : ${affordableMoboCount}`);
+    console.log(`  Affordable RAM                  : ${affordableRamCount}`);
+    console.log(`  Affordable Storage              : ${affordableStorageCount}`);
+    console.log(`  Affordable PSUs                 : ${affordablePsuCount}`);
+    console.log(`  Affordable Coolers              : ${affordableCoolerCount}`);
+    console.log(`  Affordable Cases                : ${affordableCaseCount}`);
+    console.log(`  Total New Affordable Hardware   : ${rawAffordableDesktop.length}`);
+    console.log("--------------------------------------------------");
+    console.log("  Currency                        : INR (₹) Exact Numeric");
+    console.log("  Status                          : SUCCESS");
     console.log("==================================================\n");
 
-    // Breakdown per category
+    console.log("Category breakdown:");
     for (const cat of categoryDocs) {
       const count = await Product.countDocuments({ category: cat._id });
       console.log(`  - ${cat.name.padEnd(32)}: ${count} products`);

@@ -15,7 +15,8 @@ import {
   Package,
   Sliders,
   ShieldAlert,
-  Cpu
+  Cpu,
+  Laptop
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import GearGridLogo from './GearGridLogo';
@@ -124,7 +125,14 @@ export default function Navbar() {
             to="/shop" 
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
-            Shop
+            PC Shop
+          </NavLink>
+
+          <NavLink 
+            to="/laptops" 
+            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+          >
+            Laptops
           </NavLink>
 
           <NavLink 
@@ -256,6 +264,15 @@ export default function Navbar() {
 
                   {/* Menu Links */}
                   <div className="account-menu-links">
+                    <Link
+                      to="/profile"
+                      className="account-menu-item"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      <User size={15} className="menu-item-icon text-amber" />
+                      <span>Profile</span>
+                    </Link>
+
                     {user.role === 'admin' && (
                       <Link
                         to="/admin"
@@ -348,25 +365,35 @@ export default function Navbar() {
             </NavLink>
             <NavLink to="/shop" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <Layers size={18} />
-              <span>Hardware Shop</span>
+              <span>PC Shop</span>
+            </NavLink>
+            <NavLink to="/laptops" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
+              <Laptop size={18} />
+              <span>Laptops</span>
             </NavLink>
             <NavLink to="/build" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <Wrench size={18} />
-              <span>Custom PC Builder</span>
+              <span>PC Builder</span>
             </NavLink>
             <NavLink to="/configure" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <Cpu size={18} />
-              <span>GearGrid Configure</span>
+              <span>Configure</span>
             </NavLink>
             <NavLink to="/about" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
               <HelpCircle size={18} />
-              <span>About GearGrid</span>
+              <span>About</span>
             </NavLink>
             
             {user && user.role === 'admin' && (
               <NavLink to="/admin" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}>
                 <ShieldAlert size={18} />
                 <span>Admin Operations</span>
+              </NavLink>
+            )}
+            {user && (
+              <NavLink to="/profile" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                <User size={18} />
+                <span>My Profile</span>
               </NavLink>
             )}
           </div>
@@ -383,7 +410,13 @@ export default function Navbar() {
               </Link>
             ) : (
               <div className="mobile-authenticated-block">
-                <div className="mobile-user-card">
+                <Link 
+                  to="/profile" 
+                  className="mobile-user-card" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                  title="View Profile"
+                >
                   {user.avatar ? (
                     <img src={user.avatar} alt={user.name} className="mobile-user-avatar" />
                   ) : (
@@ -395,19 +428,40 @@ export default function Navbar() {
                     <span className="mobile-user-name">{user.name}</span>
                     <span className="mobile-user-email">{user.email}</span>
                   </div>
-                </div>
+                </Link>
 
-                <button 
-                  type="button" 
-                  className="btn-outline mobile-logout-btn"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    logoutUser();
-                  }}
-                >
-                  <LogOut size={16} />
-                  <span>Sign Out</span>
-                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                  <Link
+                    to="/profile"
+                    className="btn-outline"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '10px 8px',
+                      textDecoration: 'none',
+                      fontSize: '0.82rem',
+                      borderRadius: 'var(--radius-sm)'
+                    }}
+                  >
+                    <User size={15} />
+                    <span>Profile</span>
+                  </Link>
+                  <button 
+                    type="button" 
+                    className="btn-outline mobile-logout-btn"
+                    style={{ width: '100%', padding: '10px 8px', fontSize: '0.82rem' }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logoutUser();
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               </div>
             )}
 

@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { sendVerificationOtp, sendPasswordResetOtp } from "../utils/mails.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   const user = await User.findById(userId);
@@ -262,8 +263,66 @@ const logoutUser = asyncHandler(async (req, res) => {
  * Get Current Authenticated User
  */
 const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "-password -refreshToken -emailVerificationOtp -emailVerificationExpiry -forgotPasswordOtp -forgotPasswordExpiry"
+  );
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
   return res.status(200).json(
-    new ApiResponse(200, req.user, "Current user fetched successfully")
+    new ApiResponse(200, user, "Current user fetched successfully")
+  );
+});
+
+/**
+ * Update Current Authenticated User Profile
+ */
+const updateProfile = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User account not found");
+  }
+
+  const { fullName, phone, address, city, state, postalCode, country } = req.body;
+
+  // Controlled whitelist update
+  if (fullName !== undefined) user.fullName = String(fullName).trim();
+  if (phone !== undefined) user.phone = String(phone).trim();
+  if (address !== undefined) user.address = String(address).trim();
+  if (city !== undefined) user.city = String(city).trim();
+  if (state !== undefined) user.state = String(state).trim();
+  if (postalCode !== undefined) user.postalCode = String(postalCode).trim();
+  if (country !== undefined) user.country = String(country).trim();
+
+  // If new avatar image was uploaded via Multer
+  if (req.file) {
+    try {
+      const avatarUpload = await uploadOnCloudinary(req.file.path, "geargrid/avatars");
+      if (avatarUpload?.secure_url || avatarUpload?.url) {
+        user.avatar = {
+          url: avatarUpload.secure_url || avatarUpload.url,
+          localPath: "",
+        };
+      }
+    } catch (uploadErr) {
+      console.error("Avatar upload to Cloudinary failed:", uploadErr.message);
+    }
+  }
+
+  // Enforce that security-critical fields (role, email, password, isEmailVerified, refreshToken) remain untouched
+  await user.save({ validateBeforeSave: true });
+
+  const safeUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationOtp -emailVerificationExpiry -forgotPasswordOtp -forgotPasswordExpiry"
+  );
+
+  return res.status(200).json(
+    new ApiResponse(200, safeUser, "Profile updated successfully")
   );
 });
 
@@ -458,4 +517,5 @@ export {
   verifyResetOtp,
   resetForgotPassword,
   changeCurrentPassword,
+  updateProfile,
 };

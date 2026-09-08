@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { HARDWARE_CATEGORIES } from '../data/hardwareData';
 import { getProducts } from '../services/product.api';
@@ -12,6 +12,8 @@ import {
   Zap,
   Cpu,
   Layers,
+  MemoryStick,
+  HardDrive,
   Monitor,
   Keyboard,
   Fan,
@@ -24,21 +26,73 @@ import './ShopPage.css';
 
 const ITEMS_PER_PAGE = 8;
 
+export const isLaptopProduct = (item) => {
+  if (!item) return false;
+  const slug = (item.category?.slug || '').toLowerCase();
+  const name = (item.category?.name || '').toLowerCase();
+  const rawCat = typeof item.category === 'string' ? item.category.toLowerCase() : '';
+  const type = (item.productType || '').toLowerCase();
+
+  return (
+    slug.includes('laptop') ||
+    slug.includes('macbook') ||
+    slug.includes('notebook') ||
+    name.includes('laptop') ||
+    name.includes('macbook') ||
+    name.includes('notebook') ||
+    rawCat.includes('laptop') ||
+    rawCat.includes('macbook') ||
+    type === 'laptop'
+  );
+};
+
 const getCategoryIcon = (id) => {
   switch (id) {
     case 'all': return <LayoutGrid size={15} className="category-item-icon" />;
-    case 'gpus': return <Zap size={15} className="category-item-icon" />;
-    case 'cpus': return <Cpu size={15} className="category-item-icon" />;
+    case 'gpus':
+    case 'graphics-cards': return <Zap size={15} className="category-item-icon" />;
+    case 'cpus':
+    case 'processors': return <Cpu size={15} className="category-item-icon" />;
     case 'motherboards': return <Layers size={15} className="category-item-icon" />;
-    case 'monitors': return <Monitor size={15} className="category-item-icon" />;
+    case 'ram':
+    case 'memory':
+    case 'memory-ram': return <MemoryStick size={15} className="category-item-icon" />;
+    case 'storage': return <HardDrive size={15} className="category-item-icon" />;
+    case 'monitors':
+    case 'gaming-monitors': return <Monitor size={15} className="category-item-icon" />;
     case 'peripherals': return <Keyboard size={15} className="category-item-icon" />;
-    case 'cooling': return <Fan size={15} className="category-item-icon" />;
-    case 'prebuilt': return <Server size={15} className="category-item-icon" />;
+    case 'cooling':
+    case 'cooling-and-cases':
+    case 'cooling-cases': return <Fan size={15} className="category-item-icon" />;
+    case 'prebuilt':
+    case 'custom-systems-workstations': return <Server size={15} className="category-item-icon" />;
     default: return <LayoutGrid size={15} className="category-item-icon" />;
   }
 };
 
+export const isCategoryActive = (currentParam, catId) => {
+  if (!currentParam || currentParam === 'all') {
+    return catId === 'all';
+  }
+  const cur = currentParam.toLowerCase();
+  const target = catId.toLowerCase();
+  if (cur === target) return true;
+
+  if (target === 'gpus' && (cur === 'graphics-cards' || cur === 'gpu' || cur === 'graphics-card')) return true;
+  if (target === 'cpus' && (cur === 'processors' || cur === 'cpu' || cur === 'processor')) return true;
+  if (target === 'motherboards' && (cur === 'motherboard')) return true;
+  if (target === 'memory-ram' && (cur === 'ram' || cur === 'memory' || cur === 'memory-ram' || cur === 'memory / ram')) return true;
+  if (target === 'storage' && (cur === 'storage' || cur === 'ssd' || cur === 'ssds')) return true;
+  if (target === 'monitors' && (cur === 'gaming-monitors' || cur === 'monitor')) return true;
+  if (target === 'peripherals' && (cur === 'peripheral')) return true;
+  if (target === 'cooling' && (cur === 'cooling-and-cases' || cur === 'cooling-cases' || cur === 'cases')) return true;
+  if (target === 'prebuilt' && (cur === 'custom-systems-workstations' || cur === 'custom-systems' || cur === 'custom systems / workstations' || cur === 'workstations' || cur === 'workstation')) return true;
+
+  return false;
+};
+
 const matchesCategory = (item, catId) => {
+  if (isLaptopProduct(item)) return false;
   if (!catId || catId === 'all') return true;
   const itemCatSlug = (item.category?.slug || '').toLowerCase();
   const itemCatName = (item.category?.name || '').toLowerCase();
@@ -52,17 +106,29 @@ const matchesCategory = (item, catId) => {
     const peripheralTypes = ['keyboard', 'mouse', 'headphone', 'audio', 'headset', 'mic', 'peripheral'];
     return peripheralTypes.some(t => itemCatSlug.includes(t) || itemCatName.includes(t));
   }
-  if (cat === 'gpus') {
+  if (cat === 'gpus' || cat === 'graphics-cards') {
     return itemCatSlug.includes('gpu') || itemCatSlug.includes('graphic') || itemCatName.includes('gpu') || itemCatName.includes('graphic');
   }
-  if (cat === 'cpus') {
+  if (cat === 'cpus' || cat === 'processors') {
     return itemCatSlug.includes('cpu') || itemCatSlug.includes('processor') || itemCatName.includes('cpu') || itemCatName.includes('processor');
   }
-  if (cat === 'cooling') {
-    return itemCatSlug.includes('cool') || itemCatSlug.includes('case') || itemCatSlug.includes('fan');
+  if (cat === 'motherboards') {
+    return itemCatSlug.includes('motherboard') || itemCatName.includes('motherboard');
   }
-  if (cat === 'prebuilt') {
-    return itemCatSlug.includes('system') || itemCatSlug.includes('prebuilt') || itemCatSlug.includes('pc') || itemCatSlug.includes('desktop');
+  if (cat === 'ram' || cat === 'memory' || cat === 'memory-ram') {
+    return itemCatSlug.includes('ram') || itemCatSlug.includes('memory') || itemCatName.includes('ram') || itemCatName.includes('memory');
+  }
+  if (cat === 'storage') {
+    return itemCatSlug.includes('storage') || itemCatSlug.includes('ssd') || itemCatSlug.includes('nvme') || itemCatSlug.includes('drive') || itemCatName.includes('storage');
+  }
+  if (cat === 'monitors' || cat === 'gaming-monitors') {
+    return itemCatSlug.includes('monitor') || itemCatName.includes('monitor');
+  }
+  if (cat === 'cooling' || cat === 'cooling-and-cases' || cat === 'cooling-cases') {
+    return itemCatSlug.includes('cool') || itemCatSlug.includes('case') || itemCatSlug.includes('fan') || itemCatName.includes('cool') || itemCatName.includes('case');
+  }
+  if (cat === 'prebuilt' || cat === 'custom-systems-workstations' || cat === 'custom systems / workstations') {
+    return itemCatSlug.includes('system') || itemCatSlug.includes('prebuilt') || itemCatSlug.includes('workstation') || itemCatName.includes('system') || itemCatName.includes('workstation') || itemCatName.includes('prebuilt');
   }
 
   return false;
@@ -71,6 +137,10 @@ const matchesCategory = (item, catId) => {
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || 'all';
+
+  const categoryNavRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +155,7 @@ export default function ShopPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getProducts({ limit: 100 });
+      const res = await getProducts({ limit: 250, productType: 'desktop' });
       const productList = res.data?.data?.products || res.data?.data || [];
       setProducts(productList);
     } catch (err) {
@@ -104,6 +174,54 @@ export default function ShopPage() {
     setCurrentPage(1);
   }, [activeCategory, searchQuery, sortBy]);
 
+  // Check scroll boundary overflow for subtle edge cues
+  const checkScrollEdges = useCallback(() => {
+    const el = categoryNavRef.current;
+    if (!el) return;
+    const hasOverflow = el.scrollWidth > el.clientWidth + 2;
+    setCanScrollLeft(hasOverflow && el.scrollLeft > 6);
+    setCanScrollRight(hasOverflow && el.scrollLeft < el.scrollWidth - el.clientWidth - 6);
+  }, []);
+
+  useEffect(() => {
+    const el = categoryNavRef.current;
+    if (!el) return;
+    checkScrollEdges();
+    el.addEventListener('scroll', checkScrollEdges, { passive: true });
+    window.addEventListener('resize', checkScrollEdges, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', checkScrollEdges);
+      window.removeEventListener('resize', checkScrollEdges);
+    };
+  }, [checkScrollEdges, products]);
+
+  // Mouse wheel horizontal scrolling for desktop trackpad/mouse
+  useEffect(() => {
+    const el = categoryNavRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  // Smoothly scroll active category into view when activeCategory changes
+  useEffect(() => {
+    if (!categoryNavRef.current) return;
+    const activeBtn = categoryNavRef.current.querySelector('.category-item-btn.active');
+    if (activeBtn) {
+      activeBtn.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'nearest',
+        block: 'nearest'
+      });
+    }
+  }, [activeCategory]);
+
   const handleCategorySelect = (categoryId) => {
     if (categoryId === 'all') {
       searchParams.delete('category');
@@ -113,8 +231,12 @@ export default function ShopPage() {
     }
   };
 
+  const desktopProducts = useMemo(() => {
+    return products.filter((item) => !isLaptopProduct(item));
+  }, [products]);
+
   const filteredAndSortedProducts = useMemo(() => {
-    return products.filter((item) => {
+    return desktopProducts.filter((item) => {
       const matchesCat = matchesCategory(item, activeCategory);
       const q = searchQuery.toLowerCase().trim();
       const title = (item.title || item.name || '').toLowerCase();
@@ -140,7 +262,7 @@ export default function ShopPage() {
       if (sortBy === 'rating') return ratingB - ratingA;
       return 0;
     });
-  }, [products, activeCategory, searchQuery, sortBy]);
+  }, [desktopProducts, activeCategory, searchQuery, sortBy]);
 
   const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE) || 1;
 
@@ -156,13 +278,13 @@ export default function ShopPage() {
     }
   };
 
-  const heroImage = products[0]?.images?.[0]?.url || products[0]?.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
+  const heroImage = desktopProducts[0]?.images?.[0]?.url || desktopProducts[0]?.image || products[0]?.images?.[0]?.url || products[0]?.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80';
 
   return (
     <div className="shop-page-root">
       <SEO
-        title="Shop PC Hardware — Graphics Cards, CPUs, Monitors & More | GearGrid"
-        description="Browse enthusiast-grade graphics cards, elite processors, precision mechanical keyboards, high-speed NVMe storage, and liquid-cooled gaming configurations."
+        title="PC Shop — Graphics Cards, CPUs, Monitors & Systems | GearGrid"
+        description="Explore our curated desktop PC hardware arsenal: enthusiast-grade graphics cards, elite processors, precision peripherals, cooling, and custom workstations."
         canonical="https://geargrid-delta.vercel.app/shop"
         ogImage={heroImage}
       />
@@ -175,7 +297,7 @@ export default function ShopPage() {
           <div className="shop-hero-content">
             <div className="shop-hero-eyebrow">
               <span className="shop-hero-accent-mark"></span>
-              <span>GEARGRID / HARDWARE CATALOG</span>
+              <span>GEARGRID / PC SHOP</span>
             </div>
 
             <h1 className="shop-hero-title">
@@ -189,7 +311,7 @@ export default function ShopPage() {
             <div className="shop-hero-meta">
               <div className="shop-catalog-indicator">
                 <span className="indicator-dot"></span>
-                <span>{products.length} PRODUCTS AVAILABLE</span>
+                <span>{desktopProducts.length} PC HARDWARE PRODUCTS</span>
               </div>
               <div className="shop-hero-connector"></div>
             </div>
@@ -215,26 +337,35 @@ export default function ShopPage() {
       <section className="shop-catalog-section">
         <div className="container">
 
-          {/* Segmented Hardware Category Selector */}
-          <nav className="shop-category-nav" aria-label="Hardware Categories">
-            <div className="shop-category-track">
-              {HARDWARE_CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    className={`category-item-btn ${isActive ? 'active' : ''}`}
-                    onClick={() => handleCategorySelect(cat.id)}
-                  >
-                    {getCategoryIcon(cat.id)}
-                    <span className="category-item-label">{cat.label}</span>
-                    {isActive && <span className="category-active-line" />}
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
+          {/* Segmented Hardware Category Selector with Horizontal Scroll */}
+          <div className="shop-category-nav-wrapper">
+            {canScrollLeft && <div className="category-scroll-cue left" aria-hidden="true" />}
+            <nav 
+              ref={categoryNavRef} 
+              className="shop-category-nav" 
+              aria-label="Hardware Categories"
+            >
+              <div className="shop-category-track">
+                {HARDWARE_CATEGORIES.map((cat) => {
+                  const isActive = isCategoryActive(activeCategory, cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      id={`cat-btn-${cat.id}`}
+                      type="button"
+                      className={`category-item-btn ${isActive ? 'active' : ''}`}
+                      onClick={() => handleCategorySelect(cat.id)}
+                    >
+                      {getCategoryIcon(cat.id)}
+                      <span className="category-item-label">{cat.label}</span>
+                      {isActive && <span className="category-active-line" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
+            {canScrollRight && <div className="category-scroll-cue right" aria-hidden="true" />}
+          </div>
 
           {/* Controls Bar */}
           <div className="shop-controls-bar">
@@ -246,7 +377,7 @@ export default function ShopPage() {
                 <Search size={16} className="shop-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search in catalog..."
+                  placeholder="Search in PC hardware catalog..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="shop-search-input"

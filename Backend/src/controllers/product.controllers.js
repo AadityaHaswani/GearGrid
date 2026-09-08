@@ -53,7 +53,18 @@ const CATEGORY_ALIASES = {
     'psus': 'power-supplies',
     'power-supply': 'power-supplies',
     'power-supplies': 'power-supplies',
-    'power supplies': 'power-supplies'
+    'power supplies': 'power-supplies',
+    'professional': 'professional-laptops',
+    'professional-laptops': 'professional-laptops',
+    'pro-laptops': 'professional-laptops',
+    'pro': 'professional-laptops',
+    'mac': 'mac',
+    'macbook': 'mac',
+    'macbooks': 'mac',
+    'apple': 'mac',
+    'gaming': 'gaming-laptops',
+    'gaming-laptops': 'gaming-laptops',
+    'gaming-laptop': 'gaming-laptops'
 };
 
 const resolveCategoryDoc = async (categoryQuery, lean = false) => {
@@ -86,6 +97,7 @@ const createProduct = asyncHandler(async (req, res) => {
         featured,
         specifications,
         useCaseProfile,
+        productType,
     } = req.body;
 
     const categoryDoc = await resolveCategoryDoc(category, false);
@@ -143,6 +155,7 @@ const createProduct = asyncHandler(async (req, res) => {
         brand: (brand && brand.trim()) || "GearGrid Lab",
         stock: stock !== undefined && !isNaN(Number(stock)) ? Number(stock) : 0,
         featured: featured === true || featured === "true",
+        productType: productType ? String(productType).trim().toLowerCase() : "desktop",
         images,
         specifications: parsedSpecs,
         useCaseProfile: parsedProfile,
@@ -156,7 +169,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
     const page = Math.max(Number(req.query.page) || 1, 1);
-    const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 100);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 500);
     const skip = (page - 1) * limit;
 
     const {
@@ -166,10 +179,15 @@ const getAllProducts = asyncHandler(async (req, res) => {
         sort,
         featured,
         minPrice,
-        maxPrice
+        maxPrice,
+        productType
     } = req.query;
 
     const filter = {};
+
+    if (productType) {
+        filter.productType = String(productType).trim().toLowerCase();
+    }
 
     if (search) {
         filter.title = {
@@ -236,7 +254,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     const [totalProducts, products] = await Promise.all([
         Product.countDocuments(filter),
         Product.find(filter)
-            .select("_id title price discountPrice brand stock rating numReviews images category featured specifications useCaseProfile createdAt")
+            .select("_id title price discountPrice brand stock rating numReviews images category featured specifications useCaseProfile productType createdAt")
             .populate("category", "name slug")
             .sort(sortOption)
             .skip(skip)
@@ -310,6 +328,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         featured,
         specifications,
         useCaseProfile,
+        productType,
     } = req.body;
 
     if (category) {
@@ -365,6 +384,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (brand !== undefined && brand.trim()) product.brand = brand.trim();
     if (stock !== undefined && stock !== "" && !isNaN(Number(stock))) product.stock = Number(stock);
     if (featured !== undefined) product.featured = featured === true || featured === "true";
+    if (productType !== undefined && productType.trim()) product.productType = productType.trim().toLowerCase();
 
     if (specifications !== undefined) {
         let parsedSpecs = specifications;

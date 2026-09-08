@@ -17,7 +17,8 @@ import {
   Cpu,
   Layers,
   Thermometer,
-  Sparkles
+  Sparkles,
+  Monitor
 } from 'lucide-react';
 import { PRODUCTS } from '../data/hardwareData';
 import { getProductById } from '../services/product.api';
@@ -217,10 +218,17 @@ export default function ProductDetailsPage() {
       {/* Top Breadcrumbs & Back Navigation */}
       <div className="product-lab-nav-bar">
         <div className="container product-lab-nav-container">
-          <Link to="/shop" className="product-lab-back-link">
-            <ArrowLeft size={16} />
-            <span>Back to Arsenal</span>
-          </Link>
+          {product.productType === 'laptop' || product.categoryLabel?.toLowerCase().includes('laptop') || product.categoryLabel?.toLowerCase() === 'mac' || product.category?.slug === 'mac' || product.category?.slug?.includes('laptop') || product.category?.name?.toLowerCase().includes('laptop') ? (
+            <Link to="/laptops" className="product-lab-back-link">
+              <ArrowLeft size={16} />
+              <span>Back to Laptops</span>
+            </Link>
+          ) : (
+            <Link to="/shop" className="product-lab-back-link">
+              <ArrowLeft size={16} />
+              <span>Back to PC Shop</span>
+            </Link>
+          )}
           
           <div className="product-lab-breadcrumbs">
             <span>GEARGRID LAB</span>
@@ -445,84 +453,195 @@ export default function ProductDetailsPage() {
             <h2 className="section-title">FULL SPECIFICATIONS</h2>
           </div>
 
-          <div className="specs-editorial-table">
-            
-            <div className="specs-group">
-              <h3 className="specs-group-title">
-                <Zap size={16} className="group-icon" />
-                <span>General Architecture</span>
-              </h3>
-              <div className="specs-rows">
-                <div className="spec-row">
-                  <span className="spec-name">Product Model</span>
-                  <span className="spec-data">{product.name}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Category</span>
-                  <span className="spec-data">{product.categoryLabel}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Manufacturing Architecture</span>
-                  <span className="spec-data">{product.specs ? product.specs[0] : 'Enthusiast TSMC Process'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Launch Generation</span>
-                  <span className="spec-data">Current Gen Flagship (2026 Edition)</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="specs-group">
-              <h3 className="specs-group-title">
-                <Cpu size={16} className="group-icon" />
-                <span>Performance & Computing</span>
-              </h3>
-              <div className="specs-rows">
-                <div className="spec-row">
-                  <span className="spec-name">Memory Configuration</span>
-                  <span className="spec-data">{product.specs && product.specs[1] ? product.specs[1] : 'High Speed Interface'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Bus Interface</span>
-                  <span className="spec-data">{product.specs && product.specs[2] ? product.specs[2] : 'PCIe 5.0 High Bandwidth'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Hardware Acceleration</span>
-                  <span className="spec-data">{product.specs && product.specs[3] ? product.specs[3] : 'DirectX 12 Ultimate / Vulkan'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Performance Rating</span>
-                  <span className="spec-data">{product.rating} / 5.0 Verified Score</span>
+          {product.productType === 'laptop' || product.specifications?.processor ? (
+            <div className="specs-editorial-table">
+              
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Cpu size={16} className="group-icon" />
+                  <span>Processor & Graphics Architecture</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Processor (CPU)</span>
+                    <span className="spec-data">{product.specifications?.processor || product.name}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">CPU Family / Arch</span>
+                    <span className="spec-data">{product.specifications?.cpuArchitecture || product.specifications?.processorFamily || 'High-Efficiency Multi-Core'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Graphics Processing Unit</span>
+                    <span className="spec-data">{product.specifications?.gpu || product.specifications?.gpuModel || 'Integrated Graphics'}</span>
+                  </div>
+                  {product.specifications?.gpuVram && (
+                    <div className="spec-row">
+                      <span className="spec-name">Dedicated VRAM</span>
+                      <span className="spec-data">{product.specifications.gpuVram} GB {product.specifications.gpuClass || ''}</span>
+                    </div>
+                  )}
+                  {product.specifications?.tgp && (
+                    <div className="spec-row">
+                      <span className="spec-name">Maximum TGP</span>
+                      <span className="spec-data">{product.specifications.tgp} Watts</span>
+                    </div>
+                  )}
+                  <div className="spec-row">
+                    <span className="spec-name">Power Envelope</span>
+                    <span className="spec-data">{product.specifications?.powerClass || 'Intelligent Dynamic Boost'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="specs-group">
-              <h3 className="specs-group-title">
-                <Thermometer size={16} className="group-icon" />
-                <span>Thermal, Power & Form Factor</span>
-              </h3>
-              <div className="specs-rows">
-                <div className="spec-row">
-                  <span className="spec-name">Thermal Design Power (TDP)</span>
-                  <span className="spec-data">{product.wattage ? `${product.wattage} Watts` : 'Optimized Thermal Envelope'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Recommended Power Supply</span>
-                  <span className="spec-data">{product.wattage ? `${product.wattage + 350}W 80+ Gold` : '750W 80+ Gold'}</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Cooling Solution</span>
-                  <span className="spec-data">Vapor Chamber & Custom Heatsink</span>
-                </div>
-                <div className="spec-row">
-                  <span className="spec-name">Form Factor</span>
-                  <span className="spec-data">Standard ATX / Chassis Compatible</span>
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Monitor size={16} className="group-icon" />
+                  <span>Display, Memory & Storage</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Display Panel</span>
+                    <span className="spec-data">
+                      {product.specifications?.displaySize ? `${product.specifications.displaySize}" ` : ''}
+                      {product.specifications?.resolution || ''}
+                      {product.specifications?.refreshRate ? ` (${product.specifications.refreshRate}Hz)` : ''}
+                    </span>
+                  </div>
+                  {product.specifications?.panelType && (
+                    <div className="spec-row">
+                      <span className="spec-name">Panel & Color Accuracy</span>
+                      <span className="spec-data">{product.specifications.panelType} {product.specifications?.colorCoverage ? `• ${product.specifications.colorCoverage}` : ''}</span>
+                    </div>
+                  )}
+                  <div className="spec-row">
+                    <span className="spec-name">System Memory (RAM)</span>
+                    <span className="spec-data">{product.specifications?.ram || '16GB'} {product.specifications?.ramUpgradeability ? `(${product.specifications.ramUpgradeability})` : ''}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Solid State Storage</span>
+                    <span className="spec-data">{product.specifications?.storage || '512GB NVMe'} {product.specifications?.storageInterface ? `(${product.specifications.storageInterface})` : ''}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Pre-installed OS</span>
+                    <span className="spec-data">{product.specifications?.operatingSystem || 'Windows 11 / macOS'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-          </div>
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Zap size={16} className="group-icon" />
+                  <span>Mobility, Ports & Warranty</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Battery Capacity</span>
+                    <span className="spec-data">{product.specifications?.battery || 'Extended Life Li-ion'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Form Factor Weight</span>
+                    <span className="spec-data">{product.specifications?.weight || 'Portable Workstation'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Wireless Connectivity</span>
+                    <span className="spec-data">{product.specifications?.wifi || 'Wi-Fi 6E'} • {product.specifications?.bluetooth || 'Bluetooth 5.3'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Integrated Webcam</span>
+                    <span className="spec-data">{product.specifications?.webcam || 'FHD Camera'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Keyboard Deck</span>
+                    <span className="spec-data">{product.specifications?.keyboard || 'Precision Backlit Keyboard'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Manufacturer Warranty</span>
+                    <span className="spec-data">{product.specifications?.warranty || '1 Year Official Warranty'}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          ) : (
+            <div className="specs-editorial-table">
+              
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Zap size={16} className="group-icon" />
+                  <span>General Architecture</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Product Model</span>
+                    <span className="spec-data">{product.name}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Category</span>
+                    <span className="spec-data">{product.categoryLabel}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Manufacturing Architecture</span>
+                    <span className="spec-data">{product.specs ? product.specs[0] : 'Enthusiast TSMC Process'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Launch Generation</span>
+                    <span className="spec-data">Current Gen Flagship (2026 Edition)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Cpu size={16} className="group-icon" />
+                  <span>Performance & Computing</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Memory Configuration</span>
+                    <span className="spec-data">{product.specs && product.specs[1] ? product.specs[1] : 'High Speed Interface'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Bus Interface</span>
+                    <span className="spec-data">{product.specs && product.specs[2] ? product.specs[2] : 'PCIe 5.0 High Bandwidth'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Hardware Acceleration</span>
+                    <span className="spec-data">{product.specs && product.specs[3] ? product.specs[3] : 'DirectX 12 Ultimate / Vulkan'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Performance Rating</span>
+                    <span className="spec-data">{product.rating} / 5.0 Verified Score</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="specs-group">
+                <h3 className="specs-group-title">
+                  <Thermometer size={16} className="group-icon" />
+                  <span>Thermal, Power & Form Factor</span>
+                </h3>
+                <div className="specs-rows">
+                  <div className="spec-row">
+                    <span className="spec-name">Thermal Design Power (TDP)</span>
+                    <span className="spec-data">{product.wattage ? `${product.wattage} Watts` : 'Optimized Thermal Envelope'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Recommended Power Supply</span>
+                    <span className="spec-data">{product.wattage ? `${product.wattage + 350}W 80+ Gold` : '750W 80+ Gold'}</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Cooling Solution</span>
+                    <span className="spec-data">Vapor Chamber & Custom Heatsink</span>
+                  </div>
+                  <div className="spec-row">
+                    <span className="spec-name">Form Factor</span>
+                    <span className="spec-data">Standard ATX / Chassis Compatible</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
 
         </div>
       </section>

@@ -155,3 +155,44 @@ export const addMembertoProjectValidator = () => {
       .withMessage("Role is invalid"),
   ];
 };
+
+export const userUpdateProfileValidator = () => {
+  return [
+    body("fullName")
+      .optional()
+      .trim()
+      .isLength({ max: 100 })
+      .withMessage("Full name cannot exceed 100 characters"),
+    body("phone")
+      .optional()
+      .trim()
+      .isLength({ max: 25 })
+      .withMessage("Phone number cannot exceed 25 characters"),
+    body("address")
+      .optional()
+      .trim()
+      .isLength({ max: 250 })
+      .withMessage("Address cannot exceed 250 characters"),
+    body("city")
+      .optional()
+      .trim()
+      .isLength({ max: 100 })
+      .withMessage("City cannot exceed 100 characters"),
+    body("state")
+      .optional()
+      .trim()
+      .isLength({ max: 100 })
+      .withMessage("State cannot exceed 100 characters"),
+    body("postalCode")
+      .optional()
+      .trim()
+      .isLength({ max: 20 })
+      .withMessage("Postal code cannot exceed 20 characters"),
+    body("country")
+      .optional()
+      .trim()
+      .isLength({ max: 100 })
+      .withMessage("Country cannot exceed 100 characters"),
+  ];
+};
+

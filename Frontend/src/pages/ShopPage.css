@@ -160,27 +160,51 @@
 }
 
 /* Horizontal Hardware Category Selector */
+.shop-category-nav-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 28px;
+}
+
 .shop-category-nav {
   position: relative;
   width: 100%;
-  margin-bottom: 28px;
   border-bottom: 1px solid var(--border-main);
   overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.25) transparent;
 }
 
 .shop-category-nav::-webkit-scrollbar {
-  display: none;
+  height: 3px;
+}
+
+.shop-category-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shop-category-nav::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.25);
+  border-radius: 3px;
+}
+
+.shop-category-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
 }
 
 .shop-category-track {
   display: flex;
   align-items: center;
   gap: 4px;
-  min-width: max-content;
-  padding: 0 2px 1px 2px;
+  width: max-content;
+  min-width: 100%;
+  padding: 0 2px 2px 2px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .category-item-btn {
@@ -197,6 +221,7 @@
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
@@ -235,6 +260,27 @@
   height: 2px;
   background: var(--accent-amber);
   border-radius: 2px 2px 0 0;
+}
+
+/* Subtle Edge Fade Cues */
+.category-scroll-cue {
+  position: absolute;
+  top: 0;
+  bottom: 2px;
+  width: 36px;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity var(--transition-fast);
+}
+
+.category-scroll-cue.left {
+  left: 0;
+  background: linear-gradient(90deg, var(--bg-main) 0%, rgba(18, 18, 22, 0) 100%);
+}
+
+.category-scroll-cue.right {
+  right: 0;
+  background: linear-gradient(-90deg, var(--bg-main) 0%, rgba(18, 18, 22, 0) 100%);
 }
 
 .shop-filter-tools {

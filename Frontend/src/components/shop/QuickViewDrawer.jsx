@@ -49,9 +49,23 @@ export default function QuickViewDrawer({ product, isOpen, onClose }) {
   const originalPrice = product.originalPrice || (product.discountPrice && product.discountPrice < product.price ? product.price : null);
   const rating = product.rating || 4.8;
   const reviews = product.numReviews ?? product.reviews;
-  const specs = product.specs && product.specs.length > 0
-    ? product.specs
-    : [product.brand, product.category?.name, product.stock ? `${product.stock} in stock` : 'In Stock'].filter(Boolean);
+  let specs = product.specs && product.specs.length > 0 ? product.specs : null;
+  if (!specs && product.specifications) {
+    const s = product.specifications;
+    if (product.productType === 'laptop' || s.processor || s.gpuModel) {
+      specs = [
+        s.processor ? `CPU: ${s.processor}` : null,
+        s.gpu ? `GPU: ${s.gpu}` : (s.gpuModel ? `GPU: ${s.gpuModel} ${s.gpuVram ? s.gpuVram + 'GB' : ''}` : null),
+        s.ram ? `RAM: ${s.ram} (${s.ramUpgradeability || s.ramType || 'High-Speed'})` : null,
+        s.displaySize ? `Display: ${s.displaySize}" ${s.resolution || ''} (${s.refreshRate ? s.refreshRate + 'Hz' : ''} ${s.panelType || ''})` : null,
+        s.storage ? `Storage: ${s.storage}` : null,
+        s.battery ? `Battery: ${s.battery}` : null,
+      ].filter(Boolean);
+    }
+  }
+  if (!specs || specs.length === 0) {
+    specs = [product.brand, product.category?.name, product.stock ? `${product.stock} in stock` : 'In Stock'].filter(Boolean);
+  }
   const image = (product.images && product.images.length > 0 && product.images[0]?.url)
     ? product.images[0].url
     : (product.image || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80');

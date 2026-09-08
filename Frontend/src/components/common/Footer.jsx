@@ -74,6 +74,7 @@ export default function Footer() {
             <ul className="footer-links-list">
               <li><Link to="/shop?category=gpus">Graphics Cards</Link></li>
               <li><Link to="/shop?category=cpus">Processors</Link></li>
+              <li><Link to="/laptops">Laptops</Link></li>
               <li><Link to="/shop?category=prebuilt">Custom Gaming PCs</Link></li>
               <li><Link to="/shop?category=monitors">Gaming Monitors</Link></li>
               <li><Link to="/shop?category=peripherals">Keyboards & Mice</Link></li>

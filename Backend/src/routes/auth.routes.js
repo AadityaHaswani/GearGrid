@@ -11,6 +11,7 @@ import {
   verifyResetOtp,
   resetForgotPassword,
   changeCurrentPassword,
+  updateProfile,
 } from "../controllers/auth.controllers..js";
 import {
   userRegisterValidator,
@@ -21,9 +22,11 @@ import {
   userVerifyResetOtpValidator,
   userResetForgotPasswordValidator,
   userChangeCurrentPasswordValidator,
+  userUpdateProfileValidator,
 } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const authRouter = Router();
 
@@ -34,10 +37,18 @@ authRouter.post("/verify-otp", userVerifyEmailOtpValidator(), validate, verifyEm
 authRouter.post("/resend-email-verification", userResendOtpValidator(), validate, resendEmailVerification);
 authRouter.post("/resend-otp", userResendOtpValidator(), validate, resendEmailVerification);
 
-// Authentication
+// Authentication & Profile
 authRouter.post("/login", userLoginValidator(), validate, login);
 authRouter.post("/logout", verifyJWT, logoutUser);
-authRouter.post("/current-user", verifyJWT, getCurrentUser);
+authRouter.route("/current-user").get(verifyJWT, getCurrentUser).post(verifyJWT, getCurrentUser);
+authRouter.patch(
+  "/profile",
+  verifyJWT,
+  upload.single("avatar"),
+  userUpdateProfileValidator(),
+  validate,
+  updateProfile
+);
 authRouter.post("/refresh-token", refreshAccessToken);
 
 // Forgot Password & Reset (OTP)

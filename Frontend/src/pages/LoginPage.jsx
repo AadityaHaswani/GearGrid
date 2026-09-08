@@ -268,10 +268,19 @@ export default function LoginPage({ initialMode = 'login' }) {
       const backendUser = responseData?.user;
       const loggedUser = {
         id: backendUser?._id,
-        name: backendUser?.username || backendUser?.name || email.split('@')[0],
+        name: backendUser?.fullName || backendUser?.username || backendUser?.name || email.split('@')[0],
+        username: backendUser?.username || '',
+        fullName: backendUser?.fullName || '',
         email: backendUser?.email || email.trim(),
-        avatar: backendUser?.avatar?.url || null,
+        phone: backendUser?.phone || '',
+        address: backendUser?.address || '',
+        city: backendUser?.city || '',
+        state: backendUser?.state || '',
+        postalCode: backendUser?.postalCode || '',
+        country: backendUser?.country || 'India',
+        avatar: (typeof backendUser?.avatar === 'string' ? backendUser?.avatar : backendUser?.avatar?.url) || null,
         role: backendUser?.role || 'user',
+        createdAt: backendUser?.createdAt,
       };
 
       loginUser(loggedUser, loggedUser.role === 'admin' && returnPath === '/' ? '/admin' : returnPath);
