@@ -15,7 +15,7 @@ export default function IntroVideo({ onComplete }) {
 
     const playVideo = () => {
       if (video.paused) {
-        video.play().catch(() => {});
+        video.play().catch(() => { });
       }
     };
 
@@ -49,8 +49,8 @@ export default function IntroVideo({ onComplete }) {
         onEnded={onComplete}
       />
 
-      <button 
-        type="button" 
+      <button
+        type="button"
         className="intro-skip-btn"
         onClick={handleSkip}
         aria-label="Skip Intro"
