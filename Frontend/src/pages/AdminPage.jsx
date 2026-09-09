@@ -187,35 +187,51 @@ export default function AdminPage() {
 
   const fetchAdminOrders = useCallback(async () => {
     try {
-      const res = await orderAPI.getMyOrders();
+      const res = await orderAPI.getAllOrders();
       const raw = res.data?.data || [];
-      if (raw.length > 0) {
-        const mapped = raw.map(o => ({
-          id: `GG-${o._id.slice(-6).toUpperCase()}-EXP`,
+      const mapped = raw.map(o => {
+        const customerName = o.shippingAddress?.fullName || o.user?.fullName || o.user?.username || o.user?.name || 'Verified Builder';
+        const customerEmail = o.shippingAddress?.email || o.user?.email || 'customer@geargrid.io';
+        const customerPhone = o.shippingAddress?.phone || o.user?.phone || '+1 555 382 9102';
+
+        let formattedAddress = 'Certified Insured Dispatch Destination';
+        if (o.shippingAddress) {
+          if (typeof o.shippingAddress === 'string') {
+            formattedAddress = o.shippingAddress;
+          } else if (typeof o.shippingAddress === 'object') {
+            const { address, city, state, postalCode } = o.shippingAddress;
+            formattedAddress = [address, city, state, postalCode].filter(Boolean).join(', ') || formattedAddress;
+          }
+        } else if (o.user?.address) {
+          formattedAddress = [o.user.address, o.user.city, o.user.state, o.user.postalCode].filter(Boolean).join(', ');
+        }
+
+        return {
+          id: `GG-${(o._id || '').slice(-6).toUpperCase()}-EXP`,
           _id: o._id,
           customer: {
-            name: user?.name || 'Verified Builder',
-            email: user?.email || 'customer@geargrid.io',
-            phone: '+1 555 382 9102'
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone
           },
-          shippingAddress: 'Certified Insured Dispatch Destination',
-          paymentMethod: 'VERIFIED TRANSACTION',
-          date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          shippingAddress: formattedAddress,
+          paymentMethod: o.paymentMethod ? `${o.paymentMethod} TRANSACTION` : 'VERIFIED TRANSACTION',
+          date: o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent',
           items: o.items?.map(item => ({
-            id: item.product,
-            name: item.name,
+            id: item.product?._id || item.product,
+            name: item.name || item.product?.title || 'Hardware Component',
             price: item.price,
             quantity: item.quantity
           })) || [],
           total: o.totalAmount,
           status: o.orderStatus || 'Pending'
-        }));
-        setOrders(mapped);
-      }
-    } catch {
-      // Fallback
+        };
+      });
+      setOrders(mapped);
+    } catch (err) {
+      console.error('Failed to load orders from database:', err);
     }
-  }, [user]);
+  }, []);
 
   // Run data fetching ONCE when component mounts
   useEffect(() => {
@@ -515,14 +531,25 @@ export default function AdminPage() {
   // --------------------------------------------------------------------------
   // Order Status Handler
   // --------------------------------------------------------------------------
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    const targetOrder = orders.find(o => o.id === orderId || o._id === orderId);
+    const realId = targetOrder?._id || orderId;
+
+    // Optimistic update in UI
     setOrders(prev => prev.map(o => {
-      if (o.id === orderId) {
+      if (o.id === orderId || o._id === orderId) {
         return { ...o, status: newStatus };
       }
       return o;
     }));
-    showToast(`Order ${orderId} marked as ${newStatus}`, 'amber');
+
+    try {
+      await orderAPI.updateOrderStatus(realId, newStatus);
+      showToast(`Order ${orderId} marked as ${newStatus}`, 'amber');
+    } catch (err) {
+      showToast(extractErrorMessage(err, `Failed to update status for order ${orderId}`), 'red');
+      fetchAdminOrders();
+    }
   };
 
   return (

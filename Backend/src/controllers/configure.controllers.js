@@ -4,6 +4,17 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+/**
+ * Helper to get the canonical selling price of a product (discountPrice if valid, else price)
+ */
+function getSellingPrice(product) {
+  if (!product) return 0;
+  if (product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price) {
+    return product.discountPrice;
+  }
+  return product.price || 0;
+}
+
 // -------------------------------------------------------------
 // WEIGHTS & USE-CASE PROFILES
 // -------------------------------------------------------------
@@ -415,7 +426,7 @@ function findMeaningfulUpgrades(components, productsByCategory) {
     if (gpu.isIntegrated) {
       const discreteGpus = (productsByCategory.gpu || [])
         .filter((g) => !g.isIntegrated)
-        .sort((a, b) => a.price - b.price);
+        .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
       if (discreteGpus.length > 0) {
         const targetGpu = discreteGpus[0];
         upgrades.push({
@@ -423,7 +434,7 @@ function findMeaningfulUpgrades(components, productsByCategory) {
           categoryName: "Graphics Card",
           current: sanitizeProduct(gpu),
           upgrade: sanitizeProduct(targetGpu),
-          priceDifference: targetGpu.price,
+          priceDifference: getSellingPrice(targetGpu),
           benefit: `Add ${targetGpu.title.split("(")[0].trim()} (${targetGpu.specifications?.vram || 4}GB) for dedicated gaming framerates and 3D GPU acceleration.`,
         });
       }
@@ -431,7 +442,7 @@ function findMeaningfulUpgrades(components, productsByCategory) {
       const higherGpus = (productsByCategory.gpu || [])
         .filter((g) => {
           if (g._id.toString() === gpu._id.toString()) return false;
-          if (g.price <= gpu.price) return false;
+          if (getSellingPrice(g) <= getSellingPrice(gpu)) return false;
           // Check case clearance
           const len = g.specifications?.length || 280;
           const maxLen = pcCase?.specifications?.gpuMaxLength || 360;
@@ -442,11 +453,11 @@ function findMeaningfulUpgrades(components, productsByCategory) {
           if (psuWatt < reqPsu) return false;
           return true;
         })
-        .sort((a, b) => a.price - b.price);
+        .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
       if (higherGpus.length > 0) {
         const targetGpu = higherGpus[0];
-        const diff = targetGpu.price - gpu.price;
+        const diff = getSellingPrice(targetGpu) - getSellingPrice(gpu);
         upgrades.push({
           category: "gpu",
           categoryName: "Graphics Card",
@@ -465,15 +476,15 @@ function findMeaningfulUpgrades(components, productsByCategory) {
     const higherCpus = (productsByCategory.cpu || [])
       .filter((c) => {
         if (c._id.toString() === cpu._id.toString()) return false;
-        if (c.price <= cpu.price) return false;
+        if (getSellingPrice(c) <= getSellingPrice(cpu)) return false;
         if (c.specifications?.socket && cpuSocket && c.specifications.socket !== cpuSocket) return false;
         return true;
       })
-      .sort((a, b) => a.price - b.price);
+      .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
     if (higherCpus.length > 0) {
       const targetCpu = higherCpus[0];
-      const diff = targetCpu.price - cpu.price;
+      const diff = getSellingPrice(targetCpu) - getSellingPrice(cpu);
       upgrades.push({
         category: "cpu",
         categoryName: "Processor",
@@ -492,16 +503,16 @@ function findMeaningfulUpgrades(components, productsByCategory) {
     const higherRams = (productsByCategory.ram || [])
       .filter((r) => {
         if (r._id.toString() === ram._id.toString()) return false;
-        if (r.price <= ram.price) return false;
+        if (getSellingPrice(r) <= getSellingPrice(ram)) return false;
         if (r.specifications?.memoryType && ramType && r.specifications.memoryType !== ramType) return false;
         const cap = r.specifications?.capacity || 0;
         return cap >= currentCap;
       })
-      .sort((a, b) => a.price - b.price);
+      .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
     if (higherRams.length > 0) {
       const targetRam = higherRams[0];
-      const diff = targetRam.price - ram.price;
+      const diff = getSellingPrice(targetRam) - getSellingPrice(ram);
       upgrades.push({
         category: "ram",
         categoryName: "Memory (RAM)",
@@ -519,15 +530,15 @@ function findMeaningfulUpgrades(components, productsByCategory) {
     const higherStorages = (productsByCategory.storage || [])
       .filter((s) => {
         if (s._id.toString() === storage._id.toString()) return false;
-        if (s.price <= storage.price) return false;
+        if (getSellingPrice(s) <= getSellingPrice(storage)) return false;
         const cap = s.specifications?.capacity || 0;
         return cap > currentCap;
       })
-      .sort((a, b) => a.price - b.price);
+      .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
     if (higherStorages.length > 0) {
       const targetStorage = higherStorages[0];
-      const diff = targetStorage.price - storage.price;
+      const diff = getSellingPrice(targetStorage) - getSellingPrice(storage);
       upgrades.push({
         category: "storage",
         categoryName: "Solid State Storage",
@@ -962,7 +973,7 @@ function buildLaptopExplanation(
   priorities = []
 ) {
   const s = laptop.specifications || {};
-  const price = laptop.price;
+  const price = getSellingPrice(laptop);
   const withinBudget =
     price <= (tier === "PERFORMANCE_FLEX" ? budget + budgetFlex : budget);
   const budgetUsedPercent = Number(((price / budget) * 100).toFixed(1));
@@ -1172,7 +1183,7 @@ export const generateLaptopRecommendations = async (req, res, body) => {
 
   // Candidates within maxAllowedBudget
   const withinMaxBudget = scoredLaptops.filter(
-    ({ laptop }) => laptop.price <= maxAllowedBudget
+    ({ laptop }) => getSellingPrice(laptop) <= maxAllowedBudget
   );
 
   if (withinMaxBudget.length === 0) {
@@ -1186,7 +1197,7 @@ export const generateLaptopRecommendations = async (req, res, body) => {
 
   // Under-budget pool
   const underBudget = withinMaxBudget.filter(
-    ({ laptop }) => laptop.price <= budget
+    ({ laptop }) => getSellingPrice(laptop) <= budget
   );
 
   let valuePick = null;
@@ -1196,10 +1207,10 @@ export const generateLaptopRecommendations = async (req, res, body) => {
   if (underBudget.length > 0) {
     // VALUE: pick best value ratio (score / price) strictly <= budget
     const valueSorted = [...underBudget].sort(
-      (a, b) => b.score / b.laptop.price - a.score / a.laptop.price
+      (a, b) => b.score / getSellingPrice(b.laptop) - a.score / getSellingPrice(a.laptop)
     );
     valuePick =
-      valueSorted.find((item) => item.laptop.price <= budget * 0.94) ||
+      valueSorted.find((item) => getSellingPrice(item.laptop) <= budget * 0.94) ||
       valueSorted[0];
 
     // TARGET: pick highest score strictly <= budget distinct from valuePick
@@ -1214,7 +1225,7 @@ export const generateLaptopRecommendations = async (req, res, body) => {
   } else {
     // If none strictly under budget, pick lowest priced within max budget
     const priceSorted = [...withinMaxBudget].sort(
-      (a, b) => a.laptop.price - b.laptop.price
+      (a, b) => getSellingPrice(a.laptop) - getSellingPrice(b.laptop)
     );
     valuePick = priceSorted[0];
     targetPick =
@@ -1226,7 +1237,7 @@ export const generateLaptopRecommendations = async (req, res, body) => {
   // PERFORMANCE FLEX:
   const flexCandidates = withinMaxBudget
     .filter(
-      (item) => item.laptop.price > budget && item.laptop.price <= maxAllowedBudget
+      (item) => getSellingPrice(item.laptop) > budget && getSellingPrice(item.laptop) <= maxAllowedBudget
     )
     .sort((a, b) => b.score - a.score);
 
@@ -1281,7 +1292,7 @@ export const generateLaptopRecommendations = async (req, res, body) => {
   ) {
     distinctPicks.push(flexPick.laptop);
   } else {
-    const availableLaptops = [...allLaptops].sort((a, b) => a.price - b.price);
+    const availableLaptops = [...allLaptops].sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
     const alt = availableLaptops.find(
       (l) => !distinctPicks.some((p) => p._id.toString() === l._id.toString())
     );
@@ -1411,13 +1422,13 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
   const maxCpuBudget = budget <= 45000 ? 9500 : budget <= 65000 ? 16500 : budget <= 85000 ? 22000 : maxAllowedBudget * 0.45;
 
   // Filter GPU pool
-  const gpuPool = [...categories.gpus].filter(g => g.price <= maxAllowedBudget * 0.72);
+  const gpuPool = [...categories.gpus].filter(g => getSellingPrice(g) <= maxAllowedBudget * 0.72);
   const scoredGpus = gpuPool
     .map(g => ({ item: g, score: scoreComponent(g, "gpu", weights, priorities, budget) }))
     .sort((a, b) => b.score - a.score);
 
   // Filter CPU pool
-  const cpuPool = [...categories.cpus].filter(c => c.price <= maxCpuBudget);
+  const cpuPool = [...categories.cpus].filter(c => getSellingPrice(c) <= maxCpuBudget);
   const scoredCpus = cpuPool
     .map(c => ({ item: c, score: scoreComponent(c, "cpu", weights, priorities, budget) }))
     .sort((a, b) => b.score - a.score);
@@ -1427,22 +1438,22 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
   // Evaluate Discrete GPU builds
   for (const { item: gpu } of scoredGpus) {
     for (const { item: cpu } of scoredCpus) {
-      if (gpu.price + cpu.price > maxAllowedBudget * 0.82) continue;
+      if (getSellingPrice(gpu) + getSellingPrice(cpu) > maxAllowedBudget * 0.82) continue;
 
       // Platform balance: Don't pair flagship i9/i7 with budget H610 DDR4
-      const isHighEndCpu = (cpu.specifications?.tdp || 65) >= 125 || cpu.price >= 30000;
+      const isHighEndCpu = (cpu.specifications?.tdp || 65) >= 125 || getSellingPrice(cpu) >= 30000;
 
       // Filter compatible motherboards
       const compMobos = categories.motherboards
         .filter(m => {
           const sockMatch = m.specifications?.socket?.toLowerCase() === cpu.specifications?.socket?.toLowerCase();
-          const priceMatch = m.price <= maxMoboBudget;
-          if (isHighEndCpu && m.price < 10000) return false;
+          const priceMatch = getSellingPrice(m) <= maxMoboBudget;
+          if (isHighEndCpu && getSellingPrice(m) < 10000) return false;
           return sockMatch && priceMatch;
         })
         .map(m => ({ item: m, score: scoreComponent(m, "motherboard", weights, priorities, budget) }))
         .sort((a, b) => {
-          if (budget <= 75000) return a.item.price - b.item.price;
+          if (budget <= 75000) return getSellingPrice(a.item) - getSellingPrice(b.item);
           return b.score - a.score;
         });
 
@@ -1459,7 +1470,7 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
             if (budget <= 45000) {
               if (capA === 16 && capB !== 16) return -1;
               if (capB === 16 && capA !== 16) return 1;
-              return a.item.price - b.item.price;
+              return getSellingPrice(a.item) - getSellingPrice(b.item);
             }
             if (budget <= 80000) {
               if (isEditing || isDevOrProf) {
@@ -1481,12 +1492,12 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
 
         // Filter compatible Storages
         const compStorages = categories.storages
-          .filter(s => s.price <= maxStorageBudget)
+          .filter(s => getSellingPrice(s) <= maxStorageBudget)
           .map(s => ({ item: s, score: scoreComponent(s, "storage", weights, priorities, budget) }))
           .sort((a, b) => {
             const capA = a.item.specifications?.capacity || 1000;
             const capB = b.item.specifications?.capacity || 1000;
-            if (budget <= 50000) return a.item.price - b.item.price;
+            if (budget <= 50000) return getSellingPrice(a.item) - getSellingPrice(b.item);
             if (isEditing || is3DOrAI || budget >= 75000) {
               if (capA >= 1000 && capB < 1000) return -1;
               if (capB >= 1000 && capA < 1000) return 1;
@@ -1502,11 +1513,11 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
           .filter(cl => {
             const sockMatch = !cl.specifications?.supportedSockets || cl.specifications.supportedSockets.some(s => s.toLowerCase() === cpu.specifications?.socket?.toLowerCase());
             const tdpMatch = (cl.specifications?.maxTdp || 150) >= cpuTdp;
-            const priceMatch = cl.price <= maxCoolerBudget;
+            const priceMatch = getSellingPrice(cl) <= maxCoolerBudget;
             return sockMatch && tdpMatch && priceMatch;
           })
           .map(cl => ({ item: cl, score: scoreComponent(cl, "cooling", weights, priorities, budget) }))
-          .sort((a, b) => (budget <= 75000 ? a.item.price - b.item.price : b.score - a.score));
+          .sort((a, b) => (budget <= 75000 ? getSellingPrice(a.item) - getSellingPrice(b.item) : b.score - a.score));
 
         if (compCoolers.length === 0) continue;
 
@@ -1515,20 +1526,20 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
           .filter(cs => {
             const ffMatch = !cs.specifications?.formFactorSupport || cs.specifications.formFactorSupport.some(ff => ff.toLowerCase() === mobo.specifications?.formFactor?.toLowerCase());
             const lenMatch = !cs.specifications?.gpuMaxLength || (gpu.specifications?.length || 250) <= cs.specifications.gpuMaxLength;
-            const priceMatch = cs.price <= maxCaseBudget;
+            const priceMatch = getSellingPrice(cs) <= maxCaseBudget;
             return ffMatch && lenMatch && priceMatch;
           })
           .map(cs => ({ item: cs, score: scoreComponent(cs, "case", weights, priorities, budget) }))
-          .sort((a, b) => (budget <= 75000 ? a.item.price - b.item.price : b.score - a.score));
+          .sort((a, b) => (budget <= 75000 ? getSellingPrice(a.item) - getSellingPrice(b.item) : b.score - a.score));
 
         if (compCases.length === 0) continue;
 
         // Filter compatible PSUs
         const reqPsu = gpu.specifications?.recommendedPsu || 450;
         const compPsus = categories.psus
-          .filter(p => (p.specifications?.wattage || 500) >= reqPsu && p.price <= maxPsuBudget)
+          .filter(p => (p.specifications?.wattage || 500) >= reqPsu && getSellingPrice(p) <= maxPsuBudget)
           .map(p => ({ item: p, score: scoreComponent(p, "psu", weights, priorities, budget) }))
-          .sort((a, b) => (budget <= 75000 ? a.item.price - b.item.price : b.score - a.score));
+          .sort((a, b) => (budget <= 75000 ? getSellingPrice(a.item) - getSellingPrice(b.item) : b.score - a.score));
 
         if (compPsus.length === 0) continue;
 
@@ -1538,14 +1549,14 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
             for (const { item: cooler } of compCoolers.slice(0, 2)) {
               for (const { item: pcCase } of compCases.slice(0, 2)) {
                 for (const { item: psu } of compPsus.slice(0, 2)) {
-                  const totalPrice = cpu.price + gpu.price + mobo.price + ram.price + storage.price + cooler.price + psu.price + pcCase.price;
+                  const totalPrice = getSellingPrice(cpu) + getSellingPrice(gpu) + getSellingPrice(mobo) + getSellingPrice(ram) + getSellingPrice(storage) + getSellingPrice(cooler) + getSellingPrice(psu) + getSellingPrice(pcCase);
 
                   if (totalPrice <= maxAllowedBudget) {
                     const { isCompatible, checks } = checkCompatibility(cpu, gpu, mobo, ram, storage, cooler, psu, pcCase);
                     if (isCompatible) {
                       let balanceMultiplier = 1.0;
                       if (isGaming) {
-                        if (cpu.price > gpu.price * 1.5) balanceMultiplier *= 0.75;
+                        if (getSellingPrice(cpu) > getSellingPrice(gpu) * 1.5) balanceMultiplier *= 0.75;
                       }
 
                       const totalScore =
@@ -1592,9 +1603,9 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
       };
 
       const compMobos = categories.motherboards
-        .filter(m => m.specifications?.socket?.toLowerCase() === cpu.specifications?.socket?.toLowerCase() && m.price <= maxMoboBudget)
+        .filter(m => m.specifications?.socket?.toLowerCase() === cpu.specifications?.socket?.toLowerCase() && getSellingPrice(m) <= maxMoboBudget)
         .map(m => ({ item: m, score: scoreComponent(m, "motherboard", weights, priorities, budget) }))
-        .sort((a, b) => a.item.price - b.item.price);
+        .sort((a, b) => getSellingPrice(a.item) - getSellingPrice(b.item));
 
       for (const { item: mobo } of compMobos.slice(0, 2)) {
         const compRams = categories.rams
@@ -1603,16 +1614,16 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
           .sort((a, b) => b.score - a.score);
 
         const compStorages = categories.storages
-          .filter(s => s.price <= maxStorageBudget)
+          .filter(s => getSellingPrice(s) <= maxStorageBudget)
           .map(s => ({ item: s, score: scoreComponent(s, "storage", weights, priorities, budget) }))
           .sort((a, b) => b.score - a.score);
 
         const compCoolers = categories.coolers
           .filter(cl => !cl.specifications?.supportedSockets || cl.specifications.supportedSockets.some(s => s.toLowerCase() === cpu.specifications?.socket?.toLowerCase()))
-          .sort((a, b) => a.price - b.price);
+          .sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
-        const compCases = categories.cases.sort((a, b) => a.price - b.price);
-        const compPsus = categories.psus.sort((a, b) => a.price - b.price);
+        const compCases = categories.cases.sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
+        const compPsus = categories.psus.sort((a, b) => getSellingPrice(a) - getSellingPrice(b));
 
         if (compRams.length && compStorages.length && compCoolers.length && compCases.length && compPsus.length) {
           for (const ram of compRams.slice(0, 2).map(r => r.item)) {
@@ -1620,7 +1631,7 @@ function buildSystemCandidates(categories, budget, maxAllowedBudget, useCases = 
               const cooler = compCoolers[0];
               const pcCase = compCases[0];
               const psu = compPsus[0];
-              const totalPrice = cpu.price + mobo.price + ram.price + storage.price + cooler.price + psu.price + pcCase.price;
+              const totalPrice = getSellingPrice(cpu) + getSellingPrice(mobo) + getSellingPrice(ram) + getSellingPrice(storage) + getSellingPrice(cooler) + getSellingPrice(psu) + getSellingPrice(pcCase);
 
               if (totalPrice <= maxAllowedBudget) {
                 const { isCompatible, checks } = checkCompatibility(cpu, fakeGpu, mobo, ram, storage, cooler, psu, pcCase);

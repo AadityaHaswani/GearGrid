@@ -80,39 +80,69 @@ export default function LaptopsPage() {
   const activeCategory = searchParams.get('category') || 'all';
 
   const [products, setProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [currentPage, setCurrentPage] = useState(1);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  const fetchLaptopCatalog = useCallback(async () => {
+  // Debounce search query changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 whenever category, debounced search, or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, debouncedSearch, sortBy]);
+
+  const fetchLaptopCatalog = useCallback(async (page = currentPage) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getProducts({ limit: 100, productType: 'laptop' });
-      const rawList = res.data?.data?.products || res.data?.data || [];
-      const laptopList = rawList.filter(isLaptopProduct);
-      setProducts(laptopList);
+      const params = {
+        page,
+        limit: ITEMS_PER_PAGE,
+        productType: 'laptop',
+        sort: sortBy
+      };
+      if (activeCategory && activeCategory !== 'all') {
+        params.category = activeCategory;
+      }
+      if (debouncedSearch && debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+
+      const res = await getProducts(params);
+      const data = res.data?.data;
+      const rawList = data?.products || [];
+      const total = data?.totalProducts ?? rawList.length;
+      const pages = data?.totalPages ?? (Math.ceil(total / ITEMS_PER_PAGE) || 1);
+
+      setProducts(rawList);
+      setTotalProducts(total);
+      setTotalPages(Math.max(pages, 1));
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to connect to GearGrid product catalog.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeCategory, debouncedSearch, sortBy, currentPage]);
 
   useEffect(() => {
-    fetchLaptopCatalog();
-  }, [fetchLaptopCatalog]);
-
-  // Reset page whenever category, search, or sort changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeCategory, searchQuery, sortBy]);
+    fetchLaptopCatalog(currentPage);
+  }, [fetchLaptopCatalog, currentPage]);
 
   const handleCategorySelect = (categoryId) => {
+    setCurrentPage(1);
     if (categoryId === 'all') {
       searchParams.delete('category');
       setSearchParams(searchParams);
@@ -121,45 +151,16 @@ export default function LaptopsPage() {
     }
   };
 
-  // Filtered & sorted products based on search, category and sort option
-  const filteredAndSortedProducts = useMemo(() => {
-    return products.filter((item) => {
-      const matchesCat = matchesLaptopCategory(item, activeCategory);
-      const q = searchQuery.toLowerCase().trim();
-      const title = (item.title || item.name || '').toLowerCase();
-      const catLabel = (item.category?.name || item.categoryLabel || '').toLowerCase();
-      const brand = (item.brand || '').toLowerCase();
-      const desc = (item.description || '').toLowerCase();
-      const specs = item.specs || [];
-      const matchesSearch = q === '' || (
-        title.includes(q) ||
-        catLabel.includes(q) ||
-        brand.includes(q) ||
-        desc.includes(q) ||
-        specs.some(s => String(s).toLowerCase().includes(q))
-      );
-      return matchesCat && matchesSearch;
-    }).sort((a, b) => {
-      const priceA = (a.discountPrice && a.discountPrice < a.price ? a.discountPrice : a.price) || 0;
-      const priceB = (b.discountPrice && b.discountPrice < b.price ? b.discountPrice : b.price) || 0;
-      const ratingA = a.rating || 0;
-      const ratingB = b.rating || 0;
-      if (sortBy === 'price-low') return priceA - priceB;
-      if (sortBy === 'price-high') return priceB - priceA;
-      if (sortBy === 'rating') return ratingB - ratingA;
-      return 0;
-    });
-  }, [products, activeCategory, searchQuery, sortBy]);
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE) || 1;
-
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSortedProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredAndSortedProducts, currentPage]);
+  const handleSortChange = (e) => {
+    setSortBy(e.target.value);
+  };
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
       setCurrentPage(newPage);
       window.scrollTo({ top: 400, behavior: 'smooth' });
     }
@@ -277,7 +278,7 @@ export default function LaptopsPage() {
                 type="text"
                 placeholder="Search laptops by processor, GPU, memory, or brand..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="laptops-search-input"
                 aria-label="Search laptops"
               />
@@ -287,7 +288,7 @@ export default function LaptopsPage() {
               <ArrowUpDown size={14} className="sort-icon" />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={handleSortChange}
                 className="laptops-sort-select"
                 aria-label="Sort laptops"
               >
@@ -303,13 +304,13 @@ export default function LaptopsPage() {
           {/* Status Bar */}
           <div className="laptops-status-bar">
             <span className="status-results">
-              {filteredAndSortedProducts.length > 0 ? (
+              {totalProducts > 0 ? (
                 <>
-                  Showing <strong>{(currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> - <strong>{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedProducts.length)}</strong> of <strong>{filteredAndSortedProducts.length}</strong> laptops
+                  Showing <strong>{(currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> - <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalProducts)}</strong> of <strong>{totalProducts}</strong> laptops
                 </>
               ) : (
                 <>
-                  <strong>{products.length}</strong> laptops synchronized with backend
+                  <strong>{totalProducts}</strong> laptops matching criteria
                 </>
               )}
             </span>
@@ -338,12 +339,12 @@ export default function LaptopsPage() {
               <button
                 type="button"
                 className="btn-primary"
-                onClick={fetchLaptopCatalog}
+                onClick={() => fetchLaptopCatalog(currentPage)}
               >
                 Retry Server Connection
               </button>
             </div>
-          ) : filteredAndSortedProducts.length === 0 ? (
+          ) : products.length === 0 ? (
             /* Backend Ready / Zero Products Empty State */
             <div className="laptops-readiness-card">
               
@@ -360,11 +361,11 @@ export default function LaptopsPage() {
               </div>
 
               <h2 className="readiness-title">
-                {products.length === 0 ? 'Laptop Arsenal Inbound' : 'No Matching Laptops Found'}
+                {totalProducts === 0 && !searchQuery && activeCategory === 'all' ? 'Laptop Arsenal Inbound' : 'No Matching Laptops Found'}
               </h2>
 
               <p className="readiness-description">
-                {products.length === 0 ? (
+                {totalProducts === 0 && !searchQuery && activeCategory === 'all' ? (
                   <>
                     The GearGrid portable computing section is actively linked to our live MongoDB catalog. We are currently benchmarking and calibrating the upcoming lineup of premium professional, Mac, and gaming laptops. Once laptop records are added to MongoDB, they will stream directly into this interface.
                   </>
@@ -401,7 +402,7 @@ export default function LaptopsPage() {
 
               {/* Action Buttons */}
               <div className="readiness-actions">
-                {products.length > 0 && (
+                {(searchQuery || activeCategory !== 'all') && (
                   <button
                     type="button"
                     className="btn-outline"
@@ -427,7 +428,7 @@ export default function LaptopsPage() {
             /* Active Laptop Products Grid (Reusing ProductCard) */
             <>
               <div className="laptops-products-grid">
-                {paginatedProducts.map((laptop, index) => (
+                {products.map((laptop, index) => (
                   <ProductCard
                     key={laptop._id || laptop.id}
                     product={laptop}

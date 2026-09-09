@@ -64,6 +64,16 @@ const orderSchema = new Schema(
             ],
             default: "Pending",
         },
+
+        shippingAddress: {
+            type: Schema.Types.Mixed,
+            default: null,
+        },
+
+        paymentMethod: {
+            type: String,
+            default: "CARD",
+        },
     },
     {
         timestamps: true,

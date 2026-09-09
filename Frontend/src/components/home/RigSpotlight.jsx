@@ -4,8 +4,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Center, Float, ContactShadows, Clone } from '@react-three/drei';
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import * as THREE from 'three';
-import { useShop } from '../../context/ShopContext';
+import { useShop, normalizeProduct } from '../../context/ShopContext';
 import { PRODUCTS } from '../../data/hardwareData';
+import { getProducts } from '../../services/product.api';
 import { formatPrice } from '../../utils/formatCurrency';
 import './RigSpotlight.css';
 
@@ -86,8 +87,22 @@ export default function RigSpotlight() {
   const { addToCart } = useShop();
   const containerRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [rigProduct, setRigProduct] = useState(() => normalizeProduct(PRODUCTS.find(p => p.id === 'rig-monolith') || PRODUCTS[2]));
 
-  const rigProduct = PRODUCTS.find(p => p.id === 'rig-monolith') || PRODUCTS[2];
+  useEffect(() => {
+    let isMounted = true;
+    getProducts({ category: 'custom-systems-workstations', limit: 5 })
+      .then((res) => {
+        const list = res.data?.data?.products || [];
+        if (isMounted && list.length > 0) {
+          const match = list.find(p => (p.title || '').toLowerCase().includes('apex') || (p.title || '').toLowerCase().includes('gaming') || (p.title || '').toLowerCase().includes('pc')) || list[0];
+          setRigProduct(normalizeProduct(match));
+        }
+      })
+      .catch(() => {});
+
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;

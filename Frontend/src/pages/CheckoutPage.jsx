@@ -137,7 +137,11 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const orderRes = await orderAPI.placeOrder();
+      const orderPayload = {
+        shippingAddress: { ...shippingData },
+        paymentMethod: paymentMethod === 'netbanking' ? 'NET_BANKING' : paymentMethod.toUpperCase(),
+      };
+      const orderRes = await orderAPI.placeOrder(orderPayload);
       const realOrder = orderRes.data?.data;
       const orderId = realOrder?._id;
 
@@ -145,7 +149,7 @@ export default function CheckoutPage() {
         try {
           await paymentAPI.createPayment({
             orderId,
-            paymentMethod: paymentMethod.toUpperCase(),
+            paymentMethod: paymentMethod === 'netbanking' ? 'NET_BANKING' : paymentMethod.toUpperCase(),
           });
         } catch {
           // Payment creation logged

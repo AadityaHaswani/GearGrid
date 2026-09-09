@@ -189,16 +189,25 @@ const getAllProducts = asyncHandler(async (req, res) => {
         filter.productType = String(productType).trim().toLowerCase();
     }
 
-    if (search) {
-        filter.title = {
+    if (search && search.trim()) {
+        const searchRegex = {
             $regex: search.trim(),
             $options: "i",
         };
+        filter.$or = [
+            { title: searchRegex },
+            { brand: searchRegex },
+            { description: searchRegex }
+        ];
     }
 
-    if (category) {
+    if (category && category.trim().toLowerCase() !== "all") {
         const foundCategory = await resolveCategoryDoc(category, true);
-        filter.category = foundCategory ? foundCategory._id : null;
+        if (foundCategory) {
+            filter.category = foundCategory._id;
+        } else {
+            filter.category = null;
+        }
     }
 
     if (brand) {
@@ -206,7 +215,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     }
 
     if (featured !== undefined) {
-        filter.featured = featured === "true";
+        filter.featured = featured === "true" || featured === true;
     }
 
     if (minPrice || maxPrice) {
@@ -243,6 +252,10 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
             case "oldest":
                 sortOption = { createdAt: 1 };
+                break;
+
+            case "featured":
+                sortOption = { featured: -1, createdAt: -1 };
                 break;
 
             default:
