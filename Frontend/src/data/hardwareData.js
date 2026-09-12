@@ -186,6 +186,12 @@ export const BUILDER_SLOTS = [
     name: 'Power Supply (PSU)',
     category: 'Power Supplies',
     categorySlug: 'power-supplies'
+  },
+  {
+    slot: 'case',
+    name: 'Chassis / Case',
+    category: 'Cooling & Cases',
+    categorySlug: 'cooling-and-cases'
   }
 ];
 

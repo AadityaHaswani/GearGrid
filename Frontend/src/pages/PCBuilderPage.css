@@ -736,10 +736,25 @@
   }
 }
 
+@media (max-width: 860px) {
+  /* Completely remove/hide the entire BUILD CONSOLE // SYSTEM MANIFEST section on mobile */
+  .buildlab-console-column {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .buildlab-grid-layout {
+    gap: 0 !important;
+  }
+}
+
 @media (max-width: 768px) {
   .buildlab-page-root {
     overflow-x: hidden;
-    padding-bottom: 64px;
+    padding-bottom: 96px !important;
   }
 
   .buildlab-header-section {
@@ -760,7 +775,7 @@
   }
 
   .buildlab-grid-layout {
-    gap: 24px;
+    gap: 0 !important;
   }
 
   .buildlab-visualizer-column {
@@ -914,5 +929,610 @@
   .mobile-focus-status-badge {
     padding: 3px 7px;
     font-size: 0.58rem;
+  }
+}
+
+/* =======================================================
+   Expandable Specification & Description Styles
+   ======================================================= */
+.spec-text-simple {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+.spec-text-expandable-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
+}
+
+.spec-text-content {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  word-break: break-word;
+  transition: all var(--transition-fast);
+}
+
+.spec-text-content.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.spec-text-content.is-expanded {
+  display: block;
+  animation: fadeIn 0.18s ease-in-out;
+}
+
+.spec-read-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-top: 3px;
+  font-family: var(--font-heading);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-amber);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity var(--transition-fast), text-decoration var(--transition-fast);
+  text-transform: uppercase;
+}
+
+.spec-read-toggle-btn:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+.spec-read-toggle-btn:focus-visible {
+  outline: 1px solid var(--accent-amber);
+  outline-offset: 2px;
+}
+
+.equipped-card-description {
+  margin-top: 4px;
+}
+
+/* =======================================================
+   Desktop Final Config Button
+   ======================================================= */
+.buildlab-final-config-desktop-btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.06);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all var(--transition-fast);
+}
+
+.buildlab-final-config-desktop-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--accent-amber);
+  color: #FFFFFF;
+}
+
+/* =======================================================
+   Mobile Sticky Bottom Action Dock
+   ======================================================= */
+.buildlab-mobile-dock {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .buildlab-page-root {
+    padding-bottom: 110px !important;
+  }
+
+  .buildlab-mobile-dock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 95;
+    padding: 12px 18px;
+    background: rgba(15, 16, 20, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+  }
+
+  .mobile-dock-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .mobile-dock-label {
+    font-family: var(--font-heading);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .mobile-dock-price {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent-amber);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-dock-final-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+    cursor: pointer;
+  }
+}
+
+/* =======================================================
+   Final Configuration Modal / Drawer View
+   ======================================================= */
+.final-config-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.final-config-modal-box {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  background: #111216;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 32px rgba(245, 158, 11, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.final-config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(20, 22, 28, 0.8);
+}
+
+.final-config-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.final-config-micro-tag {
+  font-family: var(--font-heading);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+}
+
+.final-config-main-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.final-config-close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.final-config-close-btn:hover {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.final-config-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+}
+
+/* 1. Total Price Card */
+.final-config-total-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-sm);
+}
+
+.final-total-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.final-total-title {
+  font-family: var(--font-heading);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.final-total-sub {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: rgba(160, 160, 170, 0.6);
+}
+
+.final-total-amount {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-amber);
+  letter-spacing: -0.02em;
+}
+
+/* 2. Compatibility Card */
+.final-config-compat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.final-config-compat-card.is-mismatch {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.final-compat-icon {
+  color: #10B981;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.final-config-compat-card.is-mismatch .final-compat-icon {
+  color: #EF4444;
+}
+
+.final-compat-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.final-compat-label {
+  font-family: var(--font-heading);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.final-compat-value {
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #10B981;
+}
+
+.final-config-compat-card.is-mismatch .final-compat-value {
+  color: #EF4444;
+}
+
+/* 3. Power / PSU Card */
+.final-config-power-card {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(22, 23, 29, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+.final-power-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.final-power-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-heading);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.final-power-val {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.final-power-divider {
+  width: 1px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* 4. Selected Components Section */
+.final-config-components-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.final-components-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-heading);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.final-components-count {
+  font-size: 0.62rem;
+  color: var(--accent-amber);
+}
+
+.final-components-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.final-component-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(20, 22, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid rgba(245, 158, 11, 0.5);
+  border-radius: 4px;
+}
+
+.final-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.final-slot-tag {
+  font-family: var(--font-heading);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-amber);
+  width: 82px;
+  flex-shrink: 0;
+}
+
+.final-component-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.final-component-name {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.final-component-keyspec {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.final-card-right {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.final-component-price {
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* 5. Actions Block */
+.final-config-actions-block {
+  padding-top: 4px;
+}
+
+.final-config-add-build-btn {
+  width: 100%;
+  padding: 13px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* Mobile Bottom-Sheet Drawer Animation & Sizing */
+@media (max-width: 768px) {
+  .final-config-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .final-config-modal-box {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 88vh;
+    animation: slideUpMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .final-config-header {
+    padding: 14px 16px;
+  }
+
+  .final-config-body {
+    padding: 14px 16px 24px 16px;
+    gap: 12px;
+  }
+
+  .final-config-main-title {
+    font-size: 1.02rem;
+  }
+
+  .final-total-amount {
+    font-size: 1.45rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .final-slot-tag {
+    width: 68px;
+    font-size: 0.6rem;
+  }
+
+  .final-component-name {
+    font-size: 0.78rem;
+  }
+
+  .final-component-keyspec {
+    font-size: 0.68rem;
+  }
+
+  .final-component-price {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .final-config-power-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .final-power-divider {
+    display: none;
+  }
+
+  .final-total-amount {
+    font-size: 1.25rem;
+  }
+
+  .final-slot-tag {
+    width: 58px;
+    font-size: 0.56rem;
+  }
+
+  .mobile-dock-price {
+    font-size: 1.05rem;
+  }
+
+  .mobile-dock-final-btn {
+    padding: 8px 12px;
+    font-size: 0.74rem;
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }

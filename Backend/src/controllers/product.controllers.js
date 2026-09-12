@@ -267,7 +267,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     const [totalProducts, products] = await Promise.all([
         Product.countDocuments(filter),
         Product.find(filter)
-            .select("_id title price discountPrice brand stock rating numReviews images category featured specifications useCaseProfile productType createdAt")
+            .select("_id title description price discountPrice brand stock rating numReviews images category featured specifications useCaseProfile productType createdAt")
             .populate("category", "name slug")
             .sort(sortOption)
             .skip(skip)

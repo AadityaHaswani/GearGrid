@@ -3,6 +3,7 @@ import { BUILDER_SLOTS } from '../data/hardwareData';
 import { getProducts } from '../services/product.api';
 import { useShop } from '../context/ShopContext';
 import BuildLabScene from '../components/builder/BuildLabScene';
+import ExpandableSpecText from '../components/builder/ExpandableSpecText';
 import SEO from '../components/common/SEO';
 import { formatPrice } from '../utils/formatCurrency';
 import {
@@ -12,7 +13,9 @@ import {
   RotateCcw,
   Check,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  X,
+  Sliders
 } from 'lucide-react';
 import './PCBuilderPage.css';
 
@@ -23,7 +26,17 @@ const CATEGORY_SHORT_NAMES = {
   ram: 'RAM',
   storage: 'STORAGE',
   cooling: 'COOLING',
-  psu: 'PSU'
+  psu: 'PSU',
+  case: 'CASE'
+};
+
+// Helper to determine if a product belongs to the case/chassis subcategory
+const isCaseProduct = (p) => {
+  if (!p) return false;
+  const title = `${p.title || ''} ${p.name || ''}`.toLowerCase();
+  const isCooler = /\b(cooler|cooling|fan|heatsink|aio|radiator|liquid)\b/i.test(title);
+  if (isCooler) return false;
+  return /\b(case|cabinet|chassis|tower)\b/i.test(title);
 };
 
 // Safe helper to extract TDP/wattage from real product descriptions/titles
@@ -44,12 +57,95 @@ const extractPsuCapacity = (psuProduct) => {
   return match ? parseInt(match[1], 10) : 1000;
 };
 
+// Helper to extract crisp, single-line key technical specs without dumping long text
+const getKeySpec = (slotKey, product) => {
+  if (!product) return 'Not Configured';
+  const specs = product.specifications || {};
+  const text = `${product.title || ''} ${product.description || ''}`;
+
+  switch (slotKey) {
+    case 'cpu': {
+      const parts = [];
+      if (specs.cores) parts.push(`${specs.cores}C / ${specs.threads || specs.cores}T`);
+      if (specs.boostClock) parts.push(`Up to ${specs.boostClock} GHz`);
+      if (specs.socket) parts.push(specs.socket);
+      if (parts.length) return parts.join(' • ');
+      const matchCores = text.match(/(\d+\s*cores?(?:\s*\/\s*\d+\s*threads?)?)/i);
+      const matchGhz = text.match(/(\d+(?:\.\d+)?\s*GHz)/i);
+      const matchSock = text.match(/(AM5|AM4|LGA\s*1700|LGA\s*1851)/i);
+      const extracted = [matchCores?.[1], matchGhz?.[1], matchSock?.[1]].filter(Boolean);
+      return extracted.length ? extracted.join(' • ') : (product.brand || 'Processor');
+    }
+    case 'gpu': {
+      const parts = [];
+      if (specs.vram) parts.push(`${specs.vram}GB ${specs.vramType || 'GDDR'}`);
+      if (specs.powerDraw) parts.push(`${specs.powerDraw}W TGP`);
+      if (parts.length) return parts.join(' • ');
+      const matchVram = text.match(/(\d+GB(?:\s+GDDR\dX?)?)/i);
+      const matchTdp = text.match(/(\d{3}\s*W(?:att)?)/i);
+      const extracted = [matchVram?.[1], matchTdp ? `${matchTdp[1]} TGP` : null].filter(Boolean);
+      return extracted.length ? extracted.join(' • ') : (product.brand || 'Graphics Card');
+    }
+    case 'motherboard': {
+      const parts = [];
+      if (specs.formFactor) parts.push(specs.formFactor);
+      if (specs.socket) parts.push(specs.socket);
+      if (specs.memoryType) parts.push(specs.memoryType);
+      if (parts.length) return parts.join(' • ');
+      const matchFf = text.match(/(E-ATX|Micro-ATX|Mini-ITX|ATX)/i);
+      const matchSock = text.match(/(AM5|AM4|LGA1700|LGA1851|B650|X670|Z790|B760|Z890)/i);
+      const extracted = [matchFf?.[1], matchSock?.[1]].filter(Boolean);
+      return extracted.length ? extracted.join(' • ') : (product.brand || 'Motherboard');
+    }
+    case 'ram': {
+      const parts = [];
+      if (specs.capacity) parts.push(`${specs.capacity}GB`);
+      if (specs.speed) parts.push(`${specs.speed}MHz`);
+      if (specs.modules) parts.push(specs.modules);
+      if (parts.length) return parts.join(' • ');
+      const matchRam = text.match(/(\d+GB(?:\s*\(\d+x\d+GB\))?(?:\s*DDR[45])?(?:\s*\d{4}MHz)?)/i);
+      return matchRam?.[1] || (product.brand ? `${product.brand} RAM` : 'System Memory');
+    }
+    case 'storage': {
+      const parts = [];
+      if (specs.type) parts.push(specs.type);
+      if (specs.interface) parts.push(specs.interface);
+      if (parts.length) return parts.join(' • ');
+      const matchCap = text.match(/(\d+\s*(?:TB|GB)\s*(?:PCIe\s*[\d.]*)?\s*(?:NVMe|SSD)?)/i);
+      return matchCap?.[1] || 'NVMe M.2 SSD';
+    }
+    case 'cooling': {
+      const parts = [];
+      if (specs.coolerType) parts.push(specs.coolerType);
+      if (specs.radiatorSize) parts.push(`${specs.radiatorSize}mm`);
+      if (parts.length) return parts.join(' • ');
+      const matchCool = text.match(/(360mm|240mm|280mm|120mm|Dual-Tower|AIO|Air Cooler|Liquid Cooler)/i);
+      return matchCool?.[1] || 'CPU Cooler';
+    }
+    case 'psu': {
+      const parts = [];
+      if (specs.wattage) parts.push(`${specs.wattage}W`);
+      if (specs.efficiency) parts.push(specs.efficiency);
+      if (parts.length) return parts.join(' • ');
+      const matchPsu = text.match(/(\d{3,4}W(?:\s*80\s*PLUS\s*\w+)?)/i);
+      return matchPsu?.[1] || 'ATX Power Supply';
+    }
+    case 'case': {
+      const matchFf = text.match(/(Mid-Tower|Micro-ATX|Mini-ITX|Full-Tower)/i);
+      return matchFf?.[1] ? `${matchFf[1]} Chassis` : 'Gaming Chassis';
+    }
+    default:
+      return product.brand || 'Verified Component';
+  }
+};
+
 export default function PCBuilderPage() {
   const { addBuildToCart, showToast } = useShop();
 
   const [activeCategory, setActiveCategory] = useState('cpu');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFinalConfigOpen, setIsFinalConfigOpen] = useState(false);
 
   const [slotProducts, setSlotProducts] = useState({
     cpu: [],
@@ -58,7 +154,8 @@ export default function PCBuilderPage() {
     ram: [],
     storage: [],
     cooling: [],
-    psu: []
+    psu: [],
+    case: []
   });
 
   const [selectedBuild, setSelectedBuild] = useState({
@@ -68,23 +165,50 @@ export default function PCBuilderPage() {
     ram: null,
     storage: null,
     cooling: null,
-    psu: null
+    psu: null,
+    case: null
   });
+
+  // Body scroll lock when Final Config Modal is open
+  useEffect(() => {
+    if (isFinalConfigOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFinalConfigOpen]);
+
+  // Keyboard shortcut Esc to close Final Config Modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFinalConfigOpen) {
+        setIsFinalConfigOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFinalConfigOpen]);
 
   // Fetch authentic products from MongoDB via existing Product API
   const fetchBuilderHardware = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const slotResults = await Promise.all(
-        BUILDER_SLOTS.map(async (slotDef) => {
+      // Group unique categories to query
+      const uniqueCats = Array.from(new Set(BUILDER_SLOTS.map(s => s.category)));
+      const catResults = {};
+      
+      await Promise.all(
+        uniqueCats.map(async (cat) => {
           try {
-            const res = await getProducts({ category: slotDef.category, limit: 50 });
-            const list = res.data?.data?.products || res.data?.data || [];
-            return { slot: slotDef.slot, products: list };
+            const res = await getProducts({ category: cat, limit: 50 });
+            catResults[cat] = res.data?.data?.products || res.data?.data || [];
           } catch (e) {
-            console.warn(`Failed to load ${slotDef.name}:`, e);
-            return { slot: slotDef.slot, products: [] };
+            console.warn(`Failed to load ${cat}:`, e);
+            catResults[cat] = [];
           }
         })
       );
@@ -92,13 +216,19 @@ export default function PCBuilderPage() {
       const productsMap = {};
       const baselineBuild = {};
 
-      slotResults.forEach(({ slot, products }) => {
-        productsMap[slot] = products;
-        if (products.length > 0) {
-          baselineBuild[slot] = products[0];
-        } else {
-          baselineBuild[slot] = null;
+      BUILDER_SLOTS.forEach((slotDef) => {
+        const rawList = catResults[slotDef.category] || [];
+        let filtered = rawList;
+
+        // Partition Cooling & Cases into dedicated coolers and chassis
+        if (slotDef.slot === 'cooling') {
+          filtered = rawList.filter((p) => !isCaseProduct(p));
+        } else if (slotDef.slot === 'case') {
+          filtered = rawList.filter((p) => isCaseProduct(p));
         }
+
+        productsMap[slotDef.slot] = filtered;
+        baselineBuild[slotDef.slot] = filtered[0] || null;
       });
 
       setSlotProducts(productsMap);
@@ -298,6 +428,14 @@ export default function PCBuilderPage() {
                 <div className="equipped-card-name">
                   {currentEquipped?.title || currentEquipped?.name || 'Not Configured'}
                 </div>
+                {currentEquipped?.description && (
+                  <ExpandableSpecText
+                    text={currentEquipped.description}
+                    maxChars={80}
+                    clampLines={2}
+                    className="equipped-card-description"
+                  />
+                )}
                 <div className="equipped-card-specs">
                   {extractWattage(currentEquipped) > 0 && (
                     <span className="equipped-spec-item">
@@ -338,12 +476,21 @@ export default function PCBuilderPage() {
                       const isSelected = (currentEquipped?._id || currentEquipped?.id) === (opt._id || opt.id);
                       const optWattage = extractWattage(opt);
                       const displayName = opt.title || opt.name;
+                      const descriptionText = opt.description || (Array.isArray(opt.specs) && opt.specs.length > 0 ? opt.specs.join(' • ') : null);
+
                       return (
-                        <button
+                        <div
                           key={opt._id || opt.id}
-                          type="button"
+                          role="button"
+                          tabIndex={0}
                           className={`buildlab-option-row ${isSelected ? 'selected' : ''}`}
                           onClick={() => handleSelectOption(activeCategory, opt)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleSelectOption(activeCategory, opt);
+                            }
+                          }}
                         >
                           <div className="option-select-marker">
                             {isSelected ? <Check size={14} /> : <div className="marker-radio-dot" />}
@@ -351,6 +498,14 @@ export default function PCBuilderPage() {
 
                           <div className="option-details">
                             <span className="option-name-text">{displayName}</span>
+                            {descriptionText && (
+                              <ExpandableSpecText
+                                text={descriptionText}
+                                maxChars={80}
+                                clampLines={2}
+                                className="option-spec-description"
+                              />
+                            )}
                             {optWattage > 0 && (
                               <span className="option-spec-badge">
                                 <Zap size={11} /> {optWattage}W TDP
@@ -364,7 +519,7 @@ export default function PCBuilderPage() {
                               {isSelected ? 'EQUIPPED' : 'SELECT'}
                             </span>
                           </div>
-                        </button>
+                        </div>
                       );
                     })
                   )}
@@ -467,9 +622,20 @@ export default function PCBuilderPage() {
                     className="btn-primary buildlab-order-btn"
                     onClick={handleDeployCustomRig}
                     disabled={loading}
+                    id="desktop-add-cart-btn"
                   >
                     <ShoppingCart size={17} />
                     <span>ADD BUILD TO CART</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-outline buildlab-final-config-desktop-btn"
+                    onClick={() => setIsFinalConfigOpen(true)}
+                    id="desktop-final-config-btn"
+                  >
+                    <Sliders size={14} />
+                    <span>FINAL CONFIG</span>
                   </button>
 
                   <button
@@ -489,6 +655,154 @@ export default function PCBuilderPage() {
 
         </div>
       </section>
+
+      {/* Mobile-Dedicated Sticky Bottom Action Dock */}
+      <div className="buildlab-mobile-dock" aria-label="Build summary dock">
+        <div className="mobile-dock-info">
+          <span className="mobile-dock-label">TOTAL INVESTMENT</span>
+          <span className="mobile-dock-price">{formatPrice(totalPrice)}</span>
+        </div>
+        <button
+          type="button"
+          className="btn-primary mobile-dock-final-btn"
+          onClick={() => setIsFinalConfigOpen(true)}
+          id="mobile-final-config-btn"
+          aria-label="Open Final Configuration Summary"
+        >
+          <span>FINAL CONFIG</span>
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      {/* Final Configuration Modal / Bottom Drawer */}
+      {isFinalConfigOpen && (
+        <div
+          className="final-config-overlay"
+          onClick={() => setIsFinalConfigOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="final-config-heading"
+        >
+          <div className="final-config-modal-box" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="final-config-header">
+              <div className="final-config-title-group">
+                <span className="final-config-micro-tag">GEARGRID RIG LAB // SUMMARY</span>
+                <h2 id="final-config-heading" className="final-config-main-title">
+                  GEARGRID FINAL CONFIGURATION
+                </h2>
+              </div>
+              <button
+                type="button"
+                className="final-config-close-btn"
+                onClick={() => setIsFinalConfigOpen(false)}
+                aria-label="Close summary modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Scrollable Content Body */}
+            <div className="final-config-body">
+
+              {/* 1. Total Build Price */}
+              <div className="final-config-total-card">
+                <div className="final-total-info">
+                  <span className="final-total-title">Total Build Price</span>
+                  <span className="final-total-sub">Includes taxes & bench validation</span>
+                </div>
+                <div className="final-total-amount">{formatPrice(totalPrice)}</div>
+              </div>
+
+              {/* 2. Compatibility Status */}
+              <div
+                className={`final-config-compat-card ${compatibility.isMismatch ? 'is-mismatch' : 'is-verified'}`}
+              >
+                <div className="final-compat-icon">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className="final-compat-details">
+                  <span className="final-compat-label">Compatibility Status</span>
+                  <span className="final-compat-value">{compatibility.label}</span>
+                </div>
+              </div>
+
+              {/* 3. Power / PSU */}
+              <div className="final-config-power-card">
+                <div className="final-power-item">
+                  <div className="final-power-title">
+                    <Zap size={13} />
+                    <span>Estimated System Draw</span>
+                  </div>
+                  <span className="final-power-val">
+                    {totalWattage > 0 ? `${totalWattage} W` : '~450 W (Est.)'}
+                  </span>
+                </div>
+                <div className="final-power-divider" />
+                <div className="final-power-item">
+                  <div className="final-power-title">
+                    <ShieldCheck size={13} />
+                    <span>Recommended PSU</span>
+                  </div>
+                  <span className="final-power-val">{recommendedPsu}W+ ATX 3.0</span>
+                </div>
+              </div>
+
+              {/* 4. Selected Components List (All 8 slots) */}
+              <div className="final-config-components-section">
+                <div className="final-components-heading">
+                  <span>SELECTED COMPONENTS</span>
+                  <span className="final-components-count">{BUILDER_SLOTS.length} SLOTS</span>
+                </div>
+
+                <div className="final-components-list">
+                  {BUILDER_SLOTS.map((slotGroup) => {
+                    const part = selectedBuild[slotGroup.slot];
+                    const displayName = part?.title || part?.name || 'Not Configured';
+                    const keySpec = getKeySpec(slotGroup.slot, part);
+                    const slotShort = CATEGORY_SHORT_NAMES[slotGroup.slot] || slotGroup.slot.toUpperCase();
+
+                    return (
+                      <div key={slotGroup.slot} className="final-component-card">
+                        <div className="final-card-left">
+                          <span className="final-slot-tag">{slotShort}</span>
+                          <div className="final-component-text-wrap">
+                            <span className="final-component-name">{displayName}</span>
+                            <span className="final-component-keyspec">{keySpec}</span>
+                          </div>
+                        </div>
+                        <div className="final-card-right">
+                          <span className="final-component-price">
+                            {part?.price ? formatPrice(part.price) : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 5. ADD ENTIRE BUILD TO CART Button */}
+              <div className="final-config-actions-block">
+                <button
+                  type="button"
+                  className="btn-primary final-config-add-build-btn"
+                  onClick={() => {
+                    handleDeployCustomRig();
+                    setIsFinalConfigOpen(false);
+                  }}
+                  disabled={loading}
+                  id="final-config-cart-submit"
+                >
+                  <ShoppingCart size={18} />
+                  <span>ADD ENTIRE BUILD TO CART</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

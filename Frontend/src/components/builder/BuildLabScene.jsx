@@ -13,7 +13,8 @@ const ANCHORS = {
   ram:         [0.36,  0.44,  0.28],
   storage:     [0.12,  0.14,  0.32],
   cooling:     [-0.02, 0.88,  0.12],
-  psu:         [-0.18, -0.74, 0.22]
+  psu:         [-0.18, -0.74, 0.22],
+  case:        [0.0,   0.0,   0.45]
 };
 
 // Fixed viewport edge positions for external callout tags
@@ -34,7 +35,8 @@ const LABEL_NAMES = {
   motherboard: 'MOTHERBOARD',
   storage: 'STORAGE',
   cooling: 'COOLING',
-  psu: 'PSU'
+  psu: 'PSU',
+  case: 'CASE'
 };
 
 const SLOT_IDS = ['cooling', 'motherboard', 'psu', 'ram', 'cpu', 'storage', 'gpu'];
