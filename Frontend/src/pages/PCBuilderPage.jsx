@@ -39,19 +39,85 @@ const isCaseProduct = (p) => {
   return /\b(case|cabinet|chassis|tower)\b/i.test(title);
 };
 
-// Safe helper to extract TDP/wattage from real product descriptions/titles
-const extractWattage = (product) => {
+// Safe helper to extract TDP/power draw from product specifications, wattage, or text
+const extractWattage = (product, slotKey) => {
   if (!product) return 0;
-  if (typeof product.wattage === 'number' && product.wattage > 0) return product.wattage;
+  const specs = product.specifications || {};
+
+  // 1. Direct specification fields based on hardware category
+  if (slotKey === 'cpu' || (!slotKey && typeof specs.tdp === 'number')) {
+    if (typeof specs.tdp === 'number' && specs.tdp > 0) return specs.tdp;
+  }
+  if (slotKey === 'gpu' || (!slotKey && (typeof specs.powerDraw === 'number' || typeof specs.tgp === 'number'))) {
+    if (typeof specs.powerDraw === 'number' && specs.powerDraw > 0) return specs.powerDraw;
+    if (typeof specs.tgp === 'number' && specs.tgp > 0) return specs.tgp;
+  }
+  if (typeof specs.wattage === 'number' && specs.wattage > 0 && slotKey !== 'psu') {
+    return specs.wattage;
+  }
+
+  // 2. Legacy / Mock top-level wattage property (e.g. from hardwareData.js)
+  if (typeof product.wattage === 'number' && product.wattage > 0 && slotKey !== 'psu') {
+    return product.wattage;
+  }
+
+  // 3. Text fallback from title / description
   const text = `${product.title || ''} ${product.description || ''}`;
-  const tdpMatch = text.match(/(\d{2,4})\s*W\s*TDP/i) || text.match(/TDP[:\s]+(\d{2,4})\s*W/i);
+  const tdpMatch = text.match(/(\d{2,4})\s*W\s*(?:TDP|TGP)/i) 
+    || text.match(/(?:TDP|TGP)[:\s]+(\d{2,4})\s*W/i)
+    || text.match(/(\d{2,4})\s*W\s*power\s*draw/i);
   if (tdpMatch) return parseInt(tdpMatch[1], 10);
+
+  // If slot is CPU or GPU, also check general wattage pattern in text
+  if (slotKey === 'cpu' || slotKey === 'gpu') {
+    const wattMatch = text.match(/(\d{2,4})\s*W\b/i);
+    if (wattMatch) {
+      const val = parseInt(wattMatch[1], 10);
+      if (val >= 25 && val <= 700) return val;
+    }
+  }
+
   return 0;
+};
+
+// Calibrated component power draw calculation for PC Builder system estimate
+const getComponentDraw = (product, slotKey) => {
+  if (!product || slotKey === 'psu') return 0;
+
+  // First attempt to extract authentic specification / rated power
+  const extracted = extractWattage(product, slotKey);
+  if (extracted > 0) return extracted;
+
+  // Calibrated baseline system overhead when explicit spec is unavailable
+  switch (slotKey) {
+    case 'cpu':
+      return 65; // Standard desktop processor base TDP envelope
+    case 'gpu':
+      return 100; // Standard discrete GPU base power draw
+    case 'motherboard':
+      return 50; // Chipset, VRMs, PCIe bus, and I/O overhead
+    case 'ram':
+      return 15; // Dual-channel DDR4/DDR5 system memory kit
+    case 'storage':
+      return 10; // High-speed PCIe NVMe M.2 SSD
+    case 'cooling':
+      return 25; // AIO pump and radiator cooling fan assembly
+    case 'case':
+      return 10; // Chassis fans and ARGB lighting distribution
+    default:
+      return 0;
+  }
 };
 
 // Safe helper to extract PSU rated output capacity
 const extractPsuCapacity = (psuProduct) => {
   if (!psuProduct) return 1000;
+  if (typeof psuProduct.specifications?.wattage === 'number' && psuProduct.specifications.wattage > 0) {
+    return psuProduct.specifications.wattage;
+  }
+  if (typeof psuProduct.wattage === 'number' && psuProduct.wattage > 0) {
+    return psuProduct.wattage;
+  }
   const text = `${psuProduct.title || ''} ${psuProduct.description || ''}`;
   const match = text.match(/(\d{3,4})\s*W\b/i);
   return match ? parseInt(match[1], 10) : 1000;
@@ -282,24 +348,30 @@ export default function PCBuilderPage() {
     }, 0);
   }, [selectedBuild]);
 
-  // Wattage calculated from real component specs where available
+  // Dynamic system power draw derived from currently selected hardware components
   const totalWattage = useMemo(() => {
     return Object.entries(selectedBuild).reduce((acc, [slotKey, curr]) => {
       if (!curr || slotKey === 'psu') return acc;
-      return acc + extractWattage(curr);
+      return acc + getComponentDraw(curr, slotKey);
     }, 0);
   }, [selectedBuild]);
 
   const recommendedPsu = useMemo(() => {
+    const gpuRec = selectedBuild.gpu?.specifications?.recommendedPsu || 0;
     if (totalWattage > 0) {
-      return Math.round((totalWattage * 1.35) / 50) * 50;
+      const calculated = Math.round((totalWattage * 1.35) / 50) * 50;
+      return Math.max(calculated, gpuRec);
     }
-    return 750;
-  }, [totalWattage]);
+    return gpuRec || 750;
+  }, [totalWattage, selectedBuild.gpu]);
 
   const psuCapacity = useMemo(() => {
     return extractPsuCapacity(selectedBuild.psu) || 1000;
   }, [selectedBuild.psu]);
+
+  const headroom = useMemo(() => {
+    return Math.max(0, recommendedPsu - totalWattage);
+  }, [recommendedPsu, totalWattage]);
 
   // Verified socket compatibility check based on real CPU and Motherboard models
   const compatibility = useMemo(() => {
@@ -437,9 +509,9 @@ export default function PCBuilderPage() {
                   />
                 )}
                 <div className="equipped-card-specs">
-                  {extractWattage(currentEquipped) > 0 && (
+                  {extractWattage(currentEquipped, activeCategory) > 0 && (
                     <span className="equipped-spec-item">
-                      <Zap size={12} /> {extractWattage(currentEquipped)}W TDP
+                      <Zap size={12} /> {extractWattage(currentEquipped, activeCategory)}W {activeCategory === 'gpu' ? 'TGP' : 'TDP'}
                     </span>
                   )}
                   <span className={`equipped-spec-item ${compatibility.verified ? 'verified' : 'warning'}`}>
@@ -474,7 +546,7 @@ export default function PCBuilderPage() {
                   ) : (
                     currentSlotOptions.map((opt) => {
                       const isSelected = (currentEquipped?._id || currentEquipped?.id) === (opt._id || opt.id);
-                      const optWattage = extractWattage(opt);
+                      const optWattage = extractWattage(opt, activeCategory);
                       const displayName = opt.title || opt.name;
                       const descriptionText = opt.description || (Array.isArray(opt.specs) && opt.specs.length > 0 ? opt.specs.join(' • ') : null);
 
@@ -508,7 +580,7 @@ export default function PCBuilderPage() {
                             )}
                             {optWattage > 0 && (
                               <span className="option-spec-badge">
-                                <Zap size={11} /> {optWattage}W TDP
+                                <Zap size={11} /> {optWattage}W {activeCategory === 'gpu' ? 'TGP' : 'TDP'}
                               </span>
                             )}
                           </div>
@@ -555,13 +627,13 @@ export default function PCBuilderPage() {
                     <Zap size={14} />
                     <span className="power-label-title">ESTIMATED SYSTEM DRAW</span>
                   </div>
-                  <span className="power-total-val">{totalWattage > 0 ? `${totalWattage} W` : '~450 W (Est.)'}</span>
+                  <span className="power-total-val">{totalWattage > 0 ? `${totalWattage} W` : 'Calculating...'}</span>
                 </div>
 
                 <div className="power-track-bar">
                   <div
                     className="power-fill-bar"
-                    style={{ width: `${Math.min(((totalWattage || 450) / psuCapacity) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totalWattage / (recommendedPsu || 750)) * 100, 100)}%` }}
                   />
                 </div>
 
@@ -570,7 +642,7 @@ export default function PCBuilderPage() {
                     Recommended PSU: <strong>{recommendedPsu}W+ ATX 3.0</strong>
                   </span>
                   <span className="power-headroom-text">
-                    {Math.max(0, psuCapacity - (totalWattage || 450))}W Headroom
+                    {headroom}W Headroom
                   </span>
                 </div>
               </div>
@@ -735,7 +807,7 @@ export default function PCBuilderPage() {
                     <span>Estimated System Draw</span>
                   </div>
                   <span className="final-power-val">
-                    {totalWattage > 0 ? `${totalWattage} W` : '~450 W (Est.)'}
+                    {totalWattage > 0 ? `${totalWattage} W` : 'Calculating...'}
                   </span>
                 </div>
                 <div className="final-power-divider" />
